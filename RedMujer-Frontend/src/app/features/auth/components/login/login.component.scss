@@ -46,3 +46,43 @@
         align-items: center;
     }
 }
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 2rem;
+
+    h2 {
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    mat-form-field {
+        width: 100%;
+    }
+
+    a {
+        font-size: 0.9rem;
+        color: #1976d2;
+        text-decoration: none;
+        text-align: right;
+
+        &:hover {
+        text-decoration: underline;
+        }
+    }
+
+    button {
+        margin-top: 0.5rem;
+        padding: 0.75rem;
+        width: 100%;
+        font-weight: 500;
+        font-size: 1rem;
+        border: 2px solid;
+    }
+}
