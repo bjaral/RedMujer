@@ -2,12 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-registro',
+  selector: 'app-home',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './registro.component.html',
-  styleUrl: './registro.component.scss',
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.scss'
 })
-export default class RegistroComponent {
-  
+export default class HomeComponent {
+
 }
