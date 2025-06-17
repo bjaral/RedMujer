@@ -8,7 +8,7 @@ import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule, HeaderComponent, RouterModule],
+  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
