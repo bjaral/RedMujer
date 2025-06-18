@@ -74,3 +74,41 @@ C:\Users\gudma\RedMujer\RedMujer_Backend\obj\Debug\net8.0\refint\RedMujer.Backen
 C:\Users\gudma\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.pdb
 C:\Users\gudma\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.genruntimeconfig.cache
 C:\Users\gudma\RedMujer\RedMujer_Backend\obj\Debug\net8.0\ref\RedMujer.Backend.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\appsettings.json
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\RedMujer.Backend.exe
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\RedMujer.Backend.deps.json
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\RedMujer.Backend.runtimeconfig.json
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\RedMujer.Backend.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\RedMujer.Backend.pdb
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\Dapper.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\Npgsql.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.csproj.AssemblyReference.cache
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.AssemblyInfoInputs.cache
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.AssemblyInfo.cs
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.csproj.CoreCompileInputs.cache
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.sourcelink.json
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\staticwebassets\msbuild.RedMujer.Backend.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\staticwebassets\msbuild.build.RedMujer.Backend.props
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.RedMujer.Backend.props
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.RedMujer.Backend.props
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\staticwebassets.pack.json
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\scopedcss\bundle\RedMujer.Backend.styles.css
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.3454C989.Up2Date
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\refint\RedMujer.Backend.dll
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.pdb
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\RedMujer.Backend.genruntimeconfig.cache
+C:\Users\Paula\Desktop\Universidad\Aplicaciones y tecnologías de la web\Proyecto Red Mujer\RedMujer\RedMujer_Backend\obj\Debug\net8.0\ref\RedMujer.Backend.dll
