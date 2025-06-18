@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RedMujer.Backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d9005bcf1659f217d26235d6608c60b385e8a64f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f07392bd557809a852ab60f08c3bf91f6eb9fce5")]
 [assembly: System.Reflection.AssemblyProductAttribute("RedMujer.Backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RedMujer.Backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
