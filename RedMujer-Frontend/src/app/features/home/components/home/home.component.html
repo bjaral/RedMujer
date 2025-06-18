@@ -1,1 +1,9 @@
-<p>home works!</p>
+<h1>Prueba</h1>
+
+<div *ngIf="random; else cargando">
+  <h2>Datos recibidos:</h2>
+  <pre>{{ random | json }}</pre>
+</div>
+<ng-template #cargando>
+  <p>Cargando datos...</p>
+</ng-template>

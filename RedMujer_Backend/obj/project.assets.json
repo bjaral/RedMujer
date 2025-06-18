@@ -689,19 +689,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\gudma\\.nuget\\packages\\": {}
+    "C:\\Users\\Paula\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\gudma\\RedMujer\\RedMujer_Backend\\RedMujer.Backend.csproj",
+      "projectUniqueName": "C:\\Users\\Paula\\Desktop\\Universidad\\Aplicaciones y tecnologías de la web\\Proyecto Red Mujer\\RedMujer\\RedMujer_Backend\\RedMujer.Backend.csproj",
       "projectName": "RedMujer.Backend",
-      "projectPath": "C:\\Users\\gudma\\RedMujer\\RedMujer_Backend\\RedMujer.Backend.csproj",
-      "packagesPath": "C:\\Users\\gudma\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\gudma\\RedMujer\\RedMujer_Backend\\obj\\",
+      "projectPath": "C:\\Users\\Paula\\Desktop\\Universidad\\Aplicaciones y tecnologías de la web\\Proyecto Red Mujer\\RedMujer\\RedMujer_Backend\\RedMujer.Backend.csproj",
+      "packagesPath": "C:\\Users\\Paula\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Paula\\Desktop\\Universidad\\Aplicaciones y tecnologías de la web\\Proyecto Red Mujer\\RedMujer\\RedMujer_Backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\gudma\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Paula\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
