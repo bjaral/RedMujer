@@ -1,0 +1,5 @@
+#vscode
+*.vscode
+
+# direcorio personal para scripts locales 
+*local-scripts/
