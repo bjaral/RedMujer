@@ -27,7 +27,7 @@
   <mat-card class="carrusel-card">
   <div class="carrusel-header">
     <h2>Conecta con la red</h2>
-    <a>Ver más</a>
+    <button mat-flat-button>Ver más</button>
   </div>
 
   <ng-container *ngIf="random; else cargando">
@@ -40,6 +40,16 @@
         </mat-card-content>
         <mat-card-actions>
           <button mat-button>Ver más</button>
+        </mat-card-actions>
+      </mat-card>
+      <mat-card class="ver-mas-card">
+        <mat-card-content>
+          <mat-card-title>¡Conoce a nuestras emprendedoras!</mat-card-title>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-flat-button (click)="toEmprendimientos()">
+            Ver todos los emprendimientos
+          </button>
         </mat-card-actions>
       </mat-card>
     </div>
