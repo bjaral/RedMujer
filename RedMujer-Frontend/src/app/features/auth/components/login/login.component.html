@@ -1,0 +1,38 @@
+<section class="login-layout">
+    <header class="header">
+        <div class="">
+            <a mat-button>Iniciar sesión</a>
+            <button mat-raised-button routerLink="/registro">Registrarse</button>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="context">
+            <h2>Bienvenidas a RedMujer</h2>
+            <p>RedMujer el desarrollo integral de mujeres emprendedoras, entregando formación, mentorías y redes de apoyo. Conecta con otras empresarias, fortalece tus habilidades y haz crecer tu negocio.</p>
+            <button mat-button routerLink="/registro">¡Únete ahora!</button>
+            <div class="illustration">
+                <img src="assets/images/redmujer.png" alt="Ilustración RedMujer" height="50%">
+            </div>
+        </section>
+        <section class="login-form">
+            <div class="login-container">
+                <h2>Iniciar Sesión</h2>
+                <mat-form-field appearance="outline">
+                    <mat-label>Usuario</mat-label>
+                    <input matInput>
+                    <mat-icon matSuffix>person</mat-icon>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Contraseña</mat-label>
+                    <input matInput [type]="hidePassword ? 'password' : 'text'">
+                    <mat-icon matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Ocultar contraseña'" [attr.aria-checked]="!hidePassword">
+                        {{hidePassword ? 'visibility_off' : 'visibility'}}
+                    </mat-icon>
+                </mat-form-field>
+                <a routerLink="/forgot-password">Recuperar Contraseña</a>
+                <button mat-raised-button color="primary">Iniciar Sesión</button>
+            </div>
+        </section>
+    </main>
+</section>

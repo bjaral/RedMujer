@@ -1,0 +1,48 @@
+## Build artifacts
+bin/
+obj/
+
+## VS & Rider config
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## ASP.NET secrets
+**/secrets.json
+
+## Dotnet CLI
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Logs
+*.log
+
+## OS crap
+Thumbs.db
+.DS_Store
+
+## Others
+*.ncrunch*
+*.localhistory*
+*.resharper*
+*.DotSettings.user
+
+## Generated files
+*.sourcelink.json
+*.GeneratedMSBuildEditorConfig.editorconfig
+
+## Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+*.testsettings
+*.runsettings
+
+# Ignore any *.json and *.dll in obj folders just in case
+**/obj/**/*.json
+**/obj/**/*.dll
