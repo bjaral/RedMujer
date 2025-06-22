@@ -1,0 +1,27 @@
+@import '../../../styles.scss';
+
+mat-toolbar {
+    display: flex;
+    align-items: center;
+    min-height: 64px; // Altura estándar de Angular Material
+    padding: 0 16px;
+
+    img {
+        height: 40px; // Ajusta este valor según lo que necesites
+        width: auto;
+        max-width: 160px; // Opcional: limita el ancho máximo
+        object-fit: contain;
+        margin-right: 16px;
+    }
+
+    a {
+        margin-inline: 16px;
+        font-size: medium;
+        font-weight: 500;
+        color: $secondary-color;
+    }
+}
+
+.spacer {
+    flex: 1 1 auto;
+}

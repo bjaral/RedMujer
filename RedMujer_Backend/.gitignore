@@ -1,0 +1,76 @@
+# Ignore build outputs
+/bin
+/obj
+
+# Ignore user-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ASP.NET Core specific
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Ignore Rider / VS Code / VS config files
+.idea/
+.vscode/
+.vs/
+
+# Ignore NuGet package cache
+packages/
+*.nupkg
+# Uncomment if using a local NuGet source folder
+# NuGetLocal/
+
+# Ignore logs
+*.log
+logs/
+
+# Ignore temporary files
+*.tmp
+*.bak
+*.swp
+*~ 
+
+# Ignore coverage results
+coverage/
+TestResults/
+*.coverage
+*.coveragexml
+
+# Ignore publish output
+publish/
+out/
+
+# Ignore database dumps / local scripts
+*.sql
+local-scripts/
+
+# Ignore generated files by dotnet-ef
+Migrations/
+
+# Environment files (if you use them)
+.env
+.env.*
+
+# Ignore Docker artifacts
+docker-compose.override.yml
+.docker/
+
+# Ignore JetBrains Rider / Resharper caches
+.ReSharper*/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Optional: if using Azure pipelines or GitHub Actions
+.azure-pipelines/
+.github/
+
+# Optional: if using SonarQube or code analysis tools
+.sonar/
+*.sonarqube
