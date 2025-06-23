@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using RedMujer_Backend.DTOs;
 using RedMujer_Backend.services;
+using System.Threading.Tasks;
 
 namespace RedMujer_Backend.controllers
 {
@@ -17,15 +19,22 @@ namespace RedMujer_Backend.controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var emprendimientos = await _service.GetAllAsync();
-            return Ok(emprendimientos);
+            var lista = await _service.GetAllAsync();
+            return Ok(lista);
         }
 
         [HttpGet("random/{cantidad}")]
         public async Task<IActionResult> GetRandom(int cantidad)
         {
-            var emprendimientos = await _service.GetRandomAsync(cantidad);
-            return Ok(emprendimientos);
+            var lista = await _service.GetRandomAsync(cantidad);
+            return Ok(lista);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Crear([FromBody] EmprendimientoDto dto)
+        {
+            var nuevo = await _service.CrearAsync(dto);
+            return CreatedAtAction(nameof(GetAll), new { id = nuevo.Id_Emprendimiento }, nuevo);
         }
     }
 }

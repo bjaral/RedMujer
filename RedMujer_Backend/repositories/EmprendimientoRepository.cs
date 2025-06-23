@@ -2,6 +2,13 @@ using Dapper;
 using Npgsql;
 using System.Data;
 using RedMujer_Backend.models;
+using System.Runtime.Serialization;
+using System.Reflection;
+using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace RedMujer_Backend.repositories
 {
@@ -19,18 +26,94 @@ namespace RedMujer_Backend.repositories
         private IDbConnection CreateConnection()
             => new NpgsqlConnection(_connectionString);
 
+        private string EnumToString<T>(T enumVal) where T : struct, Enum
+        {
+            var type = typeof(T);
+            var memInfo = type.GetMember(enumVal.ToString());
+            if (memInfo.Length > 0)
+            {
+                var attr = memInfo[0].GetCustomAttribute<EnumMemberAttribute>();
+                if (attr != null)
+                    return attr.Value!;
+            }
+            return enumVal.ToString();
+        }
+
+        private TipoModalidad? StringToModalidad(string? modalidad)
+        {
+            if (string.IsNullOrWhiteSpace(modalidad))
+                return null;
+
+            modalidad = modalidad.Trim();
+
+            if (string.Equals(modalidad, "Presencial", StringComparison.OrdinalIgnoreCase))
+                return TipoModalidad.Presencial;
+
+            if (string.Equals(modalidad, "Online", StringComparison.OrdinalIgnoreCase))
+                return TipoModalidad.Online;
+
+            if (string.Equals(modalidad, "Presencial y Online", StringComparison.OrdinalIgnoreCase))
+                return TipoModalidad.PresencialYOnline;
+
+            return null;
+        }
+
         public async Task<IEnumerable<Emprendimiento>> GetAllAsync()
         {
             const string query = "SELECT * FROM \"Emprendimientos\"";
             using var connection = CreateConnection();
-            return await connection.QueryAsync<Emprendimiento>(query);
+            var result = await connection.QueryAsync<dynamic>(query);
+
+            return result.Select(e => new Emprendimiento
+            {
+                Id_Emprendimiento = e.id_emprendimiento,
+                RUT = e.RUT,
+                Nombre = e.nombre,
+                Descripcion = e.descripcion,
+                Horario_Atencion = e.horario_atencion,
+                Vigencia = e.vigencia,
+                Imagen = e.imagen,
+                Modalidad = StringToModalidad(e.modalidad)
+            });
+        }
+
+        public async Task InsertarEmprendimientoAsync(Emprendimiento e)
+        {
+            const string query = @"
+                INSERT INTO public.""Emprendimientos""(
+                    ""RUT"", nombre, descripcion, horario_atencion, vigencia, modalidad, imagen)
+                VALUES (@RUT, @Nombre, @Descripcion, @Horario_Atencion, @Vigencia, @Modalidad::tipo_modalidad, @Imagen)";
+
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(query, new
+            {
+                e.RUT,
+                e.Nombre,
+                e.Descripcion,
+                e.Horario_Atencion,
+                e.Vigencia,
+                Modalidad = e.Modalidad == null ? null : EnumToString(e.Modalidad.Value),
+                e.Imagen
+            });
         }
 
         public async Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad)
         {
             const string query = "SELECT * FROM \"Emprendimientos\" ORDER BY RANDOM() LIMIT @cantidad";
             using var connection = CreateConnection();
-            return await connection.QueryAsync<Emprendimiento>(query, new { cantidad });
+            var result = await connection.QueryAsync<dynamic>(query, new { cantidad });
+
+            return result.Select(e => new Emprendimiento
+            {
+                Id_Emprendimiento = e.id_emprendimiento,
+                RUT = e.RUT,
+                Nombre = e.nombre,
+                Descripcion = e.descripcion,
+                Horario_Atencion = e.horario_atencion,
+                Vigencia = e.vigencia,
+                Imagen = e.imagen,
+                Modalidad = StringToModalidad(e.modalidad)
+            });
         }
     }
 }

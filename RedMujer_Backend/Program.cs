@@ -3,16 +3,16 @@ using RedMujer_Backend.services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// servicios
+// Servicios
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// dependencias
+// Dependencias (Inyección de dependencias)
 builder.Services.AddScoped<IEmprendimientoRepository, EmprendimientoRepository>();
 builder.Services.AddScoped<IEmprendimientoService, EmprendimientoService>();
 
-// CORS
+// CORS para Angular frontend en localhost:4200
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -33,8 +33,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseCors("AllowFrontend");
+
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

@@ -1,4 +1,6 @@
 using RedMujer_Backend.models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RedMujer_Backend.repositories
 {
@@ -6,5 +8,6 @@ namespace RedMujer_Backend.repositories
     {
         Task<IEnumerable<Emprendimiento>> GetAllAsync();
         Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad);
+        Task InsertarEmprendimientoAsync(Emprendimiento e);
     }
 }
