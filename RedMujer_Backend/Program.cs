@@ -1,30 +1,29 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using RedMujer_Backend.repositories;
 using RedMujer_Backend.services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Servicios
+// Configurar servicios
+
 builder.Services.AddControllers();
+
+// Agregar Swagger (OpenAPI) para documentación
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Dependencias (Inyección de dependencias)
+// Inyección de dependencias para repositorios y servicios
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+
 builder.Services.AddScoped<IEmprendimientoRepository, EmprendimientoRepository>();
 builder.Services.AddScoped<IEmprendimientoService, EmprendimientoService>();
 
-// CORS para Angular frontend en localhost:4200
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:4200")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
-});
-
 var app = builder.Build();
+
+// Middleware
 
 if (app.Environment.IsDevelopment())
 {
@@ -33,8 +32,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 
