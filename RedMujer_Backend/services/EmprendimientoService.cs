@@ -1,40 +1,62 @@
 using RedMujer_Backend.DTOs;
 using RedMujer_Backend.models;
 using RedMujer_Backend.repositories;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace RedMujer_Backend.services
 {
     public class EmprendimientoService : IEmprendimientoService
     {
-        private readonly IEmprendimientoRepository _repository;
+        private readonly IEmprendimientoRepository _repo;
 
-        public EmprendimientoService(IEmprendimientoRepository repository)
+        public EmprendimientoService(IEmprendimientoRepository repo)
         {
-            _repository = repository;
+            _repo = repo;
         }
 
-        public async Task<IEnumerable<EmprendimientoDto>> GetAllAsync()
+        private TipoModalidad? ConvertirModalidad(string? modalidad)
         {
-            var lista = await _repository.GetAllAsync();
-            return lista.Select(e => new EmprendimientoDto
+            if (string.IsNullOrWhiteSpace(modalidad))
+                return null;
+
+            modalidad = modalidad.Trim();
+
+            return modalidad switch
             {
-                Nombre = e.Nombre,
-                Descripcion = e.Descripcion,
-                Modalidad = e.Modalidad.ToString(),
-                Vigencia = e.Vigencia
-            });
+                "Presencial" => TipoModalidad.Presencial,
+                "Online" => TipoModalidad.Online,
+                "PresencialYOnline" => TipoModalidad.PresencialYOnline,
+                _ => null,
+            };
         }
 
-        public async Task<IEnumerable<EmprendimientoDto>> GetRandomAsync(int cantidad)
+        public async Task<IEnumerable<Emprendimiento>> GetAllAsync()
         {
-            var lista = await _repository.GetRandomAsync(cantidad);
-            return lista.Select(e => new EmprendimientoDto
+            return await _repo.GetAllAsync();
+        }
+
+        public async Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad)
+        {
+            return await _repo.GetRandomAsync(cantidad);
+        }
+
+        public async Task<Emprendimiento> CrearAsync(EmprendimientoDto dto)
+        {
+            var entidad = new Emprendimiento
             {
-                Nombre = e.Nombre,
-                Descripcion = e.Descripcion,
-                Modalidad = e.Modalidad.ToString(),
-                Vigencia = e.Vigencia
-            });
+                RUT = dto.RUT,
+                Nombre = dto.Nombre,
+                Descripcion = dto.Descripcion,
+                Horario_Atencion = dto.Horario_Atencion,
+                Vigencia = dto.Vigencia,
+                Imagen = dto.Imagen,
+                Modalidad = ConvertirModalidad(dto.Modalidad)
+            };
+
+            await _repo.InsertarEmprendimientoAsync(entidad);
+
+            return entidad;
         }
     }
 }
