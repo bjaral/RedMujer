@@ -113,9 +113,10 @@ mat-toolbar {
             color: $secondary-color;
             border: 0.5px solid $secondary-color;
             background-color: transparent;
+            color: #37556f;
 
             &:hover {
-                background-color: lighten(#abcae9, 25%);
+                background-color: #cde5ff;
             }
 
         }
