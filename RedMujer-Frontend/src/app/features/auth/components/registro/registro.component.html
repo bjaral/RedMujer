@@ -1,1 +1,104 @@
-<p>registro works!</p>
+<div class="registro-container">
+
+  <!-- Lado izquierdo con información -->
+  <div class="registro-info">
+    <h2>¡Sé parte de Red Mujer!</h2>
+    <p>
+      Lorem ipsum dolor sit, amet consectetur adipisicing elit. Omnis ratione atque numquam, explicabo, perspiciatis magnam eius consectetur sint ab delectus placeat assumenda quisquam culpa veritatis. Mollitia facilis fugit enim reprehenderit.
+    </p>
+    <div class="registro-ilustracion">
+      <img src="assets/images/redmujer.png" alt="Ilustración">
+    </div>
+  </div>
+
+  <!-- Lado derecho con formulario -->
+  <div class="registro-formulario">
+    <mat-stepper [orientation]="(stepperOrientation | async)!">
+      <!-- Paso 1: Datos de Usuario -->
+      <mat-step [stepControl]="usuarioForm" label="Datos de Usuario">
+        <form [formGroup]="usuarioForm">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Nombre de usuario</mat-label>
+            <input matInput formControlName="username" required>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Correo</mat-label>
+            <input matInput formControlName="email" required type="email">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Contraseña</mat-label>
+            <input matInput formControlName="password" required type="password">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Confirmar contraseña</mat-label>
+            <input matInput formControlName="confirmPassword" required type="password">
+            <mat-error *ngIf="usuarioForm.hasError('mismatch')">Las contraseñas no coinciden</mat-error>
+          </mat-form-field>
+          <div>
+            <button mat-raised-button color="primary" matStepperNext [disabled]="!usuarioForm.valid">Siguiente</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Paso 2: Datos Personales -->
+      <mat-step [stepControl]="personalesForm" label="Datos Personales">
+        <form [formGroup]="personalesForm">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>RUN</mat-label>
+            <input matInput formControlName="run" required>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" required>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Primer apellido</mat-label>
+            <input matInput formControlName="apellido1" required>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Segundo apellido</mat-label>
+            <input matInput formControlName="apellido2" required>
+          </mat-form-field>
+          <div>
+            <button mat-button matStepperPrevious>Retroceder</button>
+            <button mat-raised-button color="primary" matStepperNext [disabled]="!personalesForm.valid">Siguiente</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Paso 3: Datos de Ubicación -->
+      <mat-step [stepControl]="ubicacionForm" label="Datos de Ubicación">
+        <form [formGroup]="ubicacionForm">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Región</mat-label>
+            <mat-select formControlName="region" (selectionChange)="onRegionChange()" required>
+              <mat-option *ngFor="let region of regiones" [value]="region.nombre">{{ region.nombre }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Comuna</mat-label>
+            <mat-select formControlName="comuna" required>
+              <mat-option *ngFor="let comuna of comunas" [value]="comuna">{{ comuna }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Calle</mat-label>
+            <input matInput formControlName="calle" required>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Número</mat-label>
+            <input matInput formControlName="numero" required type="number">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Referencia adicional</mat-label>
+            <input matInput formControlName="referencia">
+          </mat-form-field>
+          <div>
+            <button mat-button matStepperPrevious>Retroceder</button>
+            <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!ubicacionForm.valid">Finalizar</button>
+          </div>
+        </form>
+      </mat-step>
+    </mat-stepper>
+  </div>
+</div>
