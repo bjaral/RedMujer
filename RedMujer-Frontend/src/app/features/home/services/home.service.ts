@@ -16,6 +16,6 @@ export class HomeService {
   }
 
   getRandom(): Observable<any> {
-    return this.http.get<any>(`${this.url}/Emprendimientos/random/3`);
+    return this.http.get<any>(`${this.url}/Emprendimientos/random/7`);
   }
 }

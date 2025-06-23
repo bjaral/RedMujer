@@ -4,6 +4,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatStepperModule } from '@angular/material/stepper';
 
 export const MATERIAL_IMPORTS = [
   MatButtonModule,
@@ -11,5 +15,9 @@ export const MATERIAL_IMPORTS = [
   MatToolbarModule,
   MatIconModule,
   MatCardModule,
-  MatSelectModule
+  MatSelectModule,
+  MatDividerModule,
+  MatSidenavModule,
+  MatFormFieldModule,
+  MatStepperModule,
 ]
