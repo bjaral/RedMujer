@@ -96,6 +96,41 @@ namespace RedMujer_Backend.repositories
                 e.Imagen
             });
         }
+        public async Task ActualizarEmprendimientoAsync(Emprendimiento e)
+        {
+            const string query = @"
+                UPDATE public.""Emprendimientos""
+                SET 
+                    ""RUT"" = @RUT,
+                    nombre = @Nombre,
+                    descripcion = @Descripcion,
+                    horario_atencion = @Horario_Atencion,
+                    vigencia = @Vigencia,
+                    modalidad = @Modalidad::tipo_modalidad,
+                    imagen = @Imagen
+                WHERE id_emprendimiento = @Id_Emprendimiento";
+
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(query, new
+            {
+                e.RUT,
+                e.Nombre,
+                e.Descripcion,
+                e.Horario_Atencion,
+                e.Vigencia,
+                Modalidad = e.Modalidad == null ? null : EnumToString(e.Modalidad.Value),
+                e.Imagen,
+                e.Id_Emprendimiento
+            });
+        }
+
+        public async Task EliminarEmprendimientoAsync(int id)
+        {
+            const string query = @"DELETE FROM public.""Emprendimientos"" WHERE id_emprendimiento = @Id";
+
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(query, new { Id = id });
+        }
 
         public async Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad)
         {

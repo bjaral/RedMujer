@@ -15,19 +15,18 @@ namespace RedMujer_Backend.services
             _repo = repo;
         }
 
-        private TipoModalidad? ConvertirModalidad(string? modalidad)
+        private TipoModalidad? MapearModalidad(string? modalidad)
         {
-            if (string.IsNullOrWhiteSpace(modalidad))
-                return null;
+            if (string.IsNullOrWhiteSpace(modalidad)) return null;
 
-            modalidad = modalidad.Trim();
+            modalidad = modalidad.Trim().ToLower();
 
             return modalidad switch
             {
-                "Presencial" => TipoModalidad.Presencial,
-                "Online" => TipoModalidad.Online,
-                "PresencialYOnline" => TipoModalidad.PresencialYOnline,
-                _ => null,
+                "presencial" => TipoModalidad.Presencial,
+                "online" => TipoModalidad.Online,
+                "presencial y online" => TipoModalidad.PresencialYOnline,
+                _ => null
             };
         }
 
@@ -51,12 +50,34 @@ namespace RedMujer_Backend.services
                 Horario_Atencion = dto.Horario_Atencion,
                 Vigencia = dto.Vigencia,
                 Imagen = dto.Imagen,
-                Modalidad = ConvertirModalidad(dto.Modalidad)
+                Modalidad = MapearModalidad(dto.Modalidad)
             };
 
             await _repo.InsertarEmprendimientoAsync(entidad);
 
             return entidad;
+        }
+
+        public async Task ActualizarAsync(int id, EmprendimientoDto dto)
+        {
+            var emprendimiento = new Emprendimiento
+            {
+                Id_Emprendimiento = id,
+                RUT = dto.RUT,
+                Nombre = dto.Nombre,
+                Descripcion = dto.Descripcion,
+                Horario_Atencion = dto.Horario_Atencion,
+                Vigencia = dto.Vigencia,
+                Imagen = dto.Imagen,
+                Modalidad = MapearModalidad(dto.Modalidad)
+            };
+
+            await _repo.ActualizarEmprendimientoAsync(emprendimiento);
+        }
+
+        public async Task EliminarAsync(int id)
+        {
+            await _repo.EliminarEmprendimientoAsync(id);
         }
     }
 }
