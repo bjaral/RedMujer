@@ -1,0 +1,55 @@
+@use '../../../../../styles.scss' as *;
+
+.registro-container {
+    display: flex;
+    padding: 2rem;
+    gap: 3rem;
+    min-height: 80vh;
+    justify-content: center;
+
+    .registro-info {
+        max-width: 45vw;
+        gap: 1.5rem;
+
+        .registro-ilustracion {
+            width: max-content;
+            justify-self: center;
+        }
+
+        img {
+            height: 300px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: bold;
+            color: $secondary-color;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: $secondary-color;
+        }
+    }
+
+    .registro-formulario {
+        
+        mat-stepper {
+            border-radius: 15px;
+        }
+        
+    }
+}
+
+mat-card {
+  width: 100%;
+  padding: 2rem 1.5rem;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .registro-info {
+        display: none;
+    }
+}
