@@ -30,6 +30,15 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IEmprendimientoRepository, EmprendimientoRepository>();
 builder.Services.AddScoped<IEmprendimientoService, EmprendimientoService>();
 
+builder.Services.AddScoped<IRegionRepository, RegionRepository>();
+builder.Services.AddScoped<IRegionService, RegionService>();
+
+builder.Services.AddScoped<IComunaRepository, ComunaRepository>();
+builder.Services.AddScoped<IComunaService, ComunaService>();
+
+builder.Services.AddScoped<IUbicacionRepository, UbicacionRepository>();
+builder.Services.AddScoped<IUbicacionService, UbicacionService>();
+
 var app = builder.Build();
 
 // Middleware
