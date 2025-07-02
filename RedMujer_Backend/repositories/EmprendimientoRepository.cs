@@ -131,6 +131,27 @@ namespace RedMujer_Backend.repositories
             using var connection = CreateConnection();
             await connection.ExecuteAsync(query, new { Id = id });
         }
+        public async Task<Emprendimiento?> ObtenerPorIdAsync(int id)
+        {
+            const string query = @"SELECT * FROM ""Emprendimientos"" WHERE id_emprendimiento = @Id LIMIT 1";
+            using var connection = CreateConnection();
+            var result = await connection.QueryFirstOrDefaultAsync<dynamic>(query, new { Id = id });
+
+            if (result == null)
+                return null;
+
+            return new Emprendimiento
+            {
+                Id_Emprendimiento = result.id_emprendimiento,
+                RUT = result.RUT,
+                Nombre = result.nombre,
+                Descripcion = result.descripcion,
+                Horario_Atencion = result.horario_atencion,
+                Vigencia = result.vigencia,
+                Imagen = result.imagen,
+                Modalidad = StringToModalidad(result.modalidad)
+            };
+        }
 
         public async Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad)
         {

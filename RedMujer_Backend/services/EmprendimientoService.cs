@@ -40,7 +40,7 @@ namespace RedMujer_Backend.services
             return await _repo.GetRandomAsync(cantidad);
         }
 
-        public async Task<Emprendimiento> CrearAsync(EmprendimientoDto dto)
+        public async Task<Emprendimiento> CrearAsync(EmprendimientoDto dto, string? rutaImagen)
         {
             var entidad = new Emprendimiento
             {
@@ -49,7 +49,7 @@ namespace RedMujer_Backend.services
                 Descripcion = dto.Descripcion,
                 Horario_Atencion = dto.Horario_Atencion,
                 Vigencia = dto.Vigencia,
-                Imagen = dto.Imagen,
+                Imagen = !string.IsNullOrEmpty(rutaImagen) ? rutaImagen.Replace("\\", "/") : null,
                 Modalidad = MapearModalidad(dto.Modalidad)
             };
 
@@ -58,7 +58,7 @@ namespace RedMujer_Backend.services
             return entidad;
         }
 
-        public async Task ActualizarAsync(int id, EmprendimientoDto dto)
+        public async Task ActualizarAsync(int id, EmprendimientoDto dto, string? rutaImagen)
         {
             var emprendimiento = new Emprendimiento
             {
@@ -68,11 +68,25 @@ namespace RedMujer_Backend.services
                 Descripcion = dto.Descripcion,
                 Horario_Atencion = dto.Horario_Atencion,
                 Vigencia = dto.Vigencia,
-                Imagen = dto.Imagen,
+                Imagen = !string.IsNullOrEmpty(rutaImagen) ? rutaImagen.Replace("\\", "/") : null,
                 Modalidad = MapearModalidad(dto.Modalidad)
             };
 
             await _repo.ActualizarEmprendimientoAsync(emprendimiento);
+        }
+
+        public async Task<Emprendimiento> ActualizarImagenAsync(int idEmprendimiento, string? rutaImagen)
+        {
+            // Obtén el emprendimiento actual
+            var emprendimiento = await _repo.ObtenerPorIdAsync(idEmprendimiento);
+            if (emprendimiento == null)
+                throw new KeyNotFoundException("Emprendimiento no encontrado");
+
+            // Actualiza solo la ruta de la imagen (relativa)
+            emprendimiento.Imagen = !string.IsNullOrEmpty(rutaImagen) ? rutaImagen.Replace("\\", "/") : null;
+            await _repo.ActualizarEmprendimientoAsync(emprendimiento);
+
+            return emprendimiento;
         }
 
         public async Task EliminarAsync(int id)
