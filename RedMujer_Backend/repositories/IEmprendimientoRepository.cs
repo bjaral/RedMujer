@@ -10,7 +10,7 @@ namespace RedMujer_Backend.repositories
         Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad);
         Task ActualizarEmprendimientoAsync(Emprendimiento e);
         Task EliminarEmprendimientoAsync(int id);
-
+        Task<Emprendimiento?> ObtenerPorIdAsync(int id);
         Task InsertarEmprendimientoAsync(Emprendimiento e);
     }
 }
