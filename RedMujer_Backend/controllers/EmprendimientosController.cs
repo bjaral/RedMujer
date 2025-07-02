@@ -5,6 +5,7 @@ using RedMujer_Backend.services;
 using RedMujer_Backend.repositories;
 using System.IO;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace RedMujer_Backend.controllers
 {
@@ -58,18 +59,21 @@ namespace RedMujer_Backend.controllers
         [HttpPost]
         public async Task<IActionResult> Crear([FromForm] EmprendimientoDto dto)
         {
+            // 1. Crear emprendimiento SIN imagen
             var nuevo = await _service.CrearAsync(dto, null);
 
+            // 2. Si viene una imagen, la subes y asocias
             if (dto.Imagen != null)
             {
                 var rutaImagen = await GuardarImagenPrincipal(nuevo.Id_Emprendimiento, dto.Imagen);
-                nuevo = await _service.ActualizarImagenAsync(nuevo.Id_Emprendimiento, rutaImagen);
+                // Actualiza sólo la imagen
+                await _service.ActualizarImagenAsync(nuevo.Id_Emprendimiento, rutaImagen);
+                nuevo.Imagen = rutaImagen; // Opcional: para devolver la ruta en la respuesta
             }
 
             return CreatedAtAction(nameof(GetAll), new { id = nuevo.Id_Emprendimiento }, nuevo);
         }
 
-        // --- SUBIR IMAGEN PRINCIPAL ---
         private async Task<string?> GuardarImagenPrincipal(int idEmprendimiento, IFormFile? imagen)
         {
             if (imagen == null || imagen.Length == 0)
@@ -89,12 +93,15 @@ namespace RedMujer_Backend.controllers
             return Path.Combine("emprendimientos", idEmprendimiento.ToString(), "imagen_principal", nombreArchivo).Replace("\\", "/");
         }
 
-        // --- SUBIR MULTIMEDIA (GALERÍA) ---
         [HttpPost("{id}/multimedia")]
         public async Task<IActionResult> SubirMultimedia(int id, [FromForm] MultimediaUploadDto dto)
         {
             if (dto.Archivo == null || dto.Archivo.Length == 0)
                 return BadRequest("No se recibió ningún archivo.");
+
+            var existe = await _service.ExisteAsync(id);
+            if (!existe)
+                return NotFound("Emprendimiento no encontrado.");
 
             string subCarpeta = "imagenes_emprendimiento";
             var ruta = await GuardarArchivoMultimedia(id, dto.Archivo, subCarpeta);

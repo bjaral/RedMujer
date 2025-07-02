@@ -13,6 +13,6 @@ namespace RedMujer_Backend.services
         Task ActualizarAsync(int id, EmprendimientoDto dto, string? rutaImagen);    
         Task EliminarAsync(int id);
         Task<Emprendimiento> ActualizarImagenAsync(int idEmprendimiento, string? rutaImagen);
-
+        Task<bool> ExisteAsync(int idEmprendimiento);
     }
 }

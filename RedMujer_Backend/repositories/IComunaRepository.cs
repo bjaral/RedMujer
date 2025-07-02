@@ -7,11 +7,11 @@ namespace RedMujer_Backend.repositories
     public interface IComunaRepository
     {
         Task<IEnumerable<Comuna>> GetAllAsync();
-        Task<Comuna?> GetByIdsAsync(int id_region, int id_comuna);
-
-        Task InsertAsync(Comuna comuna);
-        Task UpdateAsync(Comuna comuna);
-        Task DeleteAsync(int id); // Soft-delete (vigencia)
+        Task<Comuna?> GetByIdsAsync(int idRegion, int idComuna);
+        Task<Comuna?> GetByIdAsync(int idComuna);
+        Task<IEnumerable<Comuna>> ObtenerComunasPorRegionAsync(int idRegion);
+        Task CrearAsync(Comuna comuna);
+        Task ActualizarAsync(Comuna comuna);
+        Task EliminarAsync(int idComuna);
     }
 }
-    

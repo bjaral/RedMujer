@@ -1,5 +1,4 @@
 using RedMujer_Backend.DTOs;
-using RedMujer_Backend.models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,11 +6,12 @@ namespace RedMujer_Backend.services
 {
     public interface IComunaService
     {
-        Task<IEnumerable<Comuna>> GetAllAsync();
-        Task<Comuna?> GetByIdsAsync(int id_region, int id_comuna);
-
+        Task<IEnumerable<ComunaDto>> GetAllAsync();
+        Task<ComunaDto?> GetByIdsAsync(int idRegion, int idComuna); // buscar por id de region + id de comuna
+        Task<ComunaDto?> GetByIdAsync(int idComuna); // buscar solo por id de comuna
+        Task<IEnumerable<ComunaDto>> ObtenerComunasPorRegionAsync(int idRegion); // comunas de una región
         Task CrearAsync(ComunaDto dto);
-        Task ActualizarAsync(int id, ComunaDto dto);
-        Task EliminarAsync(int id);
+        Task ActualizarAsync(int idComuna, ComunaDto dto);
+        Task EliminarAsync(int idComuna);
     }
 }

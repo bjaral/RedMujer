@@ -1,8 +1,8 @@
 using RedMujer_Backend.DTOs;
 using RedMujer_Backend.models;
 using RedMujer_Backend.repositories;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RedMujer_Backend.services
 {
@@ -18,7 +18,6 @@ namespace RedMujer_Backend.services
         private TipoModalidad? MapearModalidad(string? modalidad)
         {
             if (string.IsNullOrWhiteSpace(modalidad)) return null;
-
             modalidad = modalidad.Trim().ToLower();
 
             return modalidad switch
@@ -53,11 +52,10 @@ namespace RedMujer_Backend.services
                 Modalidad = MapearModalidad(dto.Modalidad)
             };
 
-            await _repo.InsertarEmprendimientoAsync(entidad);
-
+            var id = await _repo.InsertarEmprendimientoAsync(entidad);
+            entidad.Id_Emprendimiento = id;
             return entidad;
         }
-
         public async Task ActualizarAsync(int id, EmprendimientoDto dto, string? rutaImagen)
         {
             var emprendimiento = new Emprendimiento
@@ -77,12 +75,10 @@ namespace RedMujer_Backend.services
 
         public async Task<Emprendimiento> ActualizarImagenAsync(int idEmprendimiento, string? rutaImagen)
         {
-            // Obtén el emprendimiento actual
             var emprendimiento = await _repo.ObtenerPorIdAsync(idEmprendimiento);
             if (emprendimiento == null)
                 throw new KeyNotFoundException("Emprendimiento no encontrado");
 
-            // Actualiza solo la ruta de la imagen (relativa)
             emprendimiento.Imagen = !string.IsNullOrEmpty(rutaImagen) ? rutaImagen.Replace("\\", "/") : null;
             await _repo.ActualizarEmprendimientoAsync(emprendimiento);
 
@@ -92,6 +88,12 @@ namespace RedMujer_Backend.services
         public async Task EliminarAsync(int id)
         {
             await _repo.EliminarEmprendimientoAsync(id);
+        }
+
+        public async Task<bool> ExisteAsync(int idEmprendimiento)
+        {
+            var emprendimiento = await _repo.ObtenerPorIdAsync(idEmprendimiento);
+            return emprendimiento != null;
         }
     }
 }
