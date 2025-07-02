@@ -1,5 +1,5 @@
 public class ImagenUploadDto
 {
-    public IFormFile Imagen { get; set; }
-    public string Tipo { get; set; } // "principal" o "adicional"
+    public IFormFile Imagen { get; set; } = default!; 
+    public string Tipo { get; set; } = string.Empty; 
 }
