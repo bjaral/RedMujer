@@ -44,6 +44,27 @@ builder.Services.AddScoped<IMultimediaService, MultimediaService>();
 builder.Services.AddScoped<IUbicacionRepository, UbicacionRepository>();
 builder.Services.AddScoped<IUbicacionService, UbicacionService>();
 
+builder.Services.AddScoped<IPersonaRepository, PersonaRepository>();
+builder.Services.AddScoped<IPersonaService, PersonaService>();
+
+builder.Services.AddScoped<IContactoRepository, ContactoRepository>();
+builder.Services.AddScoped<IContactoService, ContactoService>();
+
+builder.Services.AddScoped<IRegistroRepository, RegistroRepository>();
+builder.Services.AddScoped<IRegistroService, RegistroService>();
+
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+
+builder.Services.AddScoped<IEmprendimientoCategoriaRepository, EmprendimientoCategoriaRepository>();
+builder.Services.AddScoped<IEmprendimientoCategoriaService, EmprendimientoCategoriaService>();
+
+builder.Services.AddScoped<IEmprendimientoUbicacionRepository, EmprendimientoUbicacionRepository>();
+builder.Services.AddScoped<IEmprendimientoUbicacionService, EmprendimientoUbicacionService>();
+
+builder.Services.AddScoped<IPersonaEmprendimientoRepository, PersonaEmprendimientoRepository>();
+builder.Services.AddScoped<IPersonaEmprendimientoService, PersonaEmprendimientoService>();
+
 var app = builder.Build();
 
 // Middleware
@@ -53,6 +74,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 // Servir archivos estáticos desde /media
 var mediaPath = Path.Combine(Directory.GetCurrentDirectory(), "media");
 if (!Directory.Exists(mediaPath))
@@ -69,7 +91,7 @@ app.UseStaticFiles(new StaticFileOptions
 // Usar CORS antes de redirección HTTPS y autorización
 app.UseCors("AllowFrontend");
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // Deshabilitar redirección HTTPS para pruebas locales -> comentado para evitar warning de redirección en Swagger
 
 app.UseAuthorization();
 

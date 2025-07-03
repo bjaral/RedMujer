@@ -10,7 +10,7 @@ namespace RedMujer_Backend.repositories
     public class UbicacionRepository : IUbicacionRepository
     {
         private readonly IConfiguration _config;
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
         public UbicacionRepository(IConfiguration config)
         {
             _config = config;

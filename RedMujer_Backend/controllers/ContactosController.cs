@@ -1,0 +1,50 @@
+using Microsoft.AspNetCore.Mvc;
+using RedMujer_Backend.DTOs;
+using RedMujer_Backend.services;
+using System.Threading.Tasks;
+
+namespace RedMujer_Backend.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ContactosController : ControllerBase
+    {
+        private readonly IContactoService _service;
+        public ContactosController(IContactoService service)
+        {
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.GetAllAsync());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            var contacto = await _service.GetByIdAsync(id);
+            if (contacto == null) return NotFound();
+            return Ok(contacto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] ContactoDto dto)
+        {
+            await _service.CrearAsync(dto);
+            return Ok();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] ContactoDto dto)
+        {
+            await _service.ActualizarAsync(id, dto);
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _service.EliminarAsync(id);
+            return NoContent();
+        }
+    }
+}
