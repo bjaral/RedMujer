@@ -12,11 +12,10 @@ export const routes: Routes = [
         { 'path': '', 'component': HomeComponent },
         { 'path': 'emprendimientos', 'component': EmprendimientosComponent },
         { 'path': 'registro', 'component': RegistroComponent },
-        { 'path': 'login', 'component': LoginComponent },
     ]},
 
     //  Vistas sin layout
-    
+    { 'path': 'login', 'component': LoginComponent },
     
 
 ];
