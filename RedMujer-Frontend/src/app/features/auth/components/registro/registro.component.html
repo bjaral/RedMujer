@@ -16,28 +16,33 @@
     <mat-stepper [orientation]="(stepperOrientation | async)!">
       <!-- Paso 1: Datos de Usuario -->
       <mat-step [stepControl]="usuarioForm" label="Datos de Usuario">
-        <form [formGroup]="usuarioForm">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Nombre de usuario</mat-label>
-            <input matInput formControlName="username" required>
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Correo</mat-label>
-            <input matInput formControlName="email" required type="email">
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Contraseña</mat-label>
-            <input matInput formControlName="password" required type="password">
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Confirmar contraseña</mat-label>
-            <input matInput formControlName="confirmPassword" required type="password">
-            <mat-error *ngIf="usuarioForm.hasError('mismatch')">Las contraseñas no coinciden</mat-error>
-          </mat-form-field>
-          <div>
-            <button mat-raised-button color="primary" matStepperNext [disabled]="!usuarioForm.valid">Siguiente</button>
-          </div>
-        </form>
+        <div class="datos-usuario">
+          <form [formGroup]="usuarioForm">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Nombre de usuario</mat-label>
+              <input matInput formControlName="username" required>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Correo</mat-label>
+              <input matInput formControlName="email" required type="email">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Contraseña</mat-label>
+              <input matInput formControlName="password" required type="password">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Confirmar contraseña</mat-label>
+              <input matInput formControlName="confirmPassword" required type="password">
+              <mat-error *ngIf="usuarioForm.hasError('mismatch')">Las contraseñas no coinciden</mat-error>
+            </mat-form-field>
+            <div>
+              <button mat-raised-button color="primary" matStepperNext [disabled]="!usuarioForm.valid">Siguiente</button>
+            </div>
+          </form>
+        </div>
       </mat-step>
 
       <!-- Paso 2: Datos Personales -->
