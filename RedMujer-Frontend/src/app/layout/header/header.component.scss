@@ -3,7 +3,7 @@
 html,
 body {
     overflow-x: hidden;
-    width: 100%;
+    width: fit-content;
     margin: 0;
     padding: 0;
 }
@@ -11,15 +11,17 @@ body {
 mat-toolbar {
     display: flex;
     align-items: center;
-    min-height: 64px;
+    min-height: 6rem;
     padding: 0 16px;
-    background-color: white;
+    background-color: #FFF8F7;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
     color: #37556f;
 
     img {
-        height: 40px;
+        height: 60%;
         width: auto;
-        max-width: 160px;
+        max-width: 100%;
         object-fit: contain;
         margin-right: 16px;
     }
@@ -39,9 +41,15 @@ mat-toolbar {
         gap: 0.5rem;
     }
 
+    button {
+        margin-inline: 8px;
+        font-size: large;
+        font-weight: 500;
+    }
+
     a {
         margin-inline: 16px;
-        font-size: medium;
+        font-size: large;
         font-weight: 500;
         color: #37556f;
         text-decoration: none;
@@ -53,10 +61,12 @@ mat-toolbar {
     }
 
     .signin-btn {
-        color: $secondary-color;
-        background-color: transparent;
-        transition-duration: 0.3s ease-in-out;
+        border-style: solid;
+        border-color: $primary-color;
         color: #37556f;
+        transition-duration: 0.3s ease-in-out;
+        padding-left: 1rem;
+        padding-right: 1rem;
 
         &:hover {
             background-color: #cde5ff;

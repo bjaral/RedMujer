@@ -3,7 +3,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { HeaderComponent } from '../../../../layout/header/header.component';
 import { RouterModule } from '@angular/router';
 
 @Component({

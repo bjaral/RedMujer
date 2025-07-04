@@ -77,15 +77,17 @@ namespace RedMujer_Backend.repositories
             });
         }
 
-        public async Task InsertarEmprendimientoAsync(Emprendimiento e)
+        // ---- MÉTODO MODIFICADO ----
+        public async Task<int> InsertarEmprendimientoAsync(Emprendimiento e)
         {
             const string query = @"
                 INSERT INTO public.""Emprendimientos""(
                     ""RUT"", nombre, descripcion, horario_atencion, vigencia, modalidad, imagen)
-                VALUES (@RUT, @Nombre, @Descripcion, @Horario_Atencion, @Vigencia, @Modalidad::tipo_modalidad, @Imagen)";
+                VALUES (@RUT, @Nombre, @Descripcion, @Horario_Atencion, @Vigencia, @Modalidad::tipo_modalidad, @Imagen)
+                RETURNING id_emprendimiento";
 
             using var connection = CreateConnection();
-            await connection.ExecuteAsync(query, new
+            var id = await connection.ExecuteScalarAsync<int>(query, new
             {
                 e.RUT,
                 e.Nombre,
@@ -95,7 +97,12 @@ namespace RedMujer_Backend.repositories
                 Modalidad = e.Modalidad == null ? null : EnumToString(e.Modalidad.Value),
                 e.Imagen
             });
+
+            e.Id_Emprendimiento = id;
+            return id;
         }
+        // --------------------------
+
         public async Task ActualizarEmprendimientoAsync(Emprendimiento e)
         {
             const string query = @"
@@ -131,6 +138,7 @@ namespace RedMujer_Backend.repositories
             using var connection = CreateConnection();
             await connection.ExecuteAsync(query, new { Id = id });
         }
+
         public async Task<Emprendimiento?> ObtenerPorIdAsync(int id)
         {
             const string query = @"SELECT * FROM ""Emprendimientos"" WHERE id_emprendimiento = @Id LIMIT 1";
