@@ -34,15 +34,15 @@ namespace RedMujer_Backend.repositories
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
-                "INSERT INTO \"Ubicaciones\" (\"Id_Comuna\", \"Id_Emprendimiento\", \"Calle\", \"Numero\", \"Referencia\", \"Vigencia\") " +
-                "VALUES (@Id_Comuna, @Id_Emprendimiento, @Calle, @Numero, @Referencia, @Vigencia)", ubicacion);
+                "INSERT INTO \"Ubicaciones\" (\"id_comuna\", \"Id_Emprendimiento\", \"Calle\", \"Numero\", \"Referencia\", \"Vigencia\") " +
+                "VALUES (@id_comuna, @Id_Emprendimiento, @Calle, @Numero, @Referencia, @Vigencia)", ubicacion);
         }
 
         public async Task UpdateAsync(Ubicacion ubicacion)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
-                "UPDATE \"Ubicaciones\" SET \"Id_Comuna\" = @Id_Comuna, \"Id_Emprendimiento\" = @Id_Emprendimiento, " +
+                "UPDATE \"Ubicaciones\" SET \"id_comuna\" = @id_comuna, \"Id_Emprendimiento\" = @Id_Emprendimiento, " +
                 "\"Calle\" = @Calle, \"Numero\" = @Numero, \"Referencia\" = @Referencia, \"Vigencia\" = @Vigencia " +
                 "WHERE \"Id_Ubicacion\" = @Id_Ubicacion", ubicacion);
         }
