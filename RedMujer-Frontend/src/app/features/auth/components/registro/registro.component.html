@@ -1,8 +1,8 @@
 <div class="registro-container">
-
   <!-- Lado izquierdo con información -->
   <div class="registro-info">
     <h2>¡Sé parte de Red Mujer!</h2>
+    <h2>Nuestra red de emprendedoras</h2>
     <p>
       Lorem ipsum dolor sit, amet consectetur adipisicing elit. Omnis ratione atque numquam, explicabo, perspiciatis magnam eius consectetur sint ab delectus placeat assumenda quisquam culpa veritatis. Mollitia facilis fugit enim reprehenderit.
     </p>
@@ -12,55 +12,60 @@
   </div>
 
   <!-- Lado derecho con formulario -->
-  <div class="registro-formulario">
-    <mat-stepper [orientation]="(stepperOrientation | async)!">
+  <div class="registro-panel">
+    <div class="logo">
+      <img mat-card-image src="assets/images/logo-png-color.png">
+    </div>
+    <p>Completa los siguientes datos</p>
+    <mat-stepper [orientation]="(stepperOrientation | async)!" linear="true">
       <!-- Paso 1: Datos de Usuario -->
-      <mat-step [stepControl]="usuarioForm" label="Datos de Usuario">
-        <div class="datos-usuario">
-          <form [formGroup]="usuarioForm">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Nombre de usuario</mat-label>
-              <input matInput formControlName="username" required>
-            </mat-form-field>
-            
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Correo</mat-label>
-              <input matInput formControlName="email" required type="email">
-            </mat-form-field>
-            
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Contraseña</mat-label>
-              <input matInput formControlName="password" required type="password">
-            </mat-form-field>
-            
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Confirmar contraseña</mat-label>
-              <input matInput formControlName="confirmPassword" required type="password">
-              <mat-error *ngIf="usuarioForm.hasError('mismatch')">Las contraseñas no coinciden</mat-error>
-            </mat-form-field>
-            <div>
-              <button mat-raised-button color="primary" matStepperNext [disabled]="!usuarioForm.valid">Siguiente</button>
-            </div>
-          </form>
-        </div>
+      <mat-step [stepControl]="usuarioForm" label="Usuario">
+        <ng-template matStepLabel>
+          <span (click)="onStepHeaderClick($event)">Usuario</span>
+        </ng-template>
+        <form [formGroup]="usuarioForm">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre de usuario</mat-label>
+            <input matInput formControlName="username" required>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Correo</mat-label>
+            <input matInput formControlName="email" required type="email">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Contraseña</mat-label>
+            <input matInput formControlName="password" required type="password">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Confirmar contraseña</mat-label>
+            <input matInput formControlName="confirmPassword" required type="password">
+            <mat-error *ngIf="usuarioForm.hasError('mismatch')">Las contraseñas no coinciden</mat-error>
+          </mat-form-field>
+          <div>
+            <button mat-raised-button color="primary" matStepperNext [disabled]="!usuarioForm.valid">Siguiente</button>
+          </div>
+        </form>
       </mat-step>
 
       <!-- Paso 2: Datos Personales -->
-      <mat-step [stepControl]="personalesForm" label="Datos Personales">
+      <mat-step [stepControl]="personalesForm" label="Personales">
+        <ng-template matStepLabel>
+          <span (click)="onStepHeaderClick($event)">Personales</span>
+        </ng-template>
         <form [formGroup]="personalesForm">
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline">
             <mat-label>RUN</mat-label>
             <input matInput formControlName="run" required>
           </mat-form-field>
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline">
             <mat-label>Nombre</mat-label>
             <input matInput formControlName="nombre" required>
           </mat-form-field>
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline">
             <mat-label>Primer apellido</mat-label>
             <input matInput formControlName="apellido1" required>
           </mat-form-field>
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline">
             <mat-label>Segundo apellido</mat-label>
             <input matInput formControlName="apellido2" required>
           </mat-form-field>
@@ -72,29 +77,32 @@
       </mat-step>
 
       <!-- Paso 3: Datos de Ubicación -->
-      <mat-step [stepControl]="ubicacionForm" label="Datos de Ubicación">
+      <mat-step [stepControl]="ubicacionForm" label="Ubicación">
+        <ng-template matStepLabel>
+          <span (click)="onStepHeaderClick($event)">Ubicación</span>
+        </ng-template>
         <form [formGroup]="ubicacionForm">
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline">
             <mat-label>Región</mat-label>
             <mat-select formControlName="region" (selectionChange)="onRegionChange()" required>
               <mat-option *ngFor="let region of regiones" [value]="region.nombre">{{ region.nombre }}</mat-option>
             </mat-select>
           </mat-form-field>
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline">
             <mat-label>Comuna</mat-label>
             <mat-select formControlName="comuna" required>
               <mat-option *ngFor="let comuna of comunas" [value]="comuna">{{ comuna }}</mat-option>
             </mat-select>
           </mat-form-field>
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline">
             <mat-label>Calle</mat-label>
             <input matInput formControlName="calle" required>
           </mat-form-field>
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline">
             <mat-label>Número</mat-label>
             <input matInput formControlName="numero" required type="number">
           </mat-form-field>
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline">
             <mat-label>Referencia adicional</mat-label>
             <input matInput formControlName="referencia">
           </mat-form-field>

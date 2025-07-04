@@ -15,51 +15,123 @@ mat-step{
 }
 
 .registro-container {
+    background-color: #eee;
     display: flex;
     padding: 2rem;
     gap: 3rem;
-    min-height: 80vh;
+    min-height: 90vh;
     justify-content: center;
+}
 
-    .registro-info {
-        max-width: 45vw;
-        gap: 1.5rem;
+.registro-info {
+    max-width: 45vw;
+    gap: 1.5rem;
 
-        .registro-ilustracion {
-            width: max-content;
-            justify-self: center;
-        }
+    .registro-ilustracion {
+        width: max-content;
+        justify-self: center;
+    }
 
-        img {
-            height: 300px;
-        }
+    img {
+        height: 300px;
+    }
 
-        h2 {
-            margin: 0;
-            font-size: 2rem;
-            font-weight: bold;
-            color: $secondary-color;
-        }
+    h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: $secondary-color;
+        margin-bottom: 0.5rem;
+        line-height: 1.1;
+    }
 
-        p {
-            font-size: 1.1rem;
-            color: $secondary-color;
+    h2:last-of-type {
+        color: $primary-color;
+    }
+
+    p {
+        color: $secondary-color;
+        font-size: 1.15rem;
+        margin-bottom: 2rem;
+        max-width: 600px;
+    }
+}
+
+.registro-panel {
+    background-color: #fff;
+    min-width: 340px;
+    max-width: 450px;
+    max-height: fit-content;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(231, 0, 76, 0.08);
+
+    >p {
+        color: $secondary-color;
+        font-weight: 500;
+        font-size: 1.1rem;
+        text-align: center;
+    }
+
+    .logo img {
+        height: 80px;
+        width: auto;
+        max-width: 160px;
+        object-fit: contain;
+        margin-right: 16px;
+    }
+
+    mat-stepper {
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    mat-step {
+        form {
+            display: flex;
+            flex-direction: column;
         }
     }
 
-    .registro-formulario {
-        
-        mat-stepper {
-            border-radius: 15px;
+    mat-form-field {
+        width: 100%;
+        margin-bottom: 0.5rem;
+        border-radius: 30px;
+
+        input {
+            border-radius: 330px;
         }
-        
+    }
+}
+
+button[mat-raised-button] {
+    background: $primary-color;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    width: 100%;
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    box-shadow: none;
+    transition: background 0.2s, opacity 0.2s;
+
+    &:not(:disabled) {
+        cursor: pointer;
+        opacity: 1;
+        background: $primary-color;
+    }
+
+    &:disabled {
+        background: lighten($primary-color, 35%);
+        color: #fff;
+        opacity: 0.7;
+        cursor: not-allowed;
     }
 }
 
 mat-card {
-  width: 100%;
-  padding: 2rem 1.5rem;
-  box-sizing: border-box;
+    width: 100%;
+    padding: 2rem 1.5rem;
+    box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
