@@ -26,7 +26,7 @@ namespace RedMujer_Backend.repositories
                 INSERT INTO ""Multimedias"" 
                     (id_emprendimiento, tipo_multimedia, ruta, descripcion, vigencia)
                 VALUES 
-                    (@Id_Emprendimiento, @Tipo_Multimedia::tipo_multimedia, @Ruta, @Descripcion, @Vigencia)
+                    (@Id_Emprendimiento, @Tipo_Multimedia::tipo_multimedia, @Ruta, @Descripcion, @vigencia)
             ";
             using var connection = CreateConnection();
             await connection.ExecuteAsync(query, new

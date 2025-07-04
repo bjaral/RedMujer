@@ -20,38 +20,38 @@ namespace RedMujer_Backend.repositories
         public async Task<IEnumerable<Ubicacion>> GetAllAsync()
         {
             using var connection = new NpgsqlConnection(_connectionString);
-            return await connection.QueryAsync<Ubicacion>("SELECT * FROM \"Ubicaciones\" WHERE \"Vigencia\" = true");
+            return await connection.QueryAsync<Ubicacion>("SELECT * FROM \"Ubicaciones\" WHERE \"vigencia\" = true");
         }
 
         public async Task<Ubicacion?> GetByIdAsync(int id)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             return await connection.QueryFirstOrDefaultAsync<Ubicacion>(
-                "SELECT * FROM \"Ubicaciones\" WHERE \"Id_Ubicacion\" = @Id AND \"Vigencia\" = true", new { Id = id });
+                "SELECT * FROM \"Ubicaciones\" WHERE \"id_ubicacion\" = @Id AND \"vigencia\" = true", new { Id = id });
         }
 
-        public async Task InsertAsync(Ubicacion ubicacion)
+        public async Task<int> InsertAsync(Ubicacion ubicacion)
         {
             using var connection = new NpgsqlConnection(_connectionString);
-            await connection.ExecuteAsync(
-                "INSERT INTO \"Ubicaciones\" (\"Id_Comuna\", \"Id_Emprendimiento\", \"Calle\", \"Numero\", \"Referencia\", \"Vigencia\") " +
-                "VALUES (@Id_Comuna, @Id_Emprendimiento, @Calle, @Numero, @Referencia, @Vigencia)", ubicacion);
+            return await connection.ExecuteScalarAsync<int>(
+                "INSERT INTO \"Ubicaciones\" (\"id_comuna\", \"calle\", \"numero\", \"referencia\", \"vigencia\") " +
+                "VALUES (@Id_Comuna, @Calle, @Numero, @Referencia, @vigencia) RETURNING \"id_ubicacion\";", ubicacion);
         }
 
         public async Task UpdateAsync(Ubicacion ubicacion)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
-                "UPDATE \"Ubicaciones\" SET \"Id_Comuna\" = @Id_Comuna, \"Id_Emprendimiento\" = @Id_Emprendimiento, " +
-                "\"Calle\" = @Calle, \"Numero\" = @Numero, \"Referencia\" = @Referencia, \"Vigencia\" = @Vigencia " +
-                "WHERE \"Id_Ubicacion\" = @Id_Ubicacion", ubicacion);
+                "UPDATE \"Ubicaciones\" SET \"id_comuna\" = @Id_Comuna," +
+                "\"calle\" = @Calle, \"numero\" = @Numero, \"referencia\" = @Referencia, \"vigencia\" = @vigencia " +
+                "WHERE \"id_ubicacion\" = @Id_Ubicacion", ubicacion);
         }
 
         public async Task DeleteAsync(int id)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
-                "UPDATE \"Ubicaciones\" SET \"Vigencia\" = false WHERE \"Id_Ubicacion\" = @Id", new { Id = id });
+                "UPDATE \"Ubicaciones\" SET \"vigencia\" = false WHERE \"id_ubicacion\" = @Id", new { Id = id });
         }
     }
 }

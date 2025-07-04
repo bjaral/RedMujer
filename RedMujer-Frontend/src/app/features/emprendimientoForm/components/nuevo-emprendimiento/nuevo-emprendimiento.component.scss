@@ -1,0 +1,222 @@
+@use '../../../../../styles.scss' as *;
+
+$form-gap: 2rem;
+
+h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  font-family: $font-family-main;
+  color: $secondary-color;
+  margin-bottom: 2rem;
+  border-left: 6px solid $primary-color;
+  padding-left: 1rem;
+}
+
+.card {
+  max-width: 950px;
+  width: 100%;
+  margin: 0 auto;
+  background: $background-color;
+  padding: 3rem 3rem 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.07);
+}
+
+.formulario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $form-gap;
+  background: #ffffff;
+  padding: 3rem;
+  border-radius: 1.5rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 2rem;
+  }
+
+  .form-col-left,
+  .form-col-right {
+    flex: 1 1 45%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+
+  mat-form-field {
+    width: 100%;
+    max-width: 500px;
+
+    .mat-form-field-outline {
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .mat-form-field-label {
+      font-weight: 600;
+      font-family: $font-family-main;
+      color: $secondary-color;
+    }
+
+    input,
+    textarea,
+    mat-select {
+      font-family: $font-family-main;
+    }
+  }
+
+  .image-upload,
+  .extra-images-upload {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    background-color: #ffffff;
+    border: 2px dashed #ccc;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+
+    &:hover {
+      background-color: #f0f0f0;
+      border-color: $primary-color;
+    }
+
+    mat-icon {
+      font-size: 2rem;
+      color: $primary-color;
+    }
+
+    span {
+      color: $primary-color;
+      font-weight: 600;
+      font-family: $font-family-main;
+    }
+
+    small {
+      color: $secondary-color;
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    input[type='file'] {
+      display: none;
+    }
+  }
+
+  .preview-container {
+    position: relative;
+    margin: 1rem auto 0 auto;
+    max-width: 200px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    .preview {
+      width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      display: block;
+    }
+  }
+  
+  .extra-preview {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: flex-start;
+
+    .mini-preview {
+      position: relative;
+      width: 90px;
+      height: 90px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        display: block;
+      }
+    }
+  }
+
+  .remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 0, 0, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    z-index: 10;
+    padding: 0;
+
+    &:hover {
+      background-color: rgba(200, 0, 0, 0.9);
+    }
+
+    .icon-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    mat-icon {
+      font-size: 18px;
+      color: white;
+      line-height: 1;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  button[type='submit'] {
+    align-self: flex-start;
+    margin-top: 2rem;
+    background: $primary-color !important;
+    color: white !important;
+    font-family: $font-family-main;
+    font-weight: 600;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: darken($primary-color, 5%) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    &:disabled {
+      background: #ccc !important;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 768px) {
+      align-self: stretch;
+    }
+  }
+}

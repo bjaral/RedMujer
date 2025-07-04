@@ -21,21 +21,21 @@ namespace RedMujer_Backend.repositories
         public async Task<IEnumerable<Region>> GetAllAsync()
         {
             using var connection = new NpgsqlConnection(_connectionString);
-            return await connection.QueryAsync<Region>("SELECT * FROM \"Regiones\" WHERE Vigencia = true");
+            return await connection.QueryAsync<Region>("SELECT * FROM \"Regiones\" WHERE vigencia = true");
         }
 
         public async Task<Region?> GetByIdAsync(int id)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             return await connection.QueryFirstOrDefaultAsync<Region>(
-                "SELECT * FROM \"Regiones\" WHERE \"id_region\" = @Id AND Vigencia = true", new { Id = id });
+                "SELECT * FROM \"Regiones\" WHERE \"id_region\" = @Id AND vigencia = true", new { Id = id });
         }
 
         public async Task InsertAsync(Region region)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
-                "INSERT INTO \"Regiones\" (\"Nombre\", Vigencia) VALUES (@Nombre, @Vigencia)",
+                "INSERT INTO \"Regiones\" (\"Nombre\", vigencia) VALUES (@Nombre, @vigencia)",
                 new { Nombre = region.Nombre, Vigencia = region.Vigencia });
         }
 
@@ -43,7 +43,7 @@ namespace RedMujer_Backend.repositories
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
-                "UPDATE \"Regiones\" SET \"Nombre\" = @Nombre, Vigencia = @Vigencia WHERE \"id_region\" = @Id",
+                "UPDATE \"Regiones\" SET \"Nombre\" = @Nombre, vigencia = @vigencia WHERE \"id_region\" = @Id",
                 new { Nombre = region.Nombre, Vigencia = region.Vigencia, Id = region.Id_Region });
         }
 

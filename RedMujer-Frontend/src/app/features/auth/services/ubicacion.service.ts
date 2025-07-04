@@ -15,8 +15,12 @@ export class UbicacionService {
     return this.http.get<any>(`${this.apiUrl}/Regiones`);
   }
 
+  comunas(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/Comunas`);
+  }
+
   comunasPorRegion(idRegion: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/Comunas/${idRegion}`);
+    return this.http.get<any>(`${this.apiUrl}/Comunas/region/${idRegion}`);
   }
 
 }
