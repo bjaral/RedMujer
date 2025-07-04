@@ -10,17 +10,37 @@ namespace RedMujer_Backend.controllers
     public class ComunasController : ControllerBase
     {
         private readonly IComunaService _service;
+
         public ComunasController(IComunaService service)
         {
             _service = service;
         }
 
+        // GET: api/comunas
         [HttpGet]
         public async Task<IActionResult> Get() => Ok(await _service.GetAllAsync());
-        [HttpGet("{id_region}/{id_comuna}")]
+
+        // GET: api/comunas/{id_region}/{id_comuna}
+        [HttpGet("{id_region:int}/{id_comuna:int}")]
         public async Task<IActionResult> Get(int id_region, int id_comuna)
         {
             var comuna = await _service.GetByIdsAsync(id_region, id_comuna);
+            if (comuna == null) return NotFound();
+            return Ok(comuna);
+        }
+
+        // GET: api/comunas/region/{id_region}
+        [HttpGet("region/{id_region:int}")]
+        public async Task<IActionResult> GetByRegion(int id_region)
+        {
+            var comunas = await _service.ObtenerComunasPorRegionAsync(id_region);
+            return Ok(comunas);
+        }
+
+        [HttpGet("{id_comuna:int}")]
+        public async Task<IActionResult> GetById(int id_comuna)
+        {
+            var comuna = await _service.GetByIdAsync(id_comuna);
             if (comuna == null) return NotFound();
             return Ok(comuna);
         }
@@ -32,17 +52,17 @@ namespace RedMujer_Backend.controllers
             return Ok();
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] ComunaDto dto)
+        [HttpPut("{id_comuna:int}")]
+        public async Task<IActionResult> Put(int id_comuna, [FromBody] ComunaDto dto)
         {
-            await _service.ActualizarAsync(id, dto);
+            await _service.ActualizarAsync(id_comuna, dto);
             return Ok();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{id_comuna:int}")]
+        public async Task<IActionResult> Delete(int id_comuna)
         {
-            await _service.EliminarAsync(id);
+            await _service.EliminarAsync(id_comuna);
             return NoContent();
         }
     }

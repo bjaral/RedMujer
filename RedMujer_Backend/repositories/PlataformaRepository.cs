@@ -10,7 +10,7 @@ namespace RedMujer_Backend.repositories
     public class PlataformaRepository : IPlataformaRepository
     {
         private readonly IConfiguration _config;
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
 
         public PlataformaRepository(IConfiguration config)
         {

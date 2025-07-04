@@ -1,56 +1,77 @@
 using Dapper;
-using Npgsql;
-using RedMujer_Backend.models;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
+using RedMujer_Backend.models;
 
 namespace RedMujer_Backend.repositories
 {
     public class ComunaRepository : IComunaRepository
     {
-        private readonly IConfiguration _config;
+        private readonly IConfiguration _configuration;
         private readonly string _connectionString;
-        public ComunaRepository(IConfiguration config)
+
+        public ComunaRepository(IConfiguration configuration)
         {
-            _config = config;
-            _connectionString = _config.GetConnectionString("DefaultConnection");
+            _configuration = configuration;
+            _connectionString = _configuration.GetConnectionString("DefaultConnection")!;
         }
+
+        private IDbConnection CreateConnection()
+            => new NpgsqlConnection(_connectionString);
 
         public async Task<IEnumerable<Comuna>> GetAllAsync()
         {
-            using var connection = new NpgsqlConnection(_connectionString);
-            return await connection.QueryAsync<Comuna>("SELECT * FROM \"Comunas\" WHERE \"Vigencia\" = true");
+            const string query = "SELECT * FROM \"Comunas\"";
+            using var connection = CreateConnection();
+            var result = await connection.QueryAsync<Comuna>(query);
+            return result.ToList();
         }
 
-            public async Task<Comuna?> GetByIdsAsync(int id_region, int id_comuna)
+        public async Task<Comuna?> GetByIdsAsync(int idRegion, int idComuna)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
-            return await connection.QueryFirstOrDefaultAsync<Comuna>(
-                "SELECT * FROM \"Comunas\" WHERE \"id_region\" = @id_region AND \"id_comuna\" = @id_comuna AND \"vigencia\" = true",
-                new { id_region, id_comuna }
-            );
+            const string query = "SELECT * FROM \"Comunas\" WHERE id_region = @Id_Region AND id_comuna = @Id_Comuna";
+            using var connection = CreateConnection();
+            return await connection.QueryFirstOrDefaultAsync<Comuna>(query, new { Id_Region = idRegion, Id_Comuna = idComuna });
         }
 
-        public async Task InsertAsync(Comuna comuna)
+        public async Task<Comuna?> GetByIdAsync(int idComuna)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.ExecuteAsync(
-                "INSERT INTO \"Comunas\" (\"id_region\", \"Nombre\", \"Vigencia\") VALUES (@id_region, @Nombre, @Vigencia)", comuna);
+            const string query = "SELECT * FROM \"Comunas\" WHERE id_comuna = @Id_Comuna";
+            using var connection = CreateConnection();
+            return await connection.QueryFirstOrDefaultAsync<Comuna>(query, new { Id_Comuna = idComuna });
         }
 
-        public async Task UpdateAsync(Comuna comuna)
+        public async Task<IEnumerable<Comuna>> ObtenerComunasPorRegionAsync(int idRegion)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.ExecuteAsync(
-                "UPDATE \"Comunas\" SET \"id_region\" = @id_region, \"Nombre\" = @Nombre, \"Vigencia\" = @Vigencia WHERE \"id_comuna\" = @id_comuna", comuna);
+            const string query = "SELECT * FROM \"Comunas\" WHERE id_region = @Id_Region";
+            using var connection = CreateConnection();
+            var result = await connection.QueryAsync<Comuna>(query, new { Id_Region = idRegion });
+            return result.ToList();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task CrearAsync(Comuna comuna)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.ExecuteAsync(
-                "UPDATE \"Comunas\" SET \"Vigencia\" = false WHERE \"id_comuna\" = @Id", new { Id = id });
+            const string query = "INSERT INTO \"Comunas\" (id_region, nombre, vigencia) VALUES (@Id_Region, @Nombre, @Vigencia)";
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(query, comuna);
+        }
+
+        public async Task ActualizarAsync(Comuna comuna)
+        {
+            const string query = "UPDATE \"Comunas\" SET id_region = @Id_Region, nombre = @Nombre, vigencia = @Vigencia WHERE id_comuna = @Id_Comuna";
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(query, comuna);
+        }
+
+        public async Task EliminarAsync(int idComuna)
+        {
+            const string query = "DELETE FROM \"Comunas\" WHERE id_comuna = @Id_Comuna";
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(query, new { Id_Comuna = idComuna });
         }
     }
 }

@@ -17,11 +17,10 @@ export const routes: Routes = [
     // Vistas sólo con header
     { 'path': '', 'component': LayoutHeaderComponent, 'children': [
         { 'path': 'registro', 'component': RegistroComponent },
-        { 'path': 'login', 'component': LoginComponent },
     ]},
 
     //  Vistas sin layout
-    
+    { 'path': 'login', 'component': LoginComponent },
     
 
 ];
