@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -8,12 +8,7 @@ import { map } from 'rxjs/operators';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { StepperOrientation } from '@angular/material/stepper';
 import { AuthService } from '../../services/auth.service';
-
-// Valores temporales para probar
-const REGIONES = [
-  { nombre: 'Región Metropolitana', comunas: ['Santiago', 'Providencia', 'Las Condes'] },
-  { nombre: 'Valparaíso', comunas: ['Valparaíso', 'Viña del Mar', 'Quilpué'] },
-];
+import { UbicacionService } from '../../services/ubicacion.service';
 
 @Component({
   selector: 'app-registro',
@@ -33,7 +28,7 @@ const REGIONES = [
 })
 export class RegistroComponent {
   stepperOrientation: Observable<StepperOrientation>;
-  regiones = REGIONES;
+  regiones: string[] = [];
   comunas: string[] = [];
 
   usuarioForm: any;
@@ -68,13 +63,19 @@ export class RegistroComponent {
       numero: ['', Validators.required],
       referencia: [''],
     });
+
+    this.regiones 
   }
 
-  onRegionChange() {
-    const regionSeleccionada = this.ubicacionForm.get('region')?.value;
-    const region = this.regiones.find(r => r.nombre === regionSeleccionada);
-    this.comunas = region ? region.comunas : [];
-    this.ubicacionForm.get('comuna')?.setValue('');
+  // onRegionChange() {
+  //   const regionSeleccionada = this.ubicacionForm.get('region')?.value;
+  //   const region = this.regiones.find(r => r.nombre === regionSeleccionada);
+  //   this.comunas = region ? region.comunas : [];
+  //   this.ubicacionForm.get('comuna')?.setValue('');
+  // }
+
+  ngOnInit() {
+    
   }
 
   passwordMatchValidator(form: any) {
