@@ -21,9 +21,10 @@ namespace RedMujer_Backend.services
             var categorias = await _repo.GetAllAsync();
             return categorias.Select(c => new CategoriaDto
             {
+                Id_Categoria = c.Id_Categoria,
                 Descripcion = c.Descripcion,
                 Vigencia = c.Vigencia,
-                GrupoCategoria = c.GrupoCategoria
+                Grupo_Categoria = c.Grupo_Categoria
             });
         }
 
@@ -31,12 +32,12 @@ namespace RedMujer_Backend.services
         {
             var c = await _repo.GetByIdAsync(id);
             if (c == null) return null;
-
             return new CategoriaDto
             {
+                Id_Categoria = c.Id_Categoria,
                 Descripcion = c.Descripcion,
                 Vigencia = c.Vigencia,
-                GrupoCategoria = c.GrupoCategoria
+                Grupo_Categoria = c.Grupo_Categoria
             };
         }
 
@@ -46,26 +47,26 @@ namespace RedMujer_Backend.services
             {
                 Descripcion = dto.Descripcion,
                 Vigencia = dto.Vigencia,
-                GrupoCategoria = dto.GrupoCategoria
+                Grupo_Categoria = dto.Grupo_Categoria
             };
-            await _repo.InsertAsync(categoria);
+            await _repo.CrearAsync(categoria);
         }
 
         public async Task ActualizarAsync(int id, CategoriaDto dto)
         {
-            var categoria = new Categoria
+            var categoria = await _repo.GetByIdAsync(id);
+            if (categoria != null)
             {
-                IdCategoria = id,
-                Descripcion = dto.Descripcion,
-                Vigencia = dto.Vigencia,
-                GrupoCategoria = dto.GrupoCategoria
-            };
-            await _repo.UpdateAsync(categoria);
+                categoria.Descripcion = dto.Descripcion;
+                categoria.Vigencia = dto.Vigencia;
+                categoria.Grupo_Categoria = dto.Grupo_Categoria;
+                await _repo.ActualizarAsync(categoria);
+            }
         }
 
         public async Task EliminarAsync(int id)
         {
-            await _repo.DeleteAsync(id);
+            await _repo.EliminarAsync(id);
         }
     }
 }

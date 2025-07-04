@@ -31,34 +31,34 @@ namespace RedMujer_Backend.repositories
                 new { Id = id });
         }
 
-        public async Task InsertAsync(Categoria categoria)
+        public async Task CrearAsync(Categoria categoria)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
                 @"INSERT INTO ""Categorias"" 
                 (""descripcion"", ""vigencia"", ""grupo_categoria"") 
-                VALUES (@Descripcion, @Vigencia, @GrupoCategoria)",
+                VALUES (@Descripcion, @Vigencia, @Grupo_Categoria)",
                 categoria);
         }
 
-        public async Task UpdateAsync(Categoria categoria)
+        public async Task ActualizarAsync(Categoria categoria)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
                 @"UPDATE ""Categorias"" SET 
                     ""descripcion"" = @Descripcion,
                     ""vigencia"" = @Vigencia,
-                    ""grupo_categoria"" = @GrupoCategoria
-                WHERE ""id_categoria"" = @IdCategoria",
+                    ""grupo_categoria"" = @Grupo_Categoria
+                WHERE ""id_categoria"" = @Id_Categoria",
                 categoria);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task EliminarAsync(int id)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
-                "UPDATE \"Categorias\" SET vigencia = false WHERE \"id_categoria\" = @Id",
-                new { Id = id });
+                "UPDATE \"Categorias\" SET vigencia = false WHERE \"id_categoria\" = @Id_Categoria",
+                new { Id_Categoria = id });
         }
     }
 }

@@ -2,9 +2,9 @@ namespace RedMujer_Backend.models
 {
     public class Categoria
     {
-        public int IdCategoria { get; set; }
-        public string? Descripcion { get; set; }
+        public int Id_Categoria { get; set; }
+        public string Descripcion { get; set; }
         public bool Vigencia { get; set; } = true;
-        public string GrupoCategoria { get; set; } = string.Empty;
+        public string Grupo_Categoria { get; set; }
     }
 }
