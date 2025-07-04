@@ -10,10 +10,10 @@ namespace RedMujer_Backend.models
     public class Usuario
     {
         public int Id_Usuario { get; set; }
-        public string UsuarioNombre { get; set; } = string.Empty;
-        public string Contrasenna { get; set; } = string.Empty;
+        public string UsuarioNombre { get; set; }
+        public string Contrasenna { get; set; }
         public bool Vigencia { get; set; }
-        public TipoUsuario Tipo_Usuario { get; set; }  // Aquí está el enum embebido
-        public string Correo { get; set; } = string.Empty;
+        public TipoUsuario Tipo_Usuario { get; set; }
+        public string Correo { get; set; }
     }
 }

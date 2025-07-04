@@ -8,8 +8,8 @@ namespace RedMujer_Backend.repositories
     {
         Task<IEnumerable<Categoria>> GetAllAsync();
         Task<Categoria?> GetByIdAsync(int id);
-        Task InsertAsync(Categoria categoria);
-        Task UpdateAsync(Categoria categoria);
-        Task DeleteAsync(int id);
+        Task CrearAsync(Categoria categoria);
+        Task ActualizarAsync(Categoria categoria);
+        Task EliminarAsync(int id);
     }
 }

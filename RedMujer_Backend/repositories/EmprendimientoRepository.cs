@@ -161,9 +161,12 @@ namespace RedMujer_Backend.repositories
             };
         }
 
-        public async Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad)
+       public async Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad)
         {
-            const string query = "SELECT * FROM \"Emprendimientos\" ORDER BY RANDOM() LIMIT @cantidad";
+            const string query = @"SELECT * FROM ""Emprendimientos""
+                                WHERE vigencia = true
+                                ORDER BY RANDOM()
+                                LIMIT @cantidad";
             using var connection = CreateConnection();
             var result = await connection.QueryAsync<dynamic>(query, new { cantidad });
 

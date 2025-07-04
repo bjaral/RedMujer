@@ -16,35 +16,64 @@ namespace RedMujer_Backend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get() => Ok(await _service.GetAllAsync());
+        public async Task<IActionResult> Get() 
+            => Ok(await _service.GetAllAsync());
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var registro = await _service.GetByIdAsync(id);
-            if (registro == null) return NotFound();
+            if (registro == null)
+                return NotFound(new { error = "Registro no encontrado" });
             return Ok(registro);
         }
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] RegistroDto dto)
         {
-            await _service.CrearAsync(dto);
-            return Ok();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                await _service.CrearAsync(dto);
+                return Ok(new { mensaje = "Registro creado correctamente" });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] RegistroDto dto)
         {
-            await _service.ActualizarAsync(id, dto);
-            return Ok();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                await _service.ActualizarAsync(id, dto);
+                return Ok(new { mensaje = "Registro actualizado correctamente" });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _service.EliminarAsync(id);
-            return NoContent();
+            try
+            {
+                await _service.EliminarAsync(id);
+                return Ok(new { mensaje = "Registro eliminado correctamente" });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
     }
 }

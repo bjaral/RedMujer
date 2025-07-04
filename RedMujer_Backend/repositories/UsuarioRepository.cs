@@ -1,10 +1,9 @@
 using Dapper;
 using Npgsql;
 using RedMujer_Backend.models;
-using System.Collections.Generic;
-using System.Data;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RedMujer_Backend.repositories
 {
@@ -12,68 +11,99 @@ namespace RedMujer_Backend.repositories
     {
         private readonly string _connectionString;
 
-        public UsuarioRepository(IConfiguration configuration)
+        public UsuarioRepository(IConfiguration config)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _connectionString = config.GetConnectionString("DefaultConnection") ?? string.Empty;
         }
-
-        private IDbConnection CreateConnection() => new NpgsqlConnection(_connectionString);
 
         public async Task<IEnumerable<Usuario>> GetAllAsync()
         {
-            const string query = @"SELECT * FROM ""Usuarios""";
-            using var conn = CreateConnection();
-            return await conn.QueryAsync<Usuario>(query);
+            using var connection = new NpgsqlConnection(_connectionString);
+            return await connection.QueryAsync<Usuario>(
+                @"SELECT 
+                    ""id_usuario"" AS ""Id_Usuario"",
+                    ""usuario"" AS ""UsuarioNombre"",
+                    ""contrasenna"" AS ""Contrasenna"",
+                    ""vigencia"" AS ""Vigencia"",
+                    ""tipo_usuario"" AS ""Tipo_Usuario"",
+                    ""correo"" AS ""Correo""
+                  FROM ""Usuarios"" WHERE vigencia = true");
         }
 
         public async Task<Usuario?> GetByIdAsync(int id)
         {
-            const string query = @"SELECT * FROM ""Usuarios"" WHERE id_usuario = @Id";
-            using var conn = CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<Usuario>(query, new { Id = id });
-        }
-
-        public async Task CrearAsync(Usuario usuario)
-        {
-            const string query = @"
-                INSERT INTO ""Usuarios"" (usuario, contrasenna, vigencia, tipo_usuario, correo)
-                VALUES (@UsuarioNombre, @Contrasenna, @Vigencia, @Tipo_Usuario::tipo_usuario, @Correo)";
-
-            usuario.Contrasenna = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasenna);
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(query, usuario);
-        }
-
-        public async Task ActualizarAsync(Usuario usuario)
-        {
-            const string query = @"
-                UPDATE ""Usuarios""
-                SET usuario = @UsuarioNombre,
-                    contrasenna = @Contrasenna,
-                    vigencia = @Vigencia,
-                    tipo_usuario = @Tipo_Usuario::tipo_usuario,
-                    correo = @Correo
-                WHERE id_usuario = @Id_Usuario";
-
-            usuario.Contrasenna = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasenna);
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(query, usuario);
-        }
-
-        public async Task EliminarAsync(int id)
-        {
-            const string query = @"DELETE FROM ""Usuarios"" WHERE id_usuario = @Id";
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(query, new { Id = id });
+            using var connection = new NpgsqlConnection(_connectionString);
+            return await connection.QueryFirstOrDefaultAsync<Usuario>(
+                @"SELECT 
+                    ""id_usuario"" AS ""Id_Usuario"",
+                    ""usuario"" AS ""UsuarioNombre"",
+                    ""contrasenna"" AS ""Contrasenna"",
+                    ""vigencia"" AS ""Vigencia"",
+                    ""tipo_usuario"" AS ""Tipo_Usuario"",
+                    ""correo"" AS ""Correo""
+                  FROM ""Usuarios"" WHERE ""id_usuario"" = @Id AND vigencia = true",
+                new { Id = id });
         }
 
         public async Task<Usuario?> GetByUsuarioNombreAsync(string usuarioNombre)
         {
-            const string query = @"SELECT * FROM ""Usuarios"" WHERE usuario = @UsuarioNombre";
-            using var conn = CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<Usuario>(query, new { UsuarioNombre = usuarioNombre });
+            using var connection = new NpgsqlConnection(_connectionString);
+            return await connection.QueryFirstOrDefaultAsync<Usuario>(
+                @"SELECT 
+                    ""id_usuario"" AS ""Id_Usuario"",
+                    ""usuario"" AS ""UsuarioNombre"",
+                    ""contrasenna"" AS ""Contrasenna"",
+                    ""vigencia"" AS ""Vigencia"",
+                    ""tipo_usuario"" AS ""Tipo_Usuario"",
+                    ""correo"" AS ""Correo""
+                  FROM ""Usuarios"" WHERE ""usuario"" = @UsuarioNombre AND vigencia = true",
+                new { UsuarioNombre = usuarioNombre });
+        }
+
+        // *** AQUÍ VIENE EL CAMBIO: ::tipo_usuario ***
+        public async Task CrearAsync(Usuario usuario)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            await connection.ExecuteAsync(
+                @"INSERT INTO ""Usuarios"" 
+                    (""usuario"", ""contrasenna"", ""vigencia"", ""tipo_usuario"", ""correo"") 
+                  VALUES (@UsuarioNombre, @Contrasenna, @Vigencia, @TipoUsuarioStr::tipo_usuario, @Correo)",
+                new {
+                    usuario.UsuarioNombre,
+                    usuario.Contrasenna,
+                    usuario.Vigencia,
+                    TipoUsuarioStr = usuario.Tipo_Usuario.ToString(),
+                    usuario.Correo
+                });
+        }
+
+        public async Task ActualizarAsync(Usuario usuario)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            await connection.ExecuteAsync(
+                @"UPDATE ""Usuarios"" SET 
+                        ""usuario"" = @UsuarioNombre,
+                        ""contrasenna"" = @Contrasenna,
+                        ""vigencia"" = @Vigencia,
+                        ""tipo_usuario"" = @TipoUsuarioStr::tipo_usuario,
+                        ""correo"" = @Correo
+                  WHERE ""id_usuario"" = @Id_Usuario",
+                new {
+                    usuario.UsuarioNombre,
+                    usuario.Contrasenna,
+                    usuario.Vigencia,
+                    TipoUsuarioStr = usuario.Tipo_Usuario.ToString(),
+                    usuario.Correo,
+                    usuario.Id_Usuario
+                });
+        }
+
+        public async Task EliminarAsync(int id)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            await connection.ExecuteAsync(
+                @"UPDATE ""Usuarios"" SET vigencia = false WHERE ""id_usuario"" = @Id_Usuario",
+                new { Id_Usuario = id });
         }
     }
 }
