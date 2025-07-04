@@ -36,7 +36,7 @@ namespace RedMujer_Backend.controllers
             return Ok(usuario);
         }
 
-       [HttpPost]
+  [HttpPost]
         public async Task<ActionResult> Crear([FromBody] UsuarioDto dto)
         {
             if (!ModelState.IsValid)
@@ -51,13 +51,14 @@ namespace RedMujer_Backend.controllers
                 Correo = dto.Correo
             };
 
-            await _service.CrearAsync(usuario);
+            var usuarioGuardado = await _service.CrearAsync(usuario);
 
-            // Opcional: Borra la contraseña antes de mostrar
-            usuario.Contrasenna = "";
+            usuarioGuardado.Contrasenna = "";
 
-            return Ok(usuario);
+            // Puedes mapear de regreso a un DTO si quieres esconder info sensible
+            return Ok(usuarioGuardado); // Aquí sí sale el Id_Usuario
         }
+
 
 
        [HttpPut("{id}")]

@@ -29,7 +29,7 @@ namespace RedMujer_Backend.services
 
             var ubicacion = new Ubicacion
             {
-                Id_comuna = dto.id_comuna,
+                Id_Comuna = dto.id_comuna,
                 Id_Emprendimiento = dto.Id_Emprendimiento,
                 Calle = dto.Calle,
                 Numero = dto.Numero,
@@ -49,7 +49,7 @@ namespace RedMujer_Backend.services
             var ubicacion = new Ubicacion
             {
                 Id_Ubicacion = id,
-                Id_comuna = dto.id_comuna,
+                Id_Comuna = dto.id_comuna,
                 Id_Emprendimiento = dto.Id_Emprendimiento,
                 Calle = dto.Calle,
                 Numero = dto.Numero,
