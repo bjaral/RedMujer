@@ -21,6 +21,7 @@ export const routes: Routes = [
     // Vistas sólo con header
     { 'path': '', 'component': LayoutHeaderComponent, 'children': [
         { 'path': 'registro', 'component': RegistroComponent },
+        { 'path': 'login', 'component': LoginComponent },
     ]},
     { 'path': '', 'component': SidebarEmpComponent, 'children': [
         { 'path': 'nuevo-emprendimiento', 'component': NuevoEmprendimientoComponent },
@@ -28,7 +29,6 @@ export const routes: Routes = [
     ]},
 
     //  Vistas sin layout
-    { 'path': 'login', 'component': LoginComponent },
     { 'path': 'perfil', 'component': PerfilComponent}
     
 

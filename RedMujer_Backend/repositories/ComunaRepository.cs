@@ -55,14 +55,14 @@ namespace RedMujer_Backend.repositories
 
         public async Task CrearAsync(Comuna comuna)
         {
-            const string query = "INSERT INTO \"Comunas\" (id_region, nombre, vigencia) VALUES (@Id_Region, @Nombre, @Vigencia)";
+            const string query = "INSERT INTO \"Comunas\" (id_region, nombre, vigencia) VALUES (@Id_Region, @Nombre, @vigencia)";
             using var connection = CreateConnection();
             await connection.ExecuteAsync(query, comuna);
         }
 
         public async Task ActualizarAsync(Comuna comuna)
         {
-            const string query = "UPDATE \"Comunas\" SET id_region = @Id_Region, nombre = @Nombre, vigencia = @Vigencia WHERE id_comuna = @Id_Comuna";
+            const string query = "UPDATE \"Comunas\" SET id_region = @Id_Region, nombre = @Nombre, vigencia = @vigencia WHERE id_comuna = @Id_Comuna";
             using var connection = CreateConnection();
             await connection.ExecuteAsync(query, comuna);
         }

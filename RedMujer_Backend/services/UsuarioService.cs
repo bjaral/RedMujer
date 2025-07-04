@@ -20,11 +20,10 @@ namespace RedMujer_Backend.services
         public async Task<Usuario?> GetByIdAsync(int id) =>
             await _repo.GetByIdAsync(id);
 
-        public async Task<Usuario> CrearAsync(Usuario usuario)
+        public async Task<int> CrearAsync(Usuario usuario)
         {
             usuario.Contrasenna = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasenna);
-            await _repo.CrearAsync(usuario);
-            return usuario;
+            return await _repo.CrearAsync(usuario);
         }
 
         public async Task ActualizarAsync(int id, Usuario usuario)

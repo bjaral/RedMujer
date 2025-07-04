@@ -9,7 +9,7 @@ namespace RedMujer_Backend.services
     {
         Task<IEnumerable<Ubicacion>> GetAllAsync();
         Task<Ubicacion?> GetByIdAsync(int id);
-        Task CrearAsync(UbicacionDto dto);
+        Task<int> CrearAsync(UbicacionDto dto);
         Task ActualizarAsync(int id, UbicacionDto dto);
         Task EliminarAsync(int id);
     }

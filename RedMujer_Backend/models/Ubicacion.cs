@@ -4,7 +4,6 @@ namespace RedMujer_Backend.models
     {
         public int Id_Ubicacion { get; set; }
         public int Id_Comuna { get; set; }
-        public int Id_Emprendimiento { get; set; }
         public string Calle { get; set; } = string.Empty;
         public string Numero { get; set; } = string.Empty;
         public string? Referencia { get; set; }

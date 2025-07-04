@@ -51,12 +51,20 @@ namespace RedMujer_Backend.controllers
                 Correo = dto.Correo
             };
 
+<<<<<<< HEAD
             var usuarioGuardado = await _service.CrearAsync(usuario);
+=======
+            var id = await _service.CrearAsync(usuario);
+>>>>>>> 848ffadbbde22cf0434e7a5441d434c236e670d5
 
             usuarioGuardado.Contrasenna = "";
 
+<<<<<<< HEAD
             // Puedes mapear de regreso a un DTO si quieres esconder info sensible
             return Ok(usuarioGuardado); // Aquí sí sale el Id_Usuario
+=======
+            return Ok(new { id });
+>>>>>>> 848ffadbbde22cf0434e7a5441d434c236e670d5
         }
 
 

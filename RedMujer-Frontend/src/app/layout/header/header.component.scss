@@ -36,7 +36,7 @@ mat-toolbar {
 
     .desktop-buttons {
         display: flex;
-        gap: 0.5rem;
+        gap: 1rem;
     }
 
     a {
@@ -54,9 +54,9 @@ mat-toolbar {
 
     .signin-btn {
         color: $secondary-color;
-        background-color: transparent;
-        transition-duration: 0.3s ease-in-out;
-        color: #37556f;
+            border: 0.1px solid $secondary-color;
+            background-color: transparent;
+            color: #37556f;
 
         &:hover {
             background-color: #cde5ff;
@@ -111,7 +111,7 @@ mat-toolbar {
 
         &.mobile-signin-btn {
             color: $secondary-color;
-            border: 0.5px solid $secondary-color;
+            border: 0.1px solid $secondary-color;
             background-color: transparent;
             color: #37556f;
 
