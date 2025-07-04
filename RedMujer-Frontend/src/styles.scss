@@ -5,10 +5,11 @@
 $primary-color: #e7004c;
 $secondary-color: #00263e;
 $background-color: #fff;
-$font-family-main: 'Poppins', Roboto, "Helvetica Neue", sans-serif;
 
 // Importar fuente Poppins desde Google Fonts
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+$font-family-main: 'Poppins', Roboto, "Helvetica Neue", sans-serif;
 
 html {
   @include mat.theme((
