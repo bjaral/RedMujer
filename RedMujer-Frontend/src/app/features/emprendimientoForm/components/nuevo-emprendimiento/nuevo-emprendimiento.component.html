@@ -59,7 +59,9 @@
         <div class="mini-preview" *ngFor="let img of imagenesExtras; let i = index">
           <img [src]="img" alt="Imagen adicional {{ i + 1 }}" />
           <button type="button" class="remove-btn" (click)="removeExtraImage(i)">
-            <mat-icon>close</mat-icon>
+            <div class="icon-container">
+              <mat-icon>close</mat-icon>
+            </div>
           </button>
         </div>
       </div>
