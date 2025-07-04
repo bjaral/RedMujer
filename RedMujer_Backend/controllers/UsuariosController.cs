@@ -51,12 +51,12 @@ namespace RedMujer_Backend.controllers
                 Correo = dto.Correo
             };
 
-            await _service.CrearAsync(usuario);
+            var id = await _service.CrearAsync(usuario);
 
             // Opcional: Borra la contraseña antes de mostrar
             usuario.Contrasenna = "";
 
-            return Ok(usuario);
+            return Ok(new { id });
         }
 
 

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using RedMujer_Backend.DTOs;
 using RedMujer_Backend.services;
 using System.Threading.Tasks;
+using RedMujer_Backend.models;
 
 namespace RedMujer_Backend.controllers
 {
@@ -29,9 +30,10 @@ namespace RedMujer_Backend.controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] UbicacionDto dto)
         {
-            await _service.CrearAsync(dto);
-            return Ok();
+            var id = await _service.CrearAsync(dto);
+            return Ok(new { id });
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] UbicacionDto dto)

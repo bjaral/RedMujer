@@ -37,7 +37,7 @@ namespace RedMujer_Backend.repositories
             await connection.ExecuteAsync(
                 @"INSERT INTO ""Categorias"" 
                 (""descripcion"", ""vigencia"", ""grupo_categoria"") 
-                VALUES (@Descripcion, @Vigencia, @Grupo_Categoria)",
+                VALUES (@Descripcion, @vigencia, @Grupo_Categoria)",
                 categoria);
         }
 
@@ -47,7 +47,7 @@ namespace RedMujer_Backend.repositories
             await connection.ExecuteAsync(
                 @"UPDATE ""Categorias"" SET 
                     ""descripcion"" = @Descripcion,
-                    ""vigencia"" = @Vigencia,
+                    ""vigencia"" = @vigencia,
                     ""grupo_categoria"" = @Grupo_Categoria
                 WHERE ""id_categoria"" = @Id_Categoria",
                 categoria);

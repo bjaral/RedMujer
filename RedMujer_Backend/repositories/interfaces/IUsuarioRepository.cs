@@ -8,7 +8,7 @@ namespace RedMujer_Backend.repositories
     {
         Task<IEnumerable<Usuario>> GetAllAsync();
         Task<Usuario?> GetByIdAsync(int id);
-        Task CrearAsync(Usuario usuario);
+        Task<int> CrearAsync(Usuario usuario);
         Task ActualizarAsync(Usuario usuario);
         Task EliminarAsync(int id);
 

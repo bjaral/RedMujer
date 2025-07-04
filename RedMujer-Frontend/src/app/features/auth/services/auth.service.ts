@@ -9,9 +9,9 @@ import { switchMap } from 'rxjs/operators';
 export class AuthService {
 
   private apiUrl = 'http://localhost:5145/api/auth';
-  private usuarioUrl = 'http://localhost:5145/api/usuario';
-  private personaUrl = 'http://localhost:5145/api/persona';
-  private ubicacionUrl = 'http://localhost:5145/api/ubicacion';
+  private usuarioUrl = 'http://localhost:5145/api/Usuarios';
+  private personaUrl = 'http://localhost:5145/api/Personas';
+  private ubicacionUrl = 'http://localhost:5145/api/Ubicaciones';
 
   constructor(private http: HttpClient) { }
 
@@ -20,17 +20,22 @@ export class AuthService {
   }
 
   register(data: { usuario: any; persona: any; ubicacion: any }): Observable<any> {
-    // Primero crea usuario, luego persona, luego ubicación
-    return this.createUsuario(data.usuario).pipe(
-      switchMap(usuarioRes =>
-        this.createPersona({ ...data.persona, usuarioId: usuarioRes.id }).pipe(
-          switchMap(personaRes =>
-            this.createUbicacion({ ...data.ubicacion, personaId: personaRes.id })
-          )
+  return this.createUsuario(data.usuario).pipe(
+    switchMap(usuarioRes =>
+
+      this.createUbicacion(data.ubicacion).pipe(
+
+        switchMap(ubicacionRes =>
+          this.createPersona({
+            ...data.persona,
+            usuarioId: usuarioRes.id,
+            idUbicacion: ubicacionRes.id
+          })
         )
       )
-    );
-  }
+    )
+  );
+}
 
   private createUsuario(usuario: any): Observable<any> {
     return this.http.post(this.usuarioUrl, usuario);

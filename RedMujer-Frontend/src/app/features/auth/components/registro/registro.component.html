@@ -4,7 +4,9 @@
     <h2>¡Sé parte de Red Mujer!</h2>
     <h2>Nuestra red de emprendedoras</h2>
     <p>
-      Lorem ipsum dolor sit, amet consectetur adipisicing elit. Omnis ratione atque numquam, explicabo, perspiciatis magnam eius consectetur sint ab delectus placeat assumenda quisquam culpa veritatis. Mollitia facilis fugit enim reprehenderit.
+      Lorem ipsum dolor sit, amet consectetur adipisicing elit. Omnis ratione atque numquam, explicabo, perspiciatis
+      magnam eius consectetur sint ab delectus placeat assumenda quisquam culpa veritatis. Mollitia facilis fugit enim
+      reprehenderit.
     </p>
     <div class="registro-ilustracion">
       <img src="assets/images/redmujer.png" alt="Ilustración">
@@ -71,7 +73,8 @@
           </mat-form-field>
           <div>
             <button mat-button matStepperPrevious>Retroceder</button>
-            <button mat-raised-button color="primary" matStepperNext [disabled]="!personalesForm.valid">Siguiente</button>
+            <button mat-raised-button color="primary" matStepperNext
+              [disabled]="!personalesForm.valid">Siguiente</button>
           </div>
         </form>
       </mat-step>
@@ -85,13 +88,14 @@
           <mat-form-field appearance="outline">
             <mat-label>Región</mat-label>
             <mat-select formControlName="region" (selectionChange)="onRegionChange()" required>
-              <mat-option *ngFor="let region of regiones" [value]="region.nombre">{{ region.nombre }}</mat-option>
+              <mat-option *ngFor="let region of regiones" [value]="region">{{ region.nombre }}</mat-option>
             </mat-select>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Comuna</mat-label>
             <mat-select formControlName="comuna" required>
-              <mat-option *ngFor="let comuna of comunas" [value]="comuna">{{ comuna }}</mat-option>
+              <mat-option [value]="null" disabled>Seleccione una región primero</mat-option>
+              <mat-option *ngFor="let comuna of comunas" [value]="comuna.nombre">{{ comuna.nombre }}</mat-option>
             </mat-select>
           </mat-form-field>
           <mat-form-field appearance="outline">
@@ -108,7 +112,8 @@
           </mat-form-field>
           <div>
             <button mat-button matStepperPrevious>Retroceder</button>
-            <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!ubicacionForm.valid">Finalizar</button>
+            <button mat-raised-button color="primary" (click)="onSubmit()"
+              [disabled]="!ubicacionForm.valid">Finalizar</button>
           </div>
         </form>
       </mat-step>

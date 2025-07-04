@@ -24,7 +24,7 @@ namespace RedMujer_Backend.repositories
                     ""id_usuario"" AS ""Id_Usuario"",
                     ""usuario"" AS ""UsuarioNombre"",
                     ""contrasenna"" AS ""Contrasenna"",
-                    ""vigencia"" AS ""Vigencia"",
+                    ""vigencia"" AS ""vigencia"",
                     ""tipo_usuario"" AS ""Tipo_Usuario"",
                     ""correo"" AS ""Correo""
                   FROM ""Usuarios"" WHERE vigencia = true");
@@ -38,7 +38,7 @@ namespace RedMujer_Backend.repositories
                     ""id_usuario"" AS ""Id_Usuario"",
                     ""usuario"" AS ""UsuarioNombre"",
                     ""contrasenna"" AS ""Contrasenna"",
-                    ""vigencia"" AS ""Vigencia"",
+                    ""vigencia"" AS ""vigencia"",
                     ""tipo_usuario"" AS ""Tipo_Usuario"",
                     ""correo"" AS ""Correo""
                   FROM ""Usuarios"" WHERE ""id_usuario"" = @Id AND vigencia = true",
@@ -53,7 +53,7 @@ namespace RedMujer_Backend.repositories
                     ""id_usuario"" AS ""Id_Usuario"",
                     ""usuario"" AS ""UsuarioNombre"",
                     ""contrasenna"" AS ""Contrasenna"",
-                    ""vigencia"" AS ""Vigencia"",
+                    ""vigencia"" AS ""vigencia"",
                     ""tipo_usuario"" AS ""Tipo_Usuario"",
                     ""correo"" AS ""Correo""
                   FROM ""Usuarios"" WHERE ""usuario"" = @UsuarioNombre AND vigencia = true",
@@ -61,13 +61,13 @@ namespace RedMujer_Backend.repositories
         }
 
         // *** AQUÍ VIENE EL CAMBIO: ::tipo_usuario ***
-        public async Task CrearAsync(Usuario usuario)
+        public async Task<int> CrearAsync(Usuario usuario)
         {
             using var connection = new NpgsqlConnection(_connectionString);
-            await connection.ExecuteAsync(
+            return await connection.ExecuteScalarAsync<int>(
                 @"INSERT INTO ""Usuarios"" 
                     (""usuario"", ""contrasenna"", ""vigencia"", ""tipo_usuario"", ""correo"") 
-                  VALUES (@UsuarioNombre, @Contrasenna, @Vigencia, @TipoUsuarioStr::tipo_usuario, @Correo)",
+                  VALUES (@UsuarioNombre, @Contrasenna, @vigencia, @TipoUsuarioStr::tipo_usuario, @Correo) RETURNING id_usuario",
                 new {
                     usuario.UsuarioNombre,
                     usuario.Contrasenna,
@@ -84,7 +84,7 @@ namespace RedMujer_Backend.repositories
                 @"UPDATE ""Usuarios"" SET 
                         ""usuario"" = @UsuarioNombre,
                         ""contrasenna"" = @Contrasenna,
-                        ""vigencia"" = @Vigencia,
+                        ""vigencia"" = @vigencia,
                         ""tipo_usuario"" = @TipoUsuarioStr::tipo_usuario,
                         ""correo"" = @Correo
                   WHERE ""id_usuario"" = @Id_Usuario",
