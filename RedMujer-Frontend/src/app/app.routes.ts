@@ -8,6 +8,7 @@ import { NuevoEmprendimientoComponent } from './features/emprendimientoForm/comp
 import { EditarEmprendimientoComponent } from './features/emprendimientoForm/components/editar-emprendimiento/editar-emprendimiento.component';
 import { SidebarEmpComponent } from './layout/sidebar-emp/sidebar-emp.component';
 import { LayoutHeaderComponent } from './layout/layout-header/layout-header.component';
+import { PerfilComponent } from './features/profile/components/perfil/perfil.component';
 
 export const routes: Routes = [
 
@@ -28,7 +29,7 @@ export const routes: Routes = [
     ]},
 
     //  Vistas sin layout
-    
+    { 'path': 'perfil', 'component': PerfilComponent}
     
 
 ];

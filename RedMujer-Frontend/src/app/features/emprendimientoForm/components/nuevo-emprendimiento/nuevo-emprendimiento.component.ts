@@ -4,9 +4,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { EmprendimientoFormService } from '../../services/emprendimiento-form.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-nuevo-emprendimiento',
+  standalone: true,
   imports: [MATERIAL_IMPORTS, ReactiveFormsModule, CommonModule],
   templateUrl: './nuevo-emprendimiento.component.html',
   styleUrl: './nuevo-emprendimiento.component.scss'
@@ -20,7 +22,7 @@ export class NuevoEmprendimientoComponent {
   imagenPrincipalFile: File | null = null;
   imagenesExtrasFile: File[] = [];
 
-  constructor(private fb: FormBuilder, private emprendimientoFormService: EmprendimientoFormService) {
+  constructor(private fb: FormBuilder, private emprendimientoFormService: EmprendimientoFormService, private router: Router) {
     this.formulario = this.fb.group({
       rut: ['', Validators.required],
       nombre: ['', Validators.required],
@@ -83,27 +85,50 @@ export class NuevoEmprendimientoComponent {
     }
 
     const formData = this.formulario.value;
-
-    // Obtener archivo de imagen principal
     const imagenInput = document.querySelector<HTMLInputElement>('input[type="file"]:not([multiple])');
-    const imagenPrincipal = imagenInput?.files?.[0];
-
-    if (!imagenPrincipal) {
-      alert('Debes seleccionar una imagen principal.');
-      return;
-    }
+    const imagenPrincipal = imagenInput?.files?.[0] ?? null;
 
     this.emprendimientoFormService.crearEmprendimiento(formData, imagenPrincipal).subscribe({
       next: (response) => {
-        alert('Emprendimiento creado exitosamente.');
-        this.formulario.reset();
-        this.imagenSeleccionada = null;
+        const idEmprendimiento = response?.id_Emprendimiento;
+        if (!idEmprendimiento) {
+          alert('Error: no se recibió el ID del emprendimiento creado.');
+          return;
+        }
+
+        if (this.imagenesExtrasFile.length > 0) {
+          this.emprendimientoFormService.subirMultimedia(idEmprendimiento, this.imagenesExtrasFile).subscribe({
+            next: () => {
+              alert('Emprendimiento creado y multimedia subida exitosamente.');
+              this.limpiarFormulario();
+              this.router.navigate(['/perfil']);
+            },
+            error: (err) => {
+              console.error('Error al subir multimedia', err);
+              alert('Emprendimiento creado, pero hubo un error al subir las imágenes adicionales.');
+              this.router.navigate(['/perfil']);
+            }
+          });
+        } else {
+          alert('Emprendimiento creado exitosamente.');
+          this.limpiarFormulario();
+          this.router.navigate(['/perfil']);
+        }
       },
       error: (error) => {
         console.error('Error al crear el emprendimiento', error);
         alert('Ocurrió un error al crear el emprendimiento.');
       }
     });
+  }
+
+
+  private limpiarFormulario(): void {
+    this.formulario.reset();
+    this.imagenSeleccionada = null;
+    this.imagenPrincipalFile = null;
+    this.imagenesExtras = [];
+    this.imagenesExtrasFile = [];
   }
 
 }
