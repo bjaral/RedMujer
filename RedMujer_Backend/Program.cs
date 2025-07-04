@@ -4,10 +4,30 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.FileProviders;
 using RedMujer_Backend.repositories;
 using RedMujer_Backend.services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddAuthorization();
 // Configurar servicios
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("TuSuperClaveSecreta123"))
+        };
+    });
+
+
+
+
 
 // Configurar CORS para permitir solicitudes desde http://localhost:4200
 builder.Services.AddCors(options =>
@@ -19,6 +39,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
+
 
 // Agregar Swagger (OpenAPI) para documentación
 builder.Services.AddEndpointsApiExplorer();
@@ -65,7 +86,9 @@ builder.Services.AddScoped<IEmprendimientoUbicacionService, EmprendimientoUbicac
 builder.Services.AddScoped<IPersonaEmprendimientoRepository, PersonaEmprendimientoRepository>();
 builder.Services.AddScoped<IPersonaEmprendimientoService, PersonaEmprendimientoService>();
 
+
 var app = builder.Build();
+
 
 // Middleware
 
@@ -93,6 +116,7 @@ app.UseCors("AllowFrontend");
 
 // app.UseHttpsRedirection(); // Deshabilitar redirección HTTPS para pruebas locales -> comentado para evitar warning de redirección en Swagger
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
