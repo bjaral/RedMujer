@@ -24,7 +24,7 @@ export const routes: Routes = [
     { 'path': '', 'component': SidebarEmpComponent, 'children': [
         { 'path': 'nuevo-emprendimiento', 'component': NuevoEmprendimientoComponent },
         { 'path': 'editar-emprendimiento', 'component': EditarEmprendimientoComponent }
-    ]}
+    ]},
 
     //  Vistas sin layout
     { 'path': 'login', 'component': LoginComponent },
