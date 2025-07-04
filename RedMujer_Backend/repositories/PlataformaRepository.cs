@@ -36,7 +36,7 @@ namespace RedMujer_Backend.repositories
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
-                "INSERT INTO \"Plataforma\" (\"id_emprendimiento\", \"ruta\", \"descripcion\", \"vigencia\", \"tipo_plataforma\") VALUES (@Id_Emprendimiento, @Ruta, @Descripcion, @Vigencia, @Tipo_Plataforma)",
+                "INSERT INTO \"Plataforma\" (\"id_emprendimiento\", \"ruta\", \"descripcion\", \"vigencia\", \"tipo_plataforma\") VALUES (@Id_Emprendimiento, @Ruta, @Descripcion, @vigencia, @Tipo_Plataforma)",
                 new {
                     plataforma.Id_Emprendimiento,
                     plataforma.Ruta,
@@ -50,7 +50,7 @@ namespace RedMujer_Backend.repositories
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
-                "UPDATE \"Plataforma\" SET \"id_emprendimiento\" = @Id_Emprendimiento, \"ruta\" = @Ruta, \"descripcion\" = @Descripcion, \"vigencia\" = @Vigencia, \"tipo_plataforma\" = @Tipo_Plataforma WHERE \"id_plataforma\" = @Id_Plataforma",
+                "UPDATE \"Plataforma\" SET \"id_emprendimiento\" = @Id_Emprendimiento, \"ruta\" = @Ruta, \"descripcion\" = @Descripcion, \"vigencia\" = @vigencia, \"tipo_plataforma\" = @Tipo_Plataforma WHERE \"id_plataforma\" = @Id_Plataforma",
                 new {
                     plataforma.Id_Emprendimiento,
                     plataforma.Ruta,

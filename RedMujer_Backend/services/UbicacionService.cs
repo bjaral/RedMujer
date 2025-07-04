@@ -20,9 +20,8 @@ namespace RedMujer_Backend.services
         public async Task<IEnumerable<Ubicacion>> GetAllAsync() => await _repo.GetAllAsync();
         public async Task<Ubicacion?> GetByIdAsync(int id) => await _repo.GetByIdAsync(id);
 
-        public async Task CrearAsync(UbicacionDto dto)
+        public async Task<int> CrearAsync(UbicacionDto dto)
         {
-            // 1. Valida que la comuna existe y pertenece a la región indicada
             var comuna = await _comunaRepo.GetByIdsAsync(dto.Id_Region, dto.Id_Comuna);
             if (comuna == null)
                 throw new System.Exception("La comuna no pertenece a la región indicada.");
@@ -30,13 +29,12 @@ namespace RedMujer_Backend.services
             var ubicacion = new Ubicacion
             {
                 Id_Comuna = dto.Id_Comuna,
-                Id_Emprendimiento = dto.Id_Emprendimiento,
                 Calle = dto.Calle,
                 Numero = dto.Numero,
                 Referencia = dto.Referencia,
                 Vigencia = dto.Vigencia
             };
-            await _repo.InsertAsync(ubicacion);
+            return await _repo.InsertAsync(ubicacion);
         }
 
         public async Task ActualizarAsync(int id, UbicacionDto dto)
@@ -50,7 +48,6 @@ namespace RedMujer_Backend.services
             {
                 Id_Ubicacion = id,
                 Id_Comuna = dto.Id_Comuna,
-                Id_Emprendimiento = dto.Id_Emprendimiento,
                 Calle = dto.Calle,
                 Numero = dto.Numero,
                 Referencia = dto.Referencia,

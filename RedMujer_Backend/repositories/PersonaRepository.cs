@@ -23,14 +23,14 @@ namespace RedMujer_Backend.repositories
         {
             using var connection = new NpgsqlConnection(_connectionString);
             return await connection.QueryAsync<Persona>(
-                "SELECT * FROM \"Personas\" WHERE Vigencia = true");
+                "SELECT * FROM \"Personas\" WHERE vigencia = true");
         }
 
         public async Task<Persona?> GetByIdAsync(int id)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             return await connection.QueryFirstOrDefaultAsync<Persona>(
-                "SELECT * FROM \"Personas\" WHERE \"id_persona\" = @Id AND Vigencia = true",
+                "SELECT * FROM \"Personas\" WHERE \"id_persona\" = @Id AND vigencia = true",
                 new { Id = id });
         }
 
@@ -40,7 +40,7 @@ namespace RedMujer_Backend.repositories
             await connection.ExecuteAsync(
                 @"INSERT INTO ""Personas"" 
                 (""id_ubicacion"", ""RUN"", ""nombre"", ""primer_apellido"", ""segundo_apellido"", ""vigencia"", ""usuario_id"") 
-                VALUES (@IdUbicacion, @RUN, @Nombre, @PrimerApellido, @SegundoApellido, @Vigencia, @UsuarioId)",
+                VALUES (@IdUbicacion, @RUN, @Nombre, @PrimerApellido, @SegundoApellido, @vigencia, @UsuarioId)",
                 persona);
         }
 
@@ -54,7 +54,7 @@ namespace RedMujer_Backend.repositories
                     ""nombre"" = @Nombre,
                     ""primer_apellido"" = @PrimerApellido,
                     ""segundo_apellido"" = @SegundoApellido,
-                    ""vigencia"" = @Vigencia,
+                    ""vigencia"" = @vigencia,
                     ""usuario_id"" = @UsuarioId
                 WHERE ""id_persona"" = @IdPersona",
                 persona);
@@ -64,7 +64,7 @@ namespace RedMujer_Backend.repositories
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
-                "UPDATE \"Personas\" SET Vigencia = false WHERE \"id_persona\" = @Id",
+                "UPDATE \"Personas\" SET vigencia = false WHERE \"id_persona\" = @Id",
                 new { Id = id });
         }
     }
