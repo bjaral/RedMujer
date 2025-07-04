@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { StepperOrientation } from '@angular/material/stepper';
+import { AuthService } from '../../services/auth.service';
 
 // Valores temporales para probar
 const REGIONES = [
@@ -20,6 +21,15 @@ const REGIONES = [
   imports: [CommonModule, ...MATERIAL_IMPORTS, FormsModule, ReactiveFormsModule],
   templateUrl: './registro.component.html',
   styleUrl: './registro.component.scss',
+  providers: [
+    {
+      provide: STEPPER_GLOBAL_OPTIONS,
+      useValue: { 
+        displayDefaultIndicatorType: false,
+        showError: true
+      }
+    }
+  ]
 })
 export class RegistroComponent {
   stepperOrientation: Observable<StepperOrientation>;
@@ -30,7 +40,7 @@ export class RegistroComponent {
   personalesForm: any;
   ubicacionForm: any;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private authService: AuthService) {
     const breakpointObserver = inject(BreakpointObserver);
     this.stepperOrientation = breakpointObserver
       .observe('(min-width: 800px)')
@@ -72,17 +82,36 @@ export class RegistroComponent {
       ? null : { mismatch: true };
   }
 
+  // Método para prevenir clics en el header del stepper
+  onStepHeaderClick(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
+  }
+
   onSubmit() {
     if (
       this.usuarioForm.valid &&
       this.personalesForm.valid &&
       this.ubicacionForm.valid
     ) {
-      // Aquí puedes manejar el envío del formulario
-      console.log({
-        ...this.usuarioForm.value,
-        ...this.personalesForm.value,
-        ...this.ubicacionForm.value,
+      const data = {
+        usuario: {
+          username: this.usuarioForm.value.username,
+          email: this.usuarioForm.value.email,
+          password: this.usuarioForm.value.password
+        },
+        persona: this.personalesForm.value,
+        ubicacion: this.ubicacionForm.value
+      };
+
+      this.authService.register(data).subscribe({
+        next: (res) => {
+          console.log('Registro exitoso', res);
+        },
+        error: (err) => {
+          console.error('Error en registro', err)
+        }
       });
     }
   }

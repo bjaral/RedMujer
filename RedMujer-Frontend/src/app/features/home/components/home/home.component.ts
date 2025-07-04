@@ -24,7 +24,6 @@ export class HomeComponent implements OnInit {
     this.homeService.getRandom().subscribe(
       data => {
         this.random = data;
-        console.log('Respuesta recibida:', data);
       },
       error => {
         console.error('Error al obtener datos:', error);

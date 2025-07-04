@@ -1,0 +1,56 @@
+using RedMujer_Backend.DTOs;
+using RedMujer_Backend.models;
+using RedMujer_Backend.repositories;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace RedMujer_Backend.services
+{
+    public class PersonaEmprendimientoService : IPersonaEmprendimientoService
+    {
+        private readonly IPersonaEmprendimientoRepository _repo;
+
+        public PersonaEmprendimientoService(IPersonaEmprendimientoRepository repo)
+        {
+            _repo = repo;
+        }
+
+        public async Task<IEnumerable<PersonaEmprendimientoDto>> GetAllAsync()
+        {
+            var items = await _repo.GetAllAsync();
+            return items.Select(pe => new PersonaEmprendimientoDto
+            {
+                IdPersona = pe.IdPersona,
+                IdEmprendimiento = pe.IdEmprendimiento
+            });
+        }
+
+        public async Task<PersonaEmprendimientoDto?> GetByIdsAsync(int idPersona, int idEmprendimiento)
+        {
+            var pe = await _repo.GetByIdsAsync(idPersona, idEmprendimiento);
+            if (pe == null) return null;
+
+            return new PersonaEmprendimientoDto
+            {
+                IdPersona = pe.IdPersona,
+                IdEmprendimiento = pe.IdEmprendimiento
+            };
+        }
+
+        public async Task CrearAsync(PersonaEmprendimientoDto dto)
+        {
+            var pe = new PersonaEmprendimiento
+            {
+                IdPersona = dto.IdPersona,
+                IdEmprendimiento = dto.IdEmprendimiento
+            };
+            await _repo.InsertAsync(pe);
+        }
+
+        public async Task EliminarAsync(int idPersona, int idEmprendimiento)
+        {
+            await _repo.DeleteAsync(idPersona, idEmprendimiento);
+        }
+    }
+}
