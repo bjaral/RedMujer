@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using RedMujer_Backend.DTOs;
 using RedMujer_Backend.models;
 using RedMujer_Backend.services;
 using System.Collections.Generic;
@@ -18,9 +19,12 @@ namespace RedMujer_Backend.controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Usuario>> GetAll()
+        public async Task<ActionResult<IEnumerable<Usuario>>> GetAll()
         {
-            return await _service.GetAllAsync();
+            var usuarios = await _service.GetAllAsync();
+            foreach (var user in usuarios)
+                user.Contrasenna = "";
+            return Ok(usuarios);
         }
 
         [HttpGet("{id}")]
@@ -28,49 +32,67 @@ namespace RedMujer_Backend.controllers
         {
             var usuario = await _service.GetByIdAsync(id);
             if (usuario == null) return NotFound();
+            usuario.Contrasenna = "";
             return Ok(usuario);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Usuario>> Create([FromBody] Usuario usuario)
+       [HttpPost]
+        public async Task<ActionResult> Crear([FromBody] UsuarioDto dto)
         {
-            var nuevoUsuario = await _service.CrearAsync(usuario);
-            return CreatedAtAction(nameof(GetById), new { id = nuevoUsuario.Id_Usuario }, nuevoUsuario);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var usuario = new Usuario
+            {
+                UsuarioNombre = dto.Usuario,
+                Contrasenna = BCrypt.Net.BCrypt.HashPassword(dto.Contrasenna),
+                Vigencia = dto.Vigencia,
+                Tipo_Usuario = Enum.Parse<TipoUsuario>(dto.Tipo_Usuario, true),
+                Correo = dto.Correo
+            };
+
+            await _service.CrearAsync(usuario);
+
+            // Opcional: Borra la contraseña antes de mostrar
+            usuario.Contrasenna = "";
+
+            return Ok(usuario);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Usuario usuario)
+
+       [HttpPut("{id}")]
+        public async Task<ActionResult> Actualizar(int id, [FromForm] UsuarioDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var existente = await _service.GetByIdAsync(id);
-            if (existente == null) return NotFound();
+            if (existente == null)
+                return NotFound();
+
+            var usuario = new Usuario
+            {
+                Id_Usuario = id,
+                UsuarioNombre = dto.Usuario,
+                Contrasenna = string.IsNullOrWhiteSpace(dto.Contrasenna)
+                    ? existente.Contrasenna
+                    : BCrypt.Net.BCrypt.HashPassword(dto.Contrasenna),
+                Vigencia = dto.Vigencia,
+                Tipo_Usuario = Enum.Parse<TipoUsuario>(dto.Tipo_Usuario, true),
+                Correo = dto.Correo
+            };
 
             await _service.ActualizarAsync(id, usuario);
-            return NoContent();
+            return Ok(new { mensaje = "Usuario actualizado correctamente" });
         }
+
+
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult> Eliminar(int id)
         {
-            var existente = await _service.GetByIdAsync(id);
-            if (existente == null) return NotFound();
-
             await _service.EliminarAsync(id);
-            return NoContent();
+            return Ok(new { mensaje = "Usuario eliminado correctamente" });
         }
-
-        [HttpPost("authenticate")]
-        public async Task<ActionResult<Usuario>> Authenticate([FromBody] LoginRequest login)
-        {
-            var usuario = await _service.AuthenticateAsync(login.UsuarioNombre, login.Contrasenna);
-            if (usuario == null) return Unauthorized();
-
-            return Ok(usuario);
-        }
-    }
-
-    public class LoginRequest
-    {
-        public string UsuarioNombre { get; set; } = string.Empty;
-        public string Contrasenna { get; set; } = string.Empty;
     }
 }
