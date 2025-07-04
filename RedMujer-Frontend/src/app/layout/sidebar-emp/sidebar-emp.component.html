@@ -9,7 +9,7 @@
       <a routerLink="/perfil" class="navigation-item">
         <mat-icon>person</mat-icon>Mi perfil</a>
       <div class="spacer"></div>
-      <a routerLink="/" class="logout">
+      <a (click)="confirmarLogout()" class="logout">
       <mat-icon>logout</mat-icon>Cerrar sesión</a>
     </nav>
   </div>
