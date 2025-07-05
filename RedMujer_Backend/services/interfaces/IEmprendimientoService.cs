@@ -15,5 +15,7 @@ namespace RedMujer_Backend.services
         Task EliminarAsync(int id);
         Task<Emprendimiento> ActualizarImagenAsync(int idEmprendimiento, string? rutaImagen);
         Task<bool> ExisteAsync(int idEmprendimiento);
+        Task<string?> ObtenerRutaImagenPrincipalAsync(int id);
+        Task ActualizarImagenPrincipalAsync(int id, string? ruta);
     }
 }

@@ -11,6 +11,8 @@ namespace RedMujer_Backend.repositories
         Task ActualizarEmprendimientoAsync(Emprendimiento e);
         Task EliminarEmprendimientoAsync(int id);
         Task<Emprendimiento?> GetByIdAsync(int id);
-        Task<int> InsertarEmprendimientoAsync(Emprendimiento e); 
+        Task<int> InsertarEmprendimientoAsync(Emprendimiento e);
+        Task<string?> GetImagenPrincipalAsync(int id);
+        Task UpdateImagenPrincipalAsync(int id, string? ruta);
     }
 }
