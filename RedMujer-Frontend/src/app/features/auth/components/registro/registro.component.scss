@@ -91,6 +91,10 @@ mat-step{
         margin-bottom: 0.5rem;
         border-radius: 30px;
 
+        &:first-child {
+            margin-top: 0.3rem;
+        }
+
         input {
             border-radius: 330px;
         }

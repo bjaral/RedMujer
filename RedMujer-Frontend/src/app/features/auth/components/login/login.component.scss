@@ -89,6 +89,10 @@
     form {
         display: flex;
         flex-direction: column;
+
+        h2 {
+            color: $secondary-color;
+        }
     }
 
     mat-form-field {
@@ -118,4 +122,10 @@
         cursor: pointer;
     }
 }
+}
+
+@media (max-width: 768px) {
+    .login-info {
+        display: none;
+    }
 }
