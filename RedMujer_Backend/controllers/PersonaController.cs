@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace RedMujer_Backend.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class PersonasController : ControllerBase
