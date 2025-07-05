@@ -8,7 +8,7 @@
 
 .sidebar {
   background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #673ab7 100%);
-  color: #fff;
+  color: white;
   padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
@@ -36,8 +36,8 @@
       gap: 0.75rem;
       padding: 0.75rem 1rem;
       text-decoration: none;
-      color: #fff;
-      font-size: 0.95rem;
+      color: white;
+      font-size: 1rem;
       transition: background-color 0.2s ease;
 
       mat-icon {
@@ -100,59 +100,68 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 56px;
+  height: 64px;
   background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #673ab7 100%);
   display: flex;
   align-items: center;
-  padding: 0 1rem;
+  padding: 0 16px;
   box-sizing: border-box;
   z-index: 10000;
 
   .menu-icon {
     color: white;
-    margin-right: 1rem;
+    margin-right: 16px;
+    display: block;
   }
 
   .mobile-logo {
     height: 40px;
     width: auto;
-    max-width: 140px;
+    max-width: 160px;
     cursor: pointer;
+    object-fit: contain;
+    margin-right: auto;
   }
 }
 
 .mobile-sidebar {
   display: none;
-  flex-direction: column;
-  background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #673ab7 100%);
-  color: #fff;
-  padding: 1rem;
-  position: absolute;
-  top: 56px;
-  left: 0;
-  width: 100%;
-  z-index: 9999;
 
   &.open {
     display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #673ab7 100%);
+    color: #fff;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px 20px;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    z-index: 9999;
+    gap: 10px;
   }
 
   a.navigation-item {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    padding: 0.75rem 1.2rem;
+    padding: 10px 0;
     text-decoration: none;
-    color: #fff;
-    font-size: 0.95rem;
+    color: white;
+    font-size: 1.125rem;
     font-weight: 500;
     border-radius: 30px;
     transition: none;
-    width: auto;
-    margin: 0 auto 0.5rem auto;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
 
     mat-icon {
       font-size: 20px;
+      color: white;
     }
 
     &.active {
@@ -165,7 +174,7 @@
     color: #e91e63;
     font-weight: 600;
     padding: 0.8rem 1.5rem;
-    margin: 1rem auto 0 auto;
+    margin: 0 auto 10px auto;
     border-radius: 30px;
     border: none;
     width: auto;
@@ -195,7 +204,7 @@
 
   .main-content {
     padding: 1rem;
-    margin-top: 56px;
+    margin-top: 64px;
   }
 }
 
