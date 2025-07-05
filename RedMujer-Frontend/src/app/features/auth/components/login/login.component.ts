@@ -20,28 +20,30 @@ export class LoginComponent {
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      email: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(5)]],
     })
   }
 
   onSubmit() {
     if (this.loginForm.valid) {
       const credentials = {
-          email: this.loginForm.value.correo,
-          password: this.loginForm.value.password
+          Correo: this.loginForm.value.correo,
+          Password: this.loginForm.value.password
         }
       ;
 
       this.authService.login(credentials).subscribe({
         next: (res) => {
-          console.log('Inicio de sesión exitoso')
+          console.log('Inicio de sesión exitoso');
           this.toInicio();
         },
         error: (err) => {
-          alert('Correo o contraseña inválidos')
+          alert('Error en el inicio de sesión'); 
         }
       })
+    } else {
+      console.error('Formulario no válido')
     }
   }
 
