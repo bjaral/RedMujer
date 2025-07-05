@@ -30,15 +30,16 @@ mat-step{
     }
 
     h2 {
-        font-size: 2.5rem;
+        font-size: 3.25rem;
         font-weight: 700;
-        color: $secondary-color;
+        color: $primary-color;
         margin-bottom: 0.5rem;
         line-height: 1.1;
     }
 
     h2:last-of-type {
-        color: $primary-color;
+        font-size: 2.15rem;
+        color: $secondary-color;
     }
 
     p {

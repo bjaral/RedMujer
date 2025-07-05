@@ -53,10 +53,8 @@ mat-toolbar {
     }
 
     .signin-btn {
-        color: $secondary-color;
-            border: 0.1px solid $secondary-color;
-            background-color: transparent;
-            color: #37556f;
+        color: #37556f;
+        background-color: transparent;
 
         &:hover {
             background-color: #cde5ff;
@@ -110,10 +108,9 @@ mat-toolbar {
         display: block;
 
         &.mobile-signin-btn {
-            color: $secondary-color;
-            border: 0.1px solid $secondary-color;
-            background-color: transparent;
             color: #37556f;
+            border: 2px solid #37556f;
+            background-color: transparent;
 
             &:hover {
                 background-color: #cde5ff;

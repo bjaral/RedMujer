@@ -2,11 +2,11 @@
 
 .footer {
     padding: 2rem;
-    background-color: #fff;
+    padding-left: 3rem;
+    background: $gradient;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     height: auto;
-    color: $secondary-color;
     align-items: start;
 
     @media (max-width: 768px) {
@@ -30,10 +30,11 @@
         gap: 1rem;
 
         span {
-            color: $secondary-color;
-            font-weight: 500;
+            color: white;
+            font-weight: 600;
             font-size: 1.4rem;
         }
+        
     }
 
     .red-mujer,
@@ -66,20 +67,20 @@
 }
 
 h2 {
-    color: $secondary-color;
-    font-weight: 500;
+    color: white;
+    font-weight: 600;
     font-size: 1.3rem;
     margin-bottom: 0;
 }
 
 a {
-    color: #5c7a96;
+    color: white;
     transition: all;
     transition-duration: 0.3s ease-in-out;
     text-decoration: none;
 
     &:hover {
-        color: #2b4963;
+        color: white;
         cursor: pointer;
     }
 }
