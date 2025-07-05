@@ -31,6 +31,10 @@ export class HomeComponent implements OnInit {
     );
   }
 
+  toRegistro() {
+    this.router.navigate(['/registro'])
+  }
+
   toEmprendimientos() {
     this.router.navigate(['/emprendimientos']);
   }

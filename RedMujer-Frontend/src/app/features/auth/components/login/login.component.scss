@@ -1,104 +1,131 @@
 @use '../../../../../styles.scss' as *;
 
-.login-layout {
-    display: grid;
-    grid-template-rows: 1fr 7fr auto;
-    grid-template-columns: 1fr;
-    height: 100vh;
-    padding-inline: 6rem;
-    gap: 2rem;
-    height: 0%;
-
-    .header {
-        display: flex;
-        justify-content: right;
-        align-items: center;
-
-        button {
-            margin-inline: 0.5rem;
-        }
-
-    }
-
-    .main {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-    }
-
-    .context {
-        padding-inline: 3rem;
-        margin-top: 3rem;
-        
-        h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            color: #333;
-        }
-        
-        p {
-            font-size: 1.5rem;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-            color: #555;
-            max-width: 80%;
-        }
-
-        button {
-            font-size: large;
-        }
-    }
-
-    .login-form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+.login-container {
+    background-color: #eee;
+    display: flex;
+    padding: 2rem;
+    gap: 3rem;
+    min-height: 90vh;
+    justify-content: center;
 }
 
-.login-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    max-width: 30rem;
-    margin-top: 10rem;
-    margin-right: 10rem;
-    padding: 0rem 10rem 3rem;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+.login-info {
+    max-width: 45vw;
+    gap: 1.5rem;
 
-    h1 {
-        width: 100%;
-        text-align: center;
-        font-size: 3rem;
-        width: 150%;
-        margin-bottom: 1.5rem;
-        color: #333;
+    .login-ilustracion {
+        width: max-content;
+        justify-self: center;
     }
 
-    mat-form-field {
-        width: 150%;
+    img {
+        height: 300px;
     }
 
-    a {
-        font-size: medium;
-        color: #1976d2;
-        text-decoration: none;
-        text-align: right;
-        margin-top: -0.5rem;
-        margin-bottom: 0;
+    h2 {
+        font-size: 3.25rem;
+        font-weight: 700;
+        color: $primary-color;
+        margin-bottom: 0.5rem;
+        line-height: 1.1;
+    }
 
-        &:hover {
-        text-decoration: underline;
-        }
+    h2:last-of-type {
+        font-size: 2.15rem;
+        color: $secondary-color;
+    }
+
+    p {
+        color: $secondary-color;
+        font-size: 1.15rem;
+        margin-bottom: 2rem;
+        max-width: 600px;
     }
 
     button {
-        margin-top: 0.5rem;
-        padding: 0.75rem;
-        width: 100%;
+        background: white !important;
+        color: #e91e63 !important;
+        padding: 1rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 50px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        }
+    }
+}
+
+.login-panel {
+    background-color: #fff;
+    min-width: 340px;
+    max-width: 450px;
+    max-height: fit-content;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(231, 0, 76, 0.08);
+
+    >p {
+        color: $secondary-color;
         font-weight: 500;
-        font-size: larger;
-        border: 2px solid;
+        font-size: 1.1rem;
+        text-align: center;
+    }
+
+    .logo img {
+        height: 80px;
+        width: auto;
+        max-width: 160px;
+        object-fit: contain;
+        margin-right: 16px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+
+        h2 {
+            color: $secondary-color;
+        }
+    }
+
+    mat-form-field {
+        width: 100%;
+        margin-bottom: 0.5rem;
+        border-radius: 30px;
+
+        input {
+            border-radius: 330px;
+        }
+    }
+
+    button[mat-raised-button] {
+    background: $primary-color;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    width: 100%;
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    box-shadow: none;
+    transition: background 0.2s, opacity 0.2s;
+
+    &:hover {
+        background: darken($primary-color, 10%);
+        opacity: 1;
+        cursor: pointer;
+    }
+}
+}
+
+@media (max-width: 768px) {
+    .login-info {
+        display: none;
     }
 }

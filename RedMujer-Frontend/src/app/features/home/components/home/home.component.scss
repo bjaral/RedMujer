@@ -4,18 +4,21 @@
 .hero-section {
   position: relative;
   min-height: 100vh;
-  background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #673ab7 100%);
+  background: $gradient;
   display: flex;
-  align-items: center;
   overflow: hidden;
   
   .hero-container {
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 3rem;
+    padding: 0rem 3rem 3rem 4rem;
     z-index: 2;
     position: relative;
+
+    @media (max-width: 768px) {
+      padding: 2rem;
+    }
   }
 
   .hero-content {
