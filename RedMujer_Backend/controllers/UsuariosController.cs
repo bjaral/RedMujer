@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
-
 namespace RedMujer_Backend.controllers
 {
     [ApiController]
@@ -47,7 +46,7 @@ namespace RedMujer_Backend.controllers
             var usuario = new Usuario
             {
                 UsuarioNombre = dto.Usuario,
-                Contrasenna = dto.Contrasenna, // <-- SOLO password plano
+                Contrasenna = dto.Contrasenna,
                 Vigencia = dto.Vigencia,
                 Tipo_Usuario = Enum.Parse<TipoUsuario>(dto.Tipo_Usuario, true),
                 Correo = dto.Correo
@@ -76,7 +75,7 @@ namespace RedMujer_Backend.controllers
                 UsuarioNombre = dto.Usuario,
                 Contrasenna = string.IsNullOrWhiteSpace(dto.Contrasenna)
                     ? existente.Contrasenna
-                    : dto.Contrasenna, // <-- password plano, servicio lo hashea
+                    : dto.Contrasenna,
                 Vigencia = dto.Vigencia,
                 Tipo_Usuario = Enum.Parse<TipoUsuario>(dto.Tipo_Usuario, true),
                 Correo = dto.Correo
@@ -85,6 +84,7 @@ namespace RedMujer_Backend.controllers
             await _service.ActualizarAsync(id, usuario);
             return Ok(new { mensaje = "Usuario actualizado correctamente" });
         }
+
         [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Eliminar(int id)

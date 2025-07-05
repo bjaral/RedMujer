@@ -11,6 +11,7 @@ namespace RedMujer_Backend.services
         Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad);
         Task<Emprendimiento> CrearAsync(EmprendimientoDto dto, string? rutaImagen);
         Task ActualizarAsync(int id, EmprendimientoDto dto, string? rutaImagen);    
+        Task<Emprendimiento?> GetByIdAsync(int id);
         Task EliminarAsync(int id);
         Task<Emprendimiento> ActualizarImagenAsync(int idEmprendimiento, string? rutaImagen);
         Task<bool> ExisteAsync(int idEmprendimiento);
