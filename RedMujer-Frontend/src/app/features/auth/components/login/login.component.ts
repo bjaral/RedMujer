@@ -28,22 +28,27 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       const credentials = {
-          Correo: this.loginForm.value.correo,
-          Password: this.loginForm.value.password
-        }
-      ;
+        correo: this.loginForm.value.email,    
+        password: this.loginForm.value.password
+      };
+      console.log('Se envía al backend:', credentials);
 
       this.authService.login(credentials).subscribe({
         next: (res) => {
+          if (res && res.token) {
+            localStorage.setItem('tokenRedMujer', res.token);
+          } else {
+
+          }
           console.log('Inicio de sesión exitoso');
           this.toInicio();
         },
         error: (err) => {
-          alert('Error en el inicio de sesión'); 
+          alert('Error en el inicio de sesión');
         }
-      })
+      });
     } else {
-      console.error('Formulario no válido')
+      console.error('Formulario no válido');
     }
   }
 
