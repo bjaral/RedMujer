@@ -192,5 +192,22 @@ namespace RedMujer_Backend.repositories
                 Modalidad = StringToModalidad(e.modalidad)
             });
         }
+        public async Task<string?> GetImagenPrincipalAsync(int id)
+        {
+            const string sql = @"SELECT imagen FROM public.""Emprendimientos"" WHERE id_emprendimiento = @Id";
+            using (var connection = CreateConnection())
+            {
+                return await connection.QueryFirstOrDefaultAsync<string>(sql, new { Id = id });
+            }
+        }
+
+        public async Task UpdateImagenPrincipalAsync(int id, string? ruta)
+        {
+            const string sql = @"UPDATE public.""Emprendimientos"" SET imagen = @Ruta WHERE id_emprendimiento = @Id";
+            using (var connection = CreateConnection())
+            {
+                await connection.ExecuteAsync(sql, new { Ruta = ruta, Id = id });
+            }
+        }
     }
 }

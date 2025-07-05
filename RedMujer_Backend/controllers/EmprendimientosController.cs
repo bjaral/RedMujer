@@ -6,12 +6,17 @@ using RedMujer_Backend.repositories;
 using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 
 namespace RedMujer_Backend.controllers
 {
+    // DTO para múltiples imágenes (si lo usas)
+    public class ImagenesUploadDto
+    {
+        public List<IFormFile> Imagenes { get; set; } = new();
+    }
+
     [ApiController]
     [Route("api/[controller]")]
     public class EmprendimientosController : ControllerBase
@@ -49,31 +54,26 @@ namespace RedMujer_Backend.controllers
         {
             var emprendimiento = await _service.GetByIdAsync(id);
             if (emprendimiento == null)
-            {
                 return NotFound();
-            }
             return Ok(emprendimiento);
         }
 
         [HttpPost]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> Crear([FromForm] EmprendimientoDto dto)
         {
-            // 1. Crear emprendimiento SIN imagen
             var nuevo = await _service.CrearAsync(dto, null);
-
-            // 2. Si viene una imagen, la subes y asocias
             if (dto.Imagen != null)
             {
                 var rutaImagen = await GuardarImagenPrincipal(nuevo.Id_Emprendimiento, dto.Imagen);
-                // Actualiza sólo la imagen
                 await _service.ActualizarImagenAsync(nuevo.Id_Emprendimiento, rutaImagen);
-                nuevo.Imagen = rutaImagen; // Opcional: para devolver la ruta en la respuesta
+                nuevo.Imagen = rutaImagen;
             }
-
             return CreatedAtAction(nameof(GetById), new { id = nuevo.Id_Emprendimiento }, nuevo);
         }
 
         [HttpPut("{id}")]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> Actualizar(int id, [FromForm] EmprendimientoDto dto)
         {
             var rutaImagen = await GuardarImagenPrincipal(id, dto.Imagen);
@@ -89,6 +89,7 @@ namespace RedMujer_Backend.controllers
         }
 
         [HttpPost("{id}/multimedia")]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> SubirMultimedia(int id, [FromForm] MultimediaUploadDto dto)
         {
             if (dto.Archivo == null || dto.Archivo.Length == 0)
@@ -111,45 +112,68 @@ namespace RedMujer_Backend.controllers
             };
 
             await _multimediaRepo.AgregarMultimediaAsync(multimedia);
-
             return Ok(new { ruta });
         }
 
-        private async Task<string?> GuardarImagenPrincipal(int idEmprendimiento, IFormFile? imagen)
+        // === Imagen principal ===
+        [HttpGet("{id}/imagen-principal")]
+        public async Task<IActionResult> GetImagenPrincipal(int id)
         {
+            var ruta = await _service.ObtenerRutaImagenPrincipalAsync(id);
+            if (string.IsNullOrEmpty(ruta))
+                return NotFound("No hay imagen principal para este emprendimiento.");
+
+            // Construye la URL completa basada en la ruta guardada en la BD
+            var urlRelativa = Path.Combine("media", ruta).Replace("\\", "/");
+            var urlCompleta = $"{Request.Scheme}://{Request.Host}/{urlRelativa}";
+
+            return Ok(new { url = urlCompleta });
+        }
+        [HttpPut("{id}/imagen-principal")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> ActualizarImagenPrincipal(int id, [FromForm] ImagenUploadDto dto)
+        {
+            var imagen = dto.Imagen;
             if (imagen == null || imagen.Length == 0)
-                return null;
+                return BadRequest("No se recibió ningún archivo.");
 
-            var nombreArchivo = Path.GetFileName(imagen.FileName);
-            var carpetaDestino = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", idEmprendimiento.ToString(), "imagen_principal");
-            Directory.CreateDirectory(carpetaDestino);
+            var existe = await _service.ExisteAsync(id);
+            if (!existe)
+                return NotFound();
 
-            var rutaCompleta = Path.Combine(carpetaDestino, nombreArchivo);
-
-            using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+            // Borra anterior
+            var rutaAnterior = await _service.ObtenerRutaImagenPrincipalAsync(id);
+            if (!string.IsNullOrEmpty(rutaAnterior))
             {
-                await imagen.CopyToAsync(stream);
+                var rutaFisica = Path.Combine(_env.ContentRootPath, "media", rutaAnterior);
+                if (System.IO.File.Exists(rutaFisica))
+                    System.IO.File.Delete(rutaFisica);
             }
 
-            // Retornamos la ruta relativa para almacenar en base de datos y usar en URLs
-            return Path.Combine("emprendimientos", idEmprendimiento.ToString(), "imagen_principal", nombreArchivo).Replace("\\", "/");
+            // Guarda nueva
+            var rutaNueva = await GuardarImagenPrincipal(id, imagen);
+            await _service.ActualizarImagenPrincipalAsync(id, rutaNueva);
+
+            return Ok(new { ruta = rutaNueva });
         }
 
-        private async Task<string> GuardarArchivoMultimedia(int idEmprendimiento, IFormFile archivo, string subCarpeta)
+        [HttpDelete("{id}/imagen-principal")]
+        public async Task<IActionResult> EliminarImagenPrincipal(int id)
         {
-            var nombreArchivo = Path.GetFileName(archivo.FileName);
-            var carpetaDestino = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", idEmprendimiento.ToString(), subCarpeta);
-            Directory.CreateDirectory(carpetaDestino);
+            var ruta = await _service.ObtenerRutaImagenPrincipalAsync(id);
+            if (string.IsNullOrEmpty(ruta))
+                return NotFound("No hay imagen principal para este emprendimiento.");
 
-            var rutaCompleta = Path.Combine(carpetaDestino, nombreArchivo);
+            var rutaFisica = Path.Combine(_env.ContentRootPath, "media", ruta);
+            if (System.IO.File.Exists(rutaFisica))
+                System.IO.File.Delete(rutaFisica);
 
-            using (var stream = new FileStream(rutaCompleta, FileMode.Create))
-            {
-                await archivo.CopyToAsync(stream);
-            }
-
-            return Path.Combine("emprendimientos", idEmprendimiento.ToString(), subCarpeta, nombreArchivo).Replace("\\", "/");
+            await _service.ActualizarImagenPrincipalAsync(id, null);
+            return NoContent();
         }
+
+        // === Imágenes múltiples SOLO EN DISCO ===
+
         [HttpGet("{id}/imagenes-emprendimiento")]
         public IActionResult GetImagenesEmprendimiento(int id)
         {
@@ -171,5 +195,96 @@ namespace RedMujer_Backend.controllers
             return Ok(new { imagenes });
         }
 
+        [HttpPut("{id}/imagenes-emprendimiento")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> ActualizarImagenesEmprendimiento(int id, [FromForm] ImagenesUploadDto dto)
+        {
+            var imagenes = dto.Imagenes;
+            if (imagenes == null || imagenes.Count == 0)
+                return BadRequest("No se recibieron archivos.");
+
+            var existe = await _service.ExisteAsync(id);
+            if (!existe)
+                return NotFound();
+
+            var carpeta = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", id.ToString(), "imagenes_emprendimiento");
+
+            // Borra anteriores
+            if (Directory.Exists(carpeta))
+            {
+                var archivos = Directory.GetFiles(carpeta);
+                foreach (var archivo in archivos)
+                    System.IO.File.Delete(archivo);
+            }
+            Directory.CreateDirectory(carpeta);
+
+            var rutas = new List<string>();
+            foreach (var imagen in imagenes)
+            {
+                var nombreArchivo = Path.GetFileName(imagen.FileName);
+                var rutaCompleta = Path.Combine(carpeta, nombreArchivo);
+
+                using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+                {
+                    await imagen.CopyToAsync(stream);
+                }
+
+                var urlRelativa = Path.Combine("media", "emprendimientos", id.ToString(), "imagenes_emprendimiento", nombreArchivo).Replace("\\", "/");
+                rutas.Add(urlRelativa);
+            }
+
+            return Ok(new { rutas });
+        }
+
+        [HttpDelete("{id}/imagenes-emprendimiento")]
+        public IActionResult EliminarImagenesEmprendimiento(int id)
+        {
+            var carpeta = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", id.ToString(), "imagenes_emprendimiento");
+            if (!Directory.Exists(carpeta))
+                return NotFound("No hay imágenes para este emprendimiento.");
+
+            var archivos = Directory.GetFiles(carpeta);
+            foreach (var archivo in archivos)
+                System.IO.File.Delete(archivo);
+
+            return NoContent();
+        }
+
+        // === Helpers ===
+
+        private async Task<string?> GuardarImagenPrincipal(int idEmprendimiento, IFormFile? imagen)
+        {
+            if (imagen == null || imagen.Length == 0)
+                return null;
+
+            var nombreArchivo = Path.GetFileName(imagen.FileName);
+            var carpetaDestino = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", idEmprendimiento.ToString(), "imagen_principal");
+            Directory.CreateDirectory(carpetaDestino);
+
+            var rutaCompleta = Path.Combine(carpetaDestino, nombreArchivo);
+
+            using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+            {
+                await imagen.CopyToAsync(stream);
+            }
+
+            return Path.Combine("emprendimientos", idEmprendimiento.ToString(), "imagen_principal", nombreArchivo).Replace("\\", "/");
+        }
+
+        private async Task<string> GuardarArchivoMultimedia(int idEmprendimiento, IFormFile archivo, string subCarpeta)
+        {
+            var nombreArchivo = Path.GetFileName(archivo.FileName);
+            var carpetaDestino = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", idEmprendimiento.ToString(), subCarpeta);
+            Directory.CreateDirectory(carpetaDestino);
+
+            var rutaCompleta = Path.Combine(carpetaDestino, nombreArchivo);
+
+            using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+            {
+                await archivo.CopyToAsync(stream);
+            }
+
+            return Path.Combine("emprendimientos", idEmprendimiento.ToString(), subCarpeta, nombreArchivo).Replace("\\", "/");
+        }
     }
 }
