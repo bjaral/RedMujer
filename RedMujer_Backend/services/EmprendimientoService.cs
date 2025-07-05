@@ -101,5 +101,15 @@ namespace RedMujer_Backend.services
             var emprendimiento = await _repo.GetByIdAsync(idEmprendimiento);
             return emprendimiento != null;
         }
+
+        public async Task<string?> ObtenerRutaImagenPrincipalAsync(int id)
+        {
+            return await _repo.GetImagenPrincipalAsync(id);
+        }
+
+        public async Task ActualizarImagenPrincipalAsync(int id, string? ruta)
+        {
+            await _repo.UpdateImagenPrincipalAsync(id, ruta);
+        }
     }
 }
