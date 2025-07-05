@@ -149,6 +149,7 @@ export class RegistroComponent {
       this.authService.register(data).subscribe({
         next: (res) => {
           console.log('Registro exitoso');
+          this.toInicio();
         },
         error: (err) => {
           alert('Ocurrió un error en registro.')
