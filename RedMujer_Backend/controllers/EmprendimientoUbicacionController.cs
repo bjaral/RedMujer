@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using RedMujer_Backend.DTOs;
 using RedMujer_Backend.services;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace RedMujer_Backend.Controllers
 {

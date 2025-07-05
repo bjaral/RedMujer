@@ -2,11 +2,11 @@
   <div class="sidebar">
     <img mat-card-image src="assets/images/logo-png-negativo.png" alt="Logo">
     <nav>
-      <a routerLink="/perfil" class="navigation-item">
-        <mat-icon>bar_chart</mat-icon>Estadísticas</a>
-      <a routerLink="/emprendimientos" class="navigation-item narrow-item">
+      <a routerLink="/nuevo-emprendimiento" routerLinkActive="active" class="navigation-item">
+        <mat-icon>bar_chart</mat-icon>Crear emprendimiento</a>
+      <a routerLink="/mis-emprendimientos" routerLinkActive="active" class="navigation-item narrow-item">
         <mat-icon>storefront</mat-icon>Mis emprendimientos</a>
-      <a routerLink="/perfil" class="navigation-item">
+      <a routerLink="/perfil" routerLinkActive="active" class="navigation-item">
         <mat-icon>person</mat-icon>Mi perfil</a>
       <div class="spacer"></div>
       <a (click)="confirmarLogout()" class="logout">

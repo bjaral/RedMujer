@@ -6,6 +6,9 @@ using RedMujer_Backend.repositories;
 using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 
 namespace RedMujer_Backend.controllers
 {
@@ -41,19 +44,15 @@ namespace RedMujer_Backend.controllers
             return Ok(lista);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Actualizar(int id, [FromForm] EmprendimientoDto dto)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Emprendimiento>> GetById(int id)
         {
-            var rutaImagen = await GuardarImagenPrincipal(id, dto.Imagen);
-            await _service.ActualizarAsync(id, dto, rutaImagen);
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
-        {
-            await _service.EliminarAsync(id);
-            return NoContent();
+            var emprendimiento = await _service.GetByIdAsync(id);
+            if (emprendimiento == null)
+            {
+                return NotFound();
+            }
+            return Ok(emprendimiento);
         }
 
         [HttpPost]
@@ -71,26 +70,22 @@ namespace RedMujer_Backend.controllers
                 nuevo.Imagen = rutaImagen; // Opcional: para devolver la ruta en la respuesta
             }
 
-            return CreatedAtAction(nameof(GetAll), new { id = nuevo.Id_Emprendimiento }, nuevo);
+            return CreatedAtAction(nameof(GetById), new { id = nuevo.Id_Emprendimiento }, nuevo);
         }
 
-        private async Task<string?> GuardarImagenPrincipal(int idEmprendimiento, IFormFile? imagen)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Actualizar(int id, [FromForm] EmprendimientoDto dto)
         {
-            if (imagen == null || imagen.Length == 0)
-                return null;
+            var rutaImagen = await GuardarImagenPrincipal(id, dto.Imagen);
+            await _service.ActualizarAsync(id, dto, rutaImagen);
+            return NoContent();
+        }
 
-            var nombreArchivo = Path.GetFileName(imagen.FileName);
-            var carpetaDestino = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", idEmprendimiento.ToString(), "imagen_principal");
-            Directory.CreateDirectory(carpetaDestino);
-
-            var rutaCompleta = Path.Combine(carpetaDestino, nombreArchivo);
-
-            using (var stream = new FileStream(rutaCompleta, FileMode.Create))
-            {
-                await imagen.CopyToAsync(stream);
-            }
-
-            return Path.Combine("emprendimientos", idEmprendimiento.ToString(), "imagen_principal", nombreArchivo).Replace("\\", "/");
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            await _service.EliminarAsync(id);
+            return NoContent();
         }
 
         [HttpPost("{id}/multimedia")]
@@ -118,6 +113,26 @@ namespace RedMujer_Backend.controllers
             await _multimediaRepo.AgregarMultimediaAsync(multimedia);
 
             return Ok(new { ruta });
+        }
+
+        private async Task<string?> GuardarImagenPrincipal(int idEmprendimiento, IFormFile? imagen)
+        {
+            if (imagen == null || imagen.Length == 0)
+                return null;
+
+            var nombreArchivo = Path.GetFileName(imagen.FileName);
+            var carpetaDestino = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", idEmprendimiento.ToString(), "imagen_principal");
+            Directory.CreateDirectory(carpetaDestino);
+
+            var rutaCompleta = Path.Combine(carpetaDestino, nombreArchivo);
+
+            using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+            {
+                await imagen.CopyToAsync(stream);
+            }
+
+            // Retornamos la ruta relativa para almacenar en base de datos y usar en URLs
+            return Path.Combine("emprendimientos", idEmprendimiento.ToString(), "imagen_principal", nombreArchivo).Replace("\\", "/");
         }
 
         private async Task<string> GuardarArchivoMultimedia(int idEmprendimiento, IFormFile archivo, string subCarpeta)

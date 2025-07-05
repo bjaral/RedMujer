@@ -4,6 +4,7 @@ using RedMujer_Backend.models;
 using RedMujer_Backend.services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RedMujer_Backend.controllers
 {
@@ -36,7 +37,7 @@ namespace RedMujer_Backend.controllers
             return Ok(usuario);
         }
 
-       [HttpPost]
+        [HttpPost]
         public async Task<ActionResult> Crear([FromBody] UsuarioDto dto)
         {
             if (!ModelState.IsValid)
@@ -45,7 +46,7 @@ namespace RedMujer_Backend.controllers
             var usuario = new Usuario
             {
                 UsuarioNombre = dto.Usuario,
-                Contrasenna = BCrypt.Net.BCrypt.HashPassword(dto.Contrasenna),
+                Contrasenna = dto.Contrasenna,
                 Vigencia = dto.Vigencia,
                 Tipo_Usuario = Enum.Parse<TipoUsuario>(dto.Tipo_Usuario, true),
                 Correo = dto.Correo
@@ -53,14 +54,12 @@ namespace RedMujer_Backend.controllers
 
             var id = await _service.CrearAsync(usuario);
 
-            // Opcional: Borra la contraseña antes de mostrar
             usuario.Contrasenna = "";
 
             return Ok(new { id });
         }
 
-
-       [HttpPut("{id}")]
+        [HttpPut("{id}")]
         public async Task<ActionResult> Actualizar(int id, [FromForm] UsuarioDto dto)
         {
             if (!ModelState.IsValid)
@@ -76,7 +75,7 @@ namespace RedMujer_Backend.controllers
                 UsuarioNombre = dto.Usuario,
                 Contrasenna = string.IsNullOrWhiteSpace(dto.Contrasenna)
                     ? existente.Contrasenna
-                    : BCrypt.Net.BCrypt.HashPassword(dto.Contrasenna),
+                    : dto.Contrasenna,
                 Vigencia = dto.Vigencia,
                 Tipo_Usuario = Enum.Parse<TipoUsuario>(dto.Tipo_Usuario, true),
                 Correo = dto.Correo
@@ -86,8 +85,7 @@ namespace RedMujer_Backend.controllers
             return Ok(new { mensaje = "Usuario actualizado correctamente" });
         }
 
-
-
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Eliminar(int id)
         {

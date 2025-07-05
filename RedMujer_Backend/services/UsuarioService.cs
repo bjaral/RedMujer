@@ -26,6 +26,20 @@ namespace RedMujer_Backend.services
             return await _repo.CrearAsync(usuario);
         }
 
+        // Obtener usuario por correo (sin autenticación, solo búsqueda)
+        public async Task<Usuario?> GetByCorreoAsync(string correo)
+        {
+            return await _repo.GetByCorreoAsync(correo);
+        }
+
+        // Autenticación por correo
+        public async Task<Usuario?> AuthenticateByCorreoAsync(string correo, string plainPassword)
+        {
+            var user = await _repo.GetByCorreoAsync(correo);
+            if (user == null) return null;
+            return BCrypt.Net.BCrypt.Verify(plainPassword, user.Contrasenna) ? user : null;
+        }
+
         public async Task ActualizarAsync(int id, Usuario usuario)
         {
             var existente = await _repo.GetByIdAsync(id);
@@ -46,6 +60,7 @@ namespace RedMujer_Backend.services
         public async Task EliminarAsync(int id) =>
             await _repo.EliminarAsync(id);
 
+        // Autenticación por nombre de usuario
         public async Task<Usuario?> AuthenticateAsync(string usuarioNombre, string plainPassword)
         {
             var user = await _repo.GetByUsuarioNombreAsync(usuarioNombre);

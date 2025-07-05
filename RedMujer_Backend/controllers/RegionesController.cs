@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using RedMujer_Backend.DTOs;
 using RedMujer_Backend.services;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace RedMujer_Backend.controllers
 {
@@ -39,7 +41,7 @@ namespace RedMujer_Backend.controllers
             await _service.ActualizarAsync(id, dto);
             return Ok();
         }
-
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

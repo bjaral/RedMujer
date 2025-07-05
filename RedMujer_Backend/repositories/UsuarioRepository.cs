@@ -76,6 +76,20 @@ namespace RedMujer_Backend.repositories
                     usuario.Correo
                 });
         }
+        public async Task<Usuario?> GetByCorreoAsync(string correo)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            return await connection.QueryFirstOrDefaultAsync<Usuario>(
+                @"SELECT 
+                    ""id_usuario"" AS ""Id_Usuario"",
+                    ""usuario"" AS ""UsuarioNombre"",
+                    ""contrasenna"" AS ""Contrasenna"",
+                    ""vigencia"" AS ""vigencia"",
+                    ""tipo_usuario"" AS ""Tipo_Usuario"",
+                    ""correo"" AS ""Correo""
+                FROM ""Usuarios"" WHERE ""correo"" = @Correo AND vigencia = true",
+                new { Correo = correo });
+        }
 
         public async Task ActualizarAsync(Usuario usuario)
         {

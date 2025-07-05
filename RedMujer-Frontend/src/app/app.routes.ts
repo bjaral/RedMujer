@@ -9,6 +9,7 @@ import { EditarEmprendimientoComponent } from './features/emprendimientoForm/com
 import { SidebarEmpComponent } from './layout/sidebar-emp/sidebar-emp.component';
 import { LayoutHeaderComponent } from './layout/layout-header/layout-header.component';
 import { PerfilComponent } from './features/profile/components/perfil/perfil.component';
+import { MisEmprendimientosComponent } from './features/profile/components/mis-emprendimientos/mis-emprendimientos.component';
 
 export const routes: Routes = [
 
@@ -25,11 +26,12 @@ export const routes: Routes = [
     ]},
     { 'path': '', 'component': SidebarEmpComponent, 'children': [
         { 'path': 'nuevo-emprendimiento', 'component': NuevoEmprendimientoComponent },
-        { 'path': 'editar-emprendimiento', 'component': EditarEmprendimientoComponent }
+        { 'path': 'editar-emprendimiento', 'component': EditarEmprendimientoComponent },
+        { 'path': 'perfil', 'component': PerfilComponent},
+        { 'path': 'mis-emprendimientos', 'component': MisEmprendimientosComponent}
     ]},
 
     //  Vistas sin layout
-    { 'path': 'perfil', 'component': PerfilComponent}
     
 
 ];
