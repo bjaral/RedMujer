@@ -1,20 +1,50 @@
 <div class="layout">
-  <div class="sidebar">
-    <img mat-card-image src="assets/images/logo-png-negativo.png" alt="Logo">
+
+  <header class="mobile-header">
+    <button mat-icon-button class="menu-icon" (click)="toggleMobileMenu()" aria-label="Toggle navigation menu">
+      <mat-icon style="color: white;">{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+    </button>
+
+    <img mat-card-image src="assets/images/logo-png-negativo.png" alt="Logo" routerLink="/" class="mobile-logo" />
+  </header>
+
+  <div class="sidebar desktop-sidebar">
+    <img mat-card-image src="assets/images/logo-png-negativo.png" alt="Logo" routerLink="/" />
+
     <nav>
       <a routerLink="/nuevo-emprendimiento" routerLinkActive="active" class="navigation-item">
-        <mat-icon>bar_chart</mat-icon>Crear emprendimiento</a>
+        <mat-icon>bar_chart</mat-icon>Crear emprendimiento
+      </a>
       <a routerLink="/mis-emprendimientos" routerLinkActive="active" class="navigation-item narrow-item">
-        <mat-icon>storefront</mat-icon>Mis emprendimientos</a>
+        <mat-icon>storefront</mat-icon>Mis emprendimientos
+      </a>
       <a routerLink="/perfil" routerLinkActive="active" class="navigation-item">
-        <mat-icon>person</mat-icon>Mi perfil</a>
+        <mat-icon>person</mat-icon>Mi perfil
+      </a>
       <div class="spacer"></div>
       <a (click)="confirmarLogout()" class="logout">
-      <mat-icon>logout</mat-icon>Cerrar sesión</a>
+        <mat-icon>logout</mat-icon>Cerrar sesión
+      </a>
     </nav>
+  </div>
+
+  <div class="mobile-sidebar" [class.open]="isMobileMenuOpen">
+    <a routerLink="/nuevo-emprendimiento" (click)="toggleMobileMenu()" routerLinkActive="active" class="navigation-item">
+      <mat-icon>bar_chart</mat-icon>Crear emprendimiento
+    </a>
+    <a routerLink="/mis-emprendimientos" (click)="toggleMobileMenu()" routerLinkActive="active" class="navigation-item">
+      <mat-icon>storefront</mat-icon>Mis emprendimientos
+    </a>
+    <a routerLink="/perfil" (click)="toggleMobileMenu()" routerLinkActive="active" class="navigation-item">
+      <mat-icon>person</mat-icon>Mi perfil
+    </a>
+    <button class="logout mobile-logout" (click)="confirmarLogout()">
+      <mat-icon>logout</mat-icon>Cerrar sesión
+    </button>
   </div>
 
   <main class="main-content">
     <router-outlet></router-outlet>
   </main>
+
 </div>

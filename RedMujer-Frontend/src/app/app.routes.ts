@@ -32,6 +32,5 @@ export const routes: Routes = [
     ]},
 
     //  Vistas sin layout
-    
 
 ];

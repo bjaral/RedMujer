@@ -2,7 +2,7 @@
 
 .layout {
   display: grid;
-  grid-template-columns: 317px 1fr;
+  grid-template-columns: 290px 1fr;
   height: 100vh;
 }
 
@@ -26,6 +26,7 @@
   nav {
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
     width: 100%;
     flex-grow: 1;
 
@@ -53,40 +54,40 @@
     }
 
     .logout {
-        background: white !important;
-        color: #e91e63 !important;
-        padding: 1rem 2.5rem;
-        font-size: 1rem;
-        font-weight: 600;
-        border-radius: 50px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        width: 100%;
-        box-sizing: border-box;
-        text-align: center;
-        margin-top: auto;
+      background: white !important;
+      color: #e91e63 !important;
+      padding: 1rem 2.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+      margin-top: auto;
 
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
-        }
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
       }
+    }
 
     .navigation-item {
       color: white !important;
       border-color: rgba(255, 255, 255, 0.5) !important;
-      padding: 1rem 2rem;
+      padding: 1rem 1rem;
       font-size: 1rem;
       font-weight: 500;
       border-radius: 50px;
       transition: all 0.3s ease;
 
-
-      &:hover, &.active {
+      &:hover,
+      &.active {
         background: rgba(255, 255, 255, 0.1) !important;
         border-color: white !important;
       }
@@ -94,8 +95,113 @@
   }
 }
 
+.mobile-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 56px;
+  background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #673ab7 100%);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  z-index: 10000;
+
+  .menu-icon {
+    color: white;
+    margin-right: 1rem;
+  }
+
+  .mobile-logo {
+    height: 40px;
+    width: auto;
+    max-width: 140px;
+    cursor: pointer;
+  }
+}
+
+.mobile-sidebar {
+  display: none;
+  flex-direction: column;
+  background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #673ab7 100%);
+  color: #fff;
+  padding: 1rem;
+  position: absolute;
+  top: 56px;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+
+  &.open {
+    display: flex;
+  }
+
+  a.navigation-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.2rem;
+    text-decoration: none;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 30px;
+    transition: none;
+    width: auto;
+    margin: 0 auto 0.5rem auto;
+
+    mat-icon {
+      font-size: 20px;
+    }
+
+    &.active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  button.logout {
+    background: white;
+    color: #e91e63;
+    font-weight: 600;
+    padding: 0.8rem 1.5rem;
+    margin: 1rem auto 0 auto;
+    border-radius: 30px;
+    border: none;
+    width: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
 .main-content {
   padding: 2rem;
   background-color: #f4f4f4;
   overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .desktop-sidebar {
+    display: none;
+  }
+
+  .main-content {
+    padding: 1rem;
+    margin-top: 56px;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-sidebar,
+  .mobile-header {
+    display: none !important;
+  }
 }
