@@ -2,16 +2,16 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.FileProviders;
-using RedMujer_Backend.repositories;
-using RedMujer_Backend.services;
+using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using RedMujer_Backend.repositories;
+using RedMujer_Backend.services;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddAuthorization();
-// Configurar servicios
 
+// JWT Authentication con parámetros desde appsettings.json
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -21,15 +21,47 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("TuSuperClaveSecreta123"))
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
 
+builder.Services.AddAuthorization();
 
+// Swagger + JWT Bearer (botón Authorize)
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "RedMujer API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = @"JWT Authorization header usando el esquema Bearer.  
+                        Escribe 'Bearer' [espacio] y tu token en la caja de texto.  
+                        Ejemplo: 'Bearer eyJhbGciOi...'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
+            },
+            new List<string>()
+        }
+    });
+});
 
-
-
-// Configurar CORS para permitir solicitudes desde http://localhost:4200
+// CORS para Angular
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -39,13 +71,9 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
-
-
-// Agregar Swagger (OpenAPI) para documentación
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-// Inyección de dependencias para repositorios y servicios
+// Inyección de dependencias para repositorios y servicios (tu listado original)
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
@@ -86,17 +114,10 @@ builder.Services.AddScoped<IEmprendimientoUbicacionService, EmprendimientoUbicac
 builder.Services.AddScoped<IPersonaEmprendimientoRepository, PersonaEmprendimientoRepository>();
 builder.Services.AddScoped<IPersonaEmprendimientoService, PersonaEmprendimientoService>();
 
-
 var app = builder.Build();
 
-
-// Middleware
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Servir archivos estáticos desde /media
 var mediaPath = Path.Combine(Directory.GetCurrentDirectory(), "media");
@@ -111,14 +132,8 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/media"
 });
 
-// Usar CORS antes de redirección HTTPS y autorización
 app.UseCors("AllowFrontend");
-
-// app.UseHttpsRedirection(); // Deshabilitar redirección HTTPS para pruebas locales -> comentado para evitar warning de redirección en Swagger
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

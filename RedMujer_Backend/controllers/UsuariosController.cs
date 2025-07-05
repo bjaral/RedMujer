@@ -36,7 +36,7 @@ namespace RedMujer_Backend.controllers
             return Ok(usuario);
         }
 
-       [HttpPost]
+        [HttpPost]
         public async Task<ActionResult> Crear([FromBody] UsuarioDto dto)
         {
             if (!ModelState.IsValid)
@@ -45,7 +45,7 @@ namespace RedMujer_Backend.controllers
             var usuario = new Usuario
             {
                 UsuarioNombre = dto.Usuario,
-                Contrasenna = BCrypt.Net.BCrypt.HashPassword(dto.Contrasenna),
+                Contrasenna = dto.Contrasenna, // <-- SOLO password plano
                 Vigencia = dto.Vigencia,
                 Tipo_Usuario = Enum.Parse<TipoUsuario>(dto.Tipo_Usuario, true),
                 Correo = dto.Correo
@@ -53,14 +53,12 @@ namespace RedMujer_Backend.controllers
 
             var id = await _service.CrearAsync(usuario);
 
-            // Opcional: Borra la contraseña antes de mostrar
             usuario.Contrasenna = "";
 
             return Ok(new { id });
         }
 
-
-       [HttpPut("{id}")]
+        [HttpPut("{id}")]
         public async Task<ActionResult> Actualizar(int id, [FromForm] UsuarioDto dto)
         {
             if (!ModelState.IsValid)
@@ -76,7 +74,7 @@ namespace RedMujer_Backend.controllers
                 UsuarioNombre = dto.Usuario,
                 Contrasenna = string.IsNullOrWhiteSpace(dto.Contrasenna)
                     ? existente.Contrasenna
-                    : BCrypt.Net.BCrypt.HashPassword(dto.Contrasenna),
+                    : dto.Contrasenna, // <-- password plano, servicio lo hashea
                 Vigencia = dto.Vigencia,
                 Tipo_Usuario = Enum.Parse<TipoUsuario>(dto.Tipo_Usuario, true),
                 Correo = dto.Correo
@@ -85,8 +83,6 @@ namespace RedMujer_Backend.controllers
             await _service.ActualizarAsync(id, usuario);
             return Ok(new { mensaje = "Usuario actualizado correctamente" });
         }
-
-
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Eliminar(int id)

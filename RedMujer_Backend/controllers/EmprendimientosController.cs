@@ -6,6 +6,8 @@ using RedMujer_Backend.repositories;
 using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace RedMujer_Backend.controllers
 {

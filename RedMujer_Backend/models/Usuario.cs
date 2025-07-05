@@ -13,7 +13,7 @@ namespace RedMujer_Backend.models
         public string UsuarioNombre { get; set; }
         public string Contrasenna { get; set; }
         public bool Vigencia { get; set; }
-        public TipoUsuario Tipo_Usuario { get; set; }
+        public TipoUsuario Tipo_Usuario { get; set; }   
         public string Correo { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace RedMujer_Backend.repositories
         Task ActualizarAsync(Usuario usuario);
         Task EliminarAsync(int id);
 
+        Task<Usuario?> GetByCorreoAsync(string correo);
         Task<Usuario?> GetByUsuarioNombreAsync(string usuarioNombre);
     }
 }

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using RedMujer_Backend.DTOs;
 using RedMujer_Backend.services;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace RedMujer_Backend.Controllers
 {
@@ -33,7 +35,7 @@ namespace RedMujer_Backend.Controllers
             await _service.CrearAsync(dto);
             return Ok();
         }
-
+        
         [HttpDelete("{idPersona}/{idEmprendimiento}")]
         public async Task<IActionResult> Delete(int idPersona, int idEmprendimiento)
         {
