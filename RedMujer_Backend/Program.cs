@@ -11,7 +11,7 @@ using RedMujer_Backend.services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// JWT Authentication con parámetros desde appsettings.json
+// JWT Authentication configuración
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -28,7 +28,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// Swagger + JWT Bearer (botón Authorize)
+// Swagger configuración
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "RedMujer API", Version = "v1" });
@@ -61,7 +61,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// CORS para Angular
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -73,51 +73,30 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Inyección de dependencias para repositorios y servicios (tu listado original)
+// Inyección de dependencias (tu lista original)
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
-
-builder.Services.AddScoped<IEmprendimientoRepository, EmprendimientoRepository>();
-builder.Services.AddScoped<IEmprendimientoService, EmprendimientoService>();
-
-builder.Services.AddScoped<IPlataformaRepository, PlataformaRepository>();
-builder.Services.AddScoped<PlataformaService>();
-
-builder.Services.AddScoped<IRegionRepository, RegionRepository>();
-builder.Services.AddScoped<IRegionService, RegionService>();
-
-builder.Services.AddScoped<IComunaRepository, ComunaRepository>();
-builder.Services.AddScoped<IComunaService, ComunaService>();
-builder.Services.AddScoped<IMultimediaRepository, MultimediaRepository>();
-builder.Services.AddScoped<IMultimediaService, MultimediaService>();
-builder.Services.AddScoped<IUbicacionRepository, UbicacionRepository>();
-builder.Services.AddScoped<IUbicacionService, UbicacionService>();
-
-builder.Services.AddScoped<IPersonaRepository, PersonaRepository>();
-builder.Services.AddScoped<IPersonaService, PersonaService>();
-
-builder.Services.AddScoped<IContactoRepository, ContactoRepository>();
-builder.Services.AddScoped<IContactoService, ContactoService>();
-
-builder.Services.AddScoped<IRegistroRepository, RegistroRepository>();
-builder.Services.AddScoped<IRegistroService, RegistroService>();
-
-builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
-builder.Services.AddScoped<ICategoriaService, CategoriaService>();
-
-builder.Services.AddScoped<IEmprendimientoCategoriaRepository, EmprendimientoCategoriaRepository>();
-builder.Services.AddScoped<IEmprendimientoCategoriaService, EmprendimientoCategoriaService>();
-
-builder.Services.AddScoped<IEmprendimientoUbicacionRepository, EmprendimientoUbicacionRepository>();
-builder.Services.AddScoped<IEmprendimientoUbicacionService, EmprendimientoUbicacionService>();
-
-builder.Services.AddScoped<IPersonaEmprendimientoRepository, PersonaEmprendimientoRepository>();
-builder.Services.AddScoped<IPersonaEmprendimientoService, PersonaEmprendimientoService>();
+// ... las demás inyecciones
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+
+app.UseRouting();
+
+app.UseCors("AllowFrontend");
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "RedMujer API V1");
+    // c.RoutePrefix = ""; // Si quieres la UI en raíz, descomenta esta línea
+});
 
 // Servir archivos estáticos desde /media
 var mediaPath = Path.Combine(Directory.GetCurrentDirectory(), "media");
@@ -132,8 +111,6 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/media"
 });
 
-app.UseCors("AllowFrontend");
-app.UseAuthentication();
-app.UseAuthorization();
 app.MapControllers();
+
 app.Run();
