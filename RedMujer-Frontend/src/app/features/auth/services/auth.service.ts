@@ -8,14 +8,14 @@ import { switchMap } from 'rxjs/operators';
 })
 export class AuthService {
 
-  private apiUrl = 'http://localhost:5145/api/auth';
+  private apiUrl = 'http://localhost:5145/api/Auth';
   private usuarioUrl = 'http://localhost:5145/api/Usuarios';
   private personaUrl = 'http://localhost:5145/api/Personas';
   private ubicacionUrl = 'http://localhost:5145/api/Ubicaciones';
 
   constructor(private http: HttpClient) { }
 
-  login(credentials: { email: string; password: string }): Observable<any> {
+  login(credentials: { Correo: string; Password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, credentials);
   }
 

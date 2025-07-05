@@ -13,23 +13,23 @@
         <div class="logo">
             <img mat-card-image src="assets/images/logo-png-color.png">
         </div>
-        <form>
+        <form [formGroup]="loginForm">
             <h2>Iniciar Sesión</h2>
             <mat-form-field appearance="outline">
-                <mat-label>Usuario</mat-label>
-                <input matInput required>
+                <mat-label>Correo</mat-label>
+                <input formControlName="email" matInput required>
                 <mat-icon matSuffix>person</mat-icon>
             </mat-form-field>
             <mat-form-field appearance="outline">
                 <mat-label>Contraseña</mat-label>
-                <input matInput [type]="hidePassword ? 'password' : 'text'" required>
+                <input formControlName="password" matInput [type]="hidePassword ? 'password' : 'text'" required>
                 <mat-icon matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Ocultar contraseña'"
                     [attr.aria-checked]="!hidePassword">
                     {{hidePassword ? 'visibility_off' : 'visibility'}}
                 </mat-icon>
             </mat-form-field>
             <a routerLink="/forgot-password">Recuperar Contraseña</a>
-            <button mat-raised-button color="primary">Iniciar Sesión</button>
+            <button mat-raised-button color="primary" (click)="onSubmit()">Iniciar Sesión</button>
         </form>
     </section>
 </section>

@@ -4,13 +4,50 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
+import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule, RouterModule],
+  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule, RouterModule, FormsModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
   hidePassword = true;
+  loginForm: any;
+
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(5)]],
+    })
+  }
+
+  onSubmit() {
+    if (this.loginForm.valid) {
+      const credentials = {
+          Correo: this.loginForm.value.correo,
+          Password: this.loginForm.value.password
+        }
+      ;
+
+      this.authService.login(credentials).subscribe({
+        next: (res) => {
+          console.log('Inicio de sesión exitoso');
+          this.toInicio();
+        },
+        error: (err) => {
+          alert('Error en el inicio de sesión'); 
+        }
+      })
+    } else {
+      console.error('Formulario no válido')
+    }
+  }
+
+  toInicio() {
+    this.router.navigate(['']);
+  }
 }
