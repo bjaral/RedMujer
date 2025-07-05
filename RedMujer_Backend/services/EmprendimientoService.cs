@@ -56,6 +56,7 @@ namespace RedMujer_Backend.services
             entidad.Id_Emprendimiento = id;
             return entidad;
         }
+
         public async Task ActualizarAsync(int id, EmprendimientoDto dto, string? rutaImagen)
         {
             var emprendimiento = new Emprendimiento
@@ -75,7 +76,7 @@ namespace RedMujer_Backend.services
 
         public async Task<Emprendimiento> ActualizarImagenAsync(int idEmprendimiento, string? rutaImagen)
         {
-            var emprendimiento = await _repo.ObtenerPorIdAsync(idEmprendimiento);
+            var emprendimiento = await _repo.GetByIdAsync(idEmprendimiento);
             if (emprendimiento == null)
                 throw new KeyNotFoundException("Emprendimiento no encontrado");
 
@@ -85,6 +86,11 @@ namespace RedMujer_Backend.services
             return emprendimiento;
         }
 
+        public async Task<Emprendimiento?> GetByIdAsync(int id)
+        {
+            return await _repo.GetByIdAsync(id);
+        }
+
         public async Task EliminarAsync(int id)
         {
             await _repo.EliminarEmprendimientoAsync(id);
@@ -92,7 +98,7 @@ namespace RedMujer_Backend.services
 
         public async Task<bool> ExisteAsync(int idEmprendimiento)
         {
-            var emprendimiento = await _repo.ObtenerPorIdAsync(idEmprendimiento);
+            var emprendimiento = await _repo.GetByIdAsync(idEmprendimiento);
             return emprendimiento != null;
         }
     }

@@ -24,7 +24,9 @@ namespace RedMujer_Backend.repositories
         }
 
         private IDbConnection CreateConnection()
-            => new NpgsqlConnection(_connectionString);
+        {
+            return new NpgsqlConnection(_connectionString);
+        }
 
         private string EnumToString<T>(T enumVal) where T : struct, Enum
         {
@@ -58,90 +60,14 @@ namespace RedMujer_Backend.repositories
             return null;
         }
 
-        public async Task<IEnumerable<Emprendimiento>> GetAllAsync()
-        {
-            const string query = "SELECT * FROM \"Emprendimientos\"";
-            using var connection = CreateConnection();
-            var result = await connection.QueryAsync<dynamic>(query);
-
-            return result.Select(e => new Emprendimiento
-            {
-                Id_Emprendimiento = e.id_emprendimiento,
-                RUT = e.RUT,
-                Nombre = e.nombre,
-                Descripcion = e.descripcion,
-                Horario_Atencion = e.horario_atencion,
-                Vigencia = e.vigencia,
-                Imagen = e.imagen,
-                Modalidad = StringToModalidad(e.modalidad)
-            });
-        }
-
-        // ---- MÉTODO MODIFICADO ----
-        public async Task<int> InsertarEmprendimientoAsync(Emprendimiento e)
+        public async Task<Emprendimiento?> GetByIdAsync(int id)
         {
             const string query = @"
-                INSERT INTO public.""Emprendimientos""(
-                    ""RUT"", nombre, descripcion, horario_atencion, vigencia, modalidad, imagen)
-                VALUES (@RUT, @Nombre, @Descripcion, @Horario_Atencion, @Vigencia, @Modalidad::tipo_modalidad, @Imagen)
-                RETURNING id_emprendimiento";
+                SELECT id_emprendimiento, ""RUT"", nombre, descripcion, horario_atencion, vigencia, imagen, modalidad
+                FROM public.""Emprendimientos""
+                WHERE id_emprendimiento = @Id
+                LIMIT 1;";
 
-            using var connection = CreateConnection();
-            var id = await connection.ExecuteScalarAsync<int>(query, new
-            {
-                e.RUT,
-                e.Nombre,
-                e.Descripcion,
-                e.Horario_Atencion,
-                e.Vigencia,
-                Modalidad = e.Modalidad == null ? null : EnumToString(e.Modalidad.Value),
-                e.Imagen
-            });
-
-            e.Id_Emprendimiento = id;
-            return id;
-        }
-        // --------------------------
-
-        public async Task ActualizarEmprendimientoAsync(Emprendimiento e)
-        {
-            const string query = @"
-                UPDATE public.""Emprendimientos""
-                SET 
-                    ""RUT"" = @RUT,
-                    nombre = @Nombre,
-                    descripcion = @Descripcion,
-                    horario_atencion = @Horario_Atencion,
-                    vigencia = @Vigencia,
-                    modalidad = @Modalidad::tipo_modalidad,
-                    imagen = @Imagen
-                WHERE id_emprendimiento = @Id_Emprendimiento";
-
-            using var connection = CreateConnection();
-            await connection.ExecuteAsync(query, new
-            {
-                e.RUT,
-                e.Nombre,
-                e.Descripcion,
-                e.Horario_Atencion,
-                e.Vigencia,
-                Modalidad = e.Modalidad == null ? null : EnumToString(e.Modalidad.Value),
-                e.Imagen,
-                e.Id_Emprendimiento
-            });
-        }
-
-        public async Task EliminarEmprendimientoAsync(int id)
-        {
-            const string query = @"DELETE FROM public.""Emprendimientos"" WHERE id_emprendimiento = @Id";
-
-            using var connection = CreateConnection();
-            await connection.ExecuteAsync(query, new { Id = id });
-        }
-
-        public async Task<Emprendimiento?> ObtenerPorIdAsync(int id)
-        {
-            const string query = @"SELECT * FROM ""Emprendimientos"" WHERE id_emprendimiento = @Id LIMIT 1";
             using var connection = CreateConnection();
             var result = await connection.QueryFirstOrDefaultAsync<dynamic>(query, new { Id = id });
 
@@ -161,12 +87,96 @@ namespace RedMujer_Backend.repositories
             };
         }
 
-       public async Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad)
+        public async Task<IEnumerable<Emprendimiento>> GetAllAsync()
         {
-            const string query = @"SELECT * FROM ""Emprendimientos""
-                                WHERE vigencia = true
-                                ORDER BY RANDOM()
-                                LIMIT @cantidad";
+            const string query = @"SELECT id_emprendimiento, ""RUT"", nombre, descripcion, horario_atencion, vigencia, imagen, modalidad
+                                   FROM public.""Emprendimientos"";";
+
+            using var connection = CreateConnection();
+            var result = await connection.QueryAsync<dynamic>(query);
+
+            return result.Select(e => new Emprendimiento
+            {
+                Id_Emprendimiento = e.id_emprendimiento,
+                RUT = e.RUT,
+                Nombre = e.nombre,
+                Descripcion = e.descripcion,
+                Horario_Atencion = e.horario_atencion,
+                Vigencia = e.vigencia,
+                Imagen = e.imagen,
+                Modalidad = StringToModalidad(e.modalidad)
+            });
+        }
+
+        public async Task<int> InsertarEmprendimientoAsync(Emprendimiento e)
+        {
+            const string query = @"
+                INSERT INTO public.""Emprendimientos""(
+                    ""RUT"", nombre, descripcion, horario_atencion, vigencia, modalidad, imagen)
+                VALUES (@RUT, @Nombre, @Descripcion, @Horario_Atencion, @Vigencia, @Modalidad::tipo_modalidad, @Imagen)
+                RETURNING id_emprendimiento;";
+
+            using var connection = CreateConnection();
+            var id = await connection.ExecuteScalarAsync<int>(query, new
+            {
+                e.RUT,
+                e.Nombre,
+                e.Descripcion,
+                e.Horario_Atencion,
+                e.Vigencia,
+                Modalidad = e.Modalidad == null ? null : EnumToString(e.Modalidad.Value),
+                e.Imagen
+            });
+
+            e.Id_Emprendimiento = id;
+            return id;
+        }
+
+        public async Task ActualizarEmprendimientoAsync(Emprendimiento e)
+        {
+            const string query = @"
+                UPDATE public.""Emprendimientos""
+                SET
+                    ""RUT"" = @RUT,
+                    nombre = @Nombre,
+                    descripcion = @Descripcion,
+                    horario_atencion = @Horario_Atencion,
+                    vigencia = @Vigencia,
+                    modalidad = @Modalidad::tipo_modalidad,
+                    imagen = @Imagen
+                WHERE id_emprendimiento = @Id_Emprendimiento;";
+
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(query, new
+            {
+                e.RUT,
+                e.Nombre,
+                e.Descripcion,
+                e.Horario_Atencion,
+                e.Vigencia,
+                Modalidad = e.Modalidad == null ? null : EnumToString(e.Modalidad.Value),
+                e.Imagen,
+                e.Id_Emprendimiento
+            });
+        }
+
+        public async Task EliminarEmprendimientoAsync(int id)
+        {
+            const string query = @"DELETE FROM public.""Emprendimientos"" WHERE id_emprendimiento = @Id;";
+
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(query, new { Id = id });
+        }
+
+        public async Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad)
+        {
+            const string query = @"
+                SELECT id_emprendimiento, ""RUT"", nombre, descripcion, horario_atencion, vigencia, imagen, modalidad
+                FROM public.""Emprendimientos""
+                WHERE vigencia = true
+                ORDER BY RANDOM()
+                LIMIT @cantidad;";
+
             using var connection = CreateConnection();
             var result = await connection.QueryAsync<dynamic>(query, new { cantidad });
 
