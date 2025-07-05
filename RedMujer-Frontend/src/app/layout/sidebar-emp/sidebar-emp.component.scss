@@ -2,7 +2,7 @@
 
 .layout {
   display: grid;
-  grid-template-columns: 305.6px 1fr;
+  grid-template-columns: 317px 1fr;
   height: 100vh;
 }
 
@@ -86,7 +86,7 @@
       transition: all 0.3s ease;
 
 
-      &:hover {
+      &:hover, &.active {
         background: rgba(255, 255, 255, 0.1) !important;
         border-color: white !important;
       }
