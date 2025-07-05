@@ -4,6 +4,8 @@ using RedMujer_Backend.models;
 using RedMujer_Backend.services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace RedMujer_Backend.controllers
 {
@@ -83,7 +85,7 @@ namespace RedMujer_Backend.controllers
             await _service.ActualizarAsync(id, usuario);
             return Ok(new { mensaje = "Usuario actualizado correctamente" });
         }
-
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Eliminar(int id)
         {
