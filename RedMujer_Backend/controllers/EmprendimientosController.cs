@@ -150,5 +150,26 @@ namespace RedMujer_Backend.controllers
 
             return Path.Combine("emprendimientos", idEmprendimiento.ToString(), subCarpeta, nombreArchivo).Replace("\\", "/");
         }
+        [HttpGet("{id}/imagenes-emprendimiento")]
+        public IActionResult GetImagenesEmprendimiento(int id)
+        {
+            var carpeta = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", id.ToString(), "imagenes_emprendimiento");
+            var imagenes = new List<string>();
+
+            if (Directory.Exists(carpeta))
+            {
+                var archivos = Directory.GetFiles(carpeta);
+                foreach (var archivo in archivos)
+                {
+                    var nombreArchivo = Path.GetFileName(archivo);
+                    var urlRelativa = Path.Combine("media", "emprendimientos", id.ToString(), "imagenes_emprendimiento", nombreArchivo).Replace("\\", "/");
+                    var urlCompleta = $"{Request.Scheme}://{Request.Host}/{urlRelativa}";
+                    imagenes.Add(urlCompleta);
+                }
+            }
+
+            return Ok(new { imagenes });
+}
+
     }
 }
