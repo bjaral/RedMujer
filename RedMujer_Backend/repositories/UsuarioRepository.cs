@@ -45,6 +45,7 @@ namespace RedMujer_Backend.repositories
                 new { Id = id });
         }
 
+        // MEJORA: insensible a mayúsculas/minúsculas y sin espacios extra
         public async Task<Usuario?> GetByUsuarioNombreAsync(string usuarioNombre)
         {
             using var connection = new NpgsqlConnection(_connectionString);
@@ -56,26 +57,11 @@ namespace RedMujer_Backend.repositories
                     ""vigencia"" AS ""vigencia"",
                     ""tipo_usuario"" AS ""Tipo_Usuario"",
                     ""correo"" AS ""Correo""
-                  FROM ""Usuarios"" WHERE ""usuario"" = @UsuarioNombre AND vigencia = true",
-                new { UsuarioNombre = usuarioNombre });
+                  FROM ""Usuarios"" 
+                  WHERE LOWER(""usuario"") = LOWER(@UsuarioNombre) AND vigencia = true",
+                new { UsuarioNombre = usuarioNombre.Trim() });
         }
 
-        // *** AQUÍ VIENE EL CAMBIO: ::tipo_usuario ***
-        public async Task<int> CrearAsync(Usuario usuario)
-        {
-            using var connection = new NpgsqlConnection(_connectionString);
-            return await connection.ExecuteScalarAsync<int>(
-                @"INSERT INTO ""Usuarios"" 
-                    (""usuario"", ""contrasenna"", ""vigencia"", ""tipo_usuario"", ""correo"") 
-                  VALUES (@UsuarioNombre, @Contrasenna, @vigencia, @TipoUsuarioStr::tipo_usuario, @Correo) RETURNING id_usuario",
-                new {
-                    usuario.UsuarioNombre,
-                    usuario.Contrasenna,
-                    usuario.Vigencia,
-                    TipoUsuarioStr = usuario.Tipo_Usuario.ToString(),
-                    usuario.Correo
-                });
-        }
         public async Task<Usuario?> GetByCorreoAsync(string correo)
         {
             using var connection = new NpgsqlConnection(_connectionString);
@@ -87,8 +73,25 @@ namespace RedMujer_Backend.repositories
                     ""vigencia"" AS ""vigencia"",
                     ""tipo_usuario"" AS ""Tipo_Usuario"",
                     ""correo"" AS ""Correo""
-                FROM ""Usuarios"" WHERE ""correo"" = @Correo AND vigencia = true",
-                new { Correo = correo });
+                FROM ""Usuarios"" 
+                WHERE LOWER(""correo"") = LOWER(@Correo) AND vigencia = true",
+                new { Correo = correo.Trim() });
+        }
+
+        public async Task<int> CrearAsync(Usuario usuario)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            return await connection.ExecuteScalarAsync<int>(
+                @"INSERT INTO ""Usuarios"" 
+                    (""usuario"", ""contrasenna"", ""vigencia"", ""tipo_usuario"", ""correo"") 
+                  VALUES (@UsuarioNombre, @Contrasenna, @Vigencia, @TipoUsuarioStr::tipo_usuario, @Correo) RETURNING id_usuario",
+                new {
+                    usuario.UsuarioNombre,
+                    usuario.Contrasenna,
+                    usuario.Vigencia,
+                    TipoUsuarioStr = usuario.Tipo_Usuario.ToString(),
+                    usuario.Correo
+                });
         }
 
         public async Task ActualizarAsync(Usuario usuario)
@@ -98,10 +101,10 @@ namespace RedMujer_Backend.repositories
                 @"UPDATE ""Usuarios"" SET 
                         ""usuario"" = @UsuarioNombre,
                         ""contrasenna"" = @Contrasenna,
-                        ""vigencia"" = @vigencia,
+                        ""vigencia"" = @Vigencia,
                         ""tipo_usuario"" = @TipoUsuarioStr::tipo_usuario,
                         ""correo"" = @Correo
-                  WHERE ""id_usuario"" = @Id_Usuario",
+                    WHERE ""id_usuario"" = @Id_Usuario",
                 new {
                     usuario.UsuarioNombre,
                     usuario.Contrasenna,
@@ -112,12 +115,8 @@ namespace RedMujer_Backend.repositories
                 });
         }
 
-        public async Task EliminarAsync(int id)
-        {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.ExecuteAsync(
-                @"UPDATE ""Usuarios"" SET vigencia = false WHERE ""id_usuario"" = @Id_Usuario",
-                new { Id_Usuario = id });
-        }
+        public async Task EliminarAsync(int id) =>
+            await new NpgsqlConnection(_connectionString)
+                .ExecuteAsync(@"DELETE FROM ""Usuarios"" WHERE ""id_usuario"" = @Id", new { Id = id });
     }
 }

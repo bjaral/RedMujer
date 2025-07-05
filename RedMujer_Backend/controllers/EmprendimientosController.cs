@@ -169,7 +169,7 @@ namespace RedMujer_Backend.controllers
             }
 
             return Ok(new { imagenes });
-}
+        }
 
     }
 }
