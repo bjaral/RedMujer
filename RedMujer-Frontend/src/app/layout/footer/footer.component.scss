@@ -16,7 +16,7 @@
     }
 
     img {
-        height: 80px;
+        height: 60px;
         width: auto;
         max-width: 160px;
         object-fit: contain;
@@ -32,7 +32,7 @@
         span {
             color: white;
             font-weight: 600;
-            font-size: 1.4rem;
+            font-size: 1.1rem;
         }
         
     }
@@ -66,10 +66,10 @@
     }
 }
 
-h2 {
+.title {
     color: white;
     font-weight: 600;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     margin-bottom: 0;
 }
 
@@ -78,6 +78,7 @@ a {
     transition: all;
     transition-duration: 0.3s ease-in-out;
     text-decoration: none;
+    font-size: 1rem;
 
     &:hover {
         color: white;
@@ -91,9 +92,9 @@ ul {
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0rem;
 }
 
 li>a {
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
