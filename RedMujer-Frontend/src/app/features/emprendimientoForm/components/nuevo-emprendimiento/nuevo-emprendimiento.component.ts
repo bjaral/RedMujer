@@ -100,18 +100,18 @@ export class NuevoEmprendimientoComponent {
             next: () => {
               alert('Emprendimiento creado y multimedia subida exitosamente.');
               this.limpiarFormulario();
-              this.router.navigate(['/perfil']);
+              this.router.navigate(['/mis-emprendimientos']);
             },
             error: (err) => {
               console.error('Error al subir multimedia', err);
               alert('Emprendimiento creado, pero hubo un error al subir las imágenes adicionales.');
-              this.router.navigate(['/perfil']);
+              this.router.navigate(['/mis-emprendimientos']);
             }
           });
         } else {
           alert('Emprendimiento creado exitosamente.');
           this.limpiarFormulario();
-          this.router.navigate(['/perfil']);
+          this.router.navigate(['/mis-emprendimientos']);
         }
       },
       error: (error) => {

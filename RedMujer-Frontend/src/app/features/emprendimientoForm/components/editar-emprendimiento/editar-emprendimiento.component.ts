@@ -16,15 +16,14 @@ import { OnInit } from '@angular/core';
   styleUrl: './editar-emprendimiento.component.scss'
 })
 
-export class EditarEmprendimientoComponent implements OnInit{
+export class EditarEmprendimientoComponent implements OnInit {
 
   formulario: FormGroup;
   imagenSeleccionada: string | ArrayBuffer | null = null;
   imagenesExtras: string[] = [];
   imagenPrincipalFile: File | null = null;
   imagenesExtrasFile: File[] = [];
-
-  private idEmprendimiento!: number;
+  idEmprendimiento!: number; 
 
   constructor(private fb: FormBuilder, private emprendimientoFormService: EmprendimientoFormService, private router: Router, private route: ActivatedRoute) {
     this.formulario = this.fb.group({
@@ -52,19 +51,22 @@ export class EditarEmprendimientoComponent implements OnInit{
         this.formulario.patchValue({
           rut: emprendimiento.rut,
           nombre: emprendimiento.nombre,
-          descripcion: emprendimiento.descripcion || '',
-          modalidad: emprendimiento.modalidad ?? '',
+          descripcion: (emprendimiento.descripcion && emprendimiento.descripcion !== 'null') ? emprendimiento.descripcion : '',
+          modalidad: emprendimiento.modalidad,
           horario_Atencion: emprendimiento.horario_Atencion,
-          imagen: emprendimiento.imagen || ''
         });
+        if (emprendimiento.imagen) {
+          this.imagenSeleccionada = encodeURI(`http://localhost:5145/media/${emprendimiento.imagen}`);
+        }
       },
       error: (error) => {
         console.error('Error al cargar el emprendimiento', error);
         alert('Ocurrió un error al cargar el emprendimiento. Por favor, intenténtelo de nuevo');
         this.router.navigate(['/mis-emprendimientos']);
       }
-    })
+    });
   }
+
 
   onFileSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
@@ -117,43 +119,34 @@ export class EditarEmprendimientoComponent implements OnInit{
       return;
     }
 
-    const formData = this.formulario.value;
-    const imagenInput = document.querySelector<HTMLInputElement>('input[type="file"]:not([multiple])');
-    const imagenPrincipal = imagenInput?.files?.[0] ?? null;
+    const data = this.formulario.value;
+    const formData = new FormData();
 
-    this.emprendimientoFormService.crearEmprendimiento(formData, imagenPrincipal).subscribe({
-      next: (response) => {
-        const idEmprendimiento = response?.id_Emprendimiento;
-        if (!idEmprendimiento) {
-          alert('Error: no se recibió el ID del emprendimiento creado.');
-          return;
-        }
+    formData.append('RUT', data.rut);
+    formData.append('Nombre', data.nombre);
+    formData.append('Descripcion', data.descripcion || '');
+    formData.append('Modalidad', data.modalidad);
+    formData.append('Horario_Atencion', data.horario_Atencion);
+    formData.append('Vigencia', 'true');
 
-        if (this.imagenesExtrasFile.length > 0) {
-          this.emprendimientoFormService.subirMultimedia(idEmprendimiento, this.imagenesExtrasFile).subscribe({
-            next: () => {
-              alert('Emprendimiento creado y multimedia subida exitosamente.');
-              this.limpiarFormulario();
-              this.router.navigate(['/perfil']);
-            },
-            error: (err) => {
-              console.error('Error al subir multimedia', err);
-              alert('Emprendimiento creado, pero hubo un error al subir las imágenes adicionales.');
-              this.router.navigate(['/perfil']);
-            }
-          });
-        } else {
-          alert('Emprendimiento creado exitosamente.');
-          this.limpiarFormulario();
-          this.router.navigate(['/perfil']);
-        }
+    // Solo agregá la imagen si el usuario seleccionó una nueva
+    if (this.imagenPrincipalFile) {
+      formData.append('Imagen', this.imagenPrincipalFile);
+    }
+
+    this.emprendimientoFormService.actualizarEmprendimiento(this.idEmprendimiento, formData).subscribe({
+      next: () => {
+        alert('Emprendimiento actualizado correctamente.');
+        this.router.navigate(['/mis-emprendimientos']);
       },
       error: (error) => {
-        console.error('Error al crear el emprendimiento', error);
-        alert('Ocurrió un error al crear el emprendimiento.');
+        console.error('Error al actualizar el emprendimiento', error);
+        alert('Ocurrió un error al actualizar el emprendimiento.');
       }
     });
   }
+
+
 
 
   private limpiarFormulario(): void {
