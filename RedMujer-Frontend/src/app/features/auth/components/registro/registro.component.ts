@@ -26,7 +26,7 @@ import { Router } from '@angular/router';
     }
   ]
 })
-export class RegistroComponent {
+export class RegistroComponent implements OnInit {
   stepperOrientation: Observable<StepperOrientation>;
   regiones: any[] = [];
   comunas: any[] = [];

@@ -133,7 +133,7 @@ namespace RedMujer_Backend.services
                 Imagen = e.Imagen,
                 Modalidad = e.Modalidad switch
                 {
-                    TipoModalidad.PresencialYOnline => "Presencial y Online",
+                    TipoModalidad.PresencialYOnline => "PresencialYOnline",
                     TipoModalidad.Presencial => "Presencial",
                     TipoModalidad.Online => "Online",
                     _ => ""
