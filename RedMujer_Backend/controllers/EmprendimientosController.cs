@@ -93,7 +93,10 @@ namespace RedMujer_Backend.controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Actualizar(int id, [FromForm] EmprendimientoCreateDto dto)
         {
-            // Este PUT no borra imágenes si no recibe ninguna
+            // Verifica si no se recibió ni imagen ni campos actualizables
+            if (dto.Imagen == null && dto.EsVacio())
+                return NoContent(); // No hacer nada si no hay datos
+
             string? rutaImagen = null;
             if (dto.Imagen != null)
                 rutaImagen = await GuardarImagenPrincipal(id, dto.Imagen);
