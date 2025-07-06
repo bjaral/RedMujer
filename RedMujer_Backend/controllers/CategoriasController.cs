@@ -1,51 +1,62 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using RedMujer_Backend.DTOs;
 using RedMujer_Backend.services;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
-namespace RedMujer_Backend.Controllers
+namespace RedMujer_Backend.controllers
 {
-    
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("categorias")]
     public class CategoriasController : ControllerBase
     {
-        private readonly ICategoriaService _service;
-        public CategoriasController(ICategoriaService service)
+        private readonly ICategoriaService _categoriaService;
+
+        public CategoriasController(ICategoriaService categoriaService)
         {
-            _service = service;
+            _categoriaService = categoriaService;
         }
 
+        // GET: /categorias
         [HttpGet]
-        public async Task<IActionResult> Get() => Ok(await _service.GetAllAsync());
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<ActionResult<IEnumerable<CategoriaDto>>> GetAll()
         {
-            var categoria = await _service.GetByIdAsync(id);
-            if (categoria == null) return NotFound();
+            var categorias = await _categoriaService.GetAllAsync();
+            return Ok(categorias);
+        }
+
+        // GET: /categorias/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CategoriaDto>> GetById(int id)
+        {
+            var categoria = await _categoriaService.GetByIdAsync(id);
+            if (categoria == null)
+                return NotFound();
             return Ok(categoria);
         }
 
+        // POST: /categorias
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CategoriaDto dto)
+        public async Task<ActionResult> Crear([FromBody] CategoriaDto dto)
         {
-            await _service.CrearAsync(dto);
-            return Ok();
+            await _categoriaService.CrearAsync(dto);
+            return CreatedAtAction(nameof(GetAll), null);
         }
 
+        // PUT: /categorias/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] CategoriaDto dto)
+        public async Task<ActionResult> Actualizar(int id, [FromBody] CategoriaDto dto)
         {
-            await _service.ActualizarAsync(id, dto);
-            return Ok();
+            await _categoriaService.ActualizarAsync(id, dto);
+            return NoContent();
         }
 
+        // DELETE: /categorias/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult> Eliminar(int id)
         {
-            await _service.EliminarAsync(id);
+            await _categoriaService.EliminarAsync(id);
             return NoContent();
         }
     }
