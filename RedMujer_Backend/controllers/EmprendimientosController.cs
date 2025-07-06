@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using RedMujer_Backend.DTOs;
 using RedMujer_Backend.models;
 using RedMujer_Backend.services;
-using RedMujer_Backend.repositories;
 using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace RedMujer_Backend.controllers
 {
@@ -15,24 +15,26 @@ namespace RedMujer_Backend.controllers
         public List<IFormFile> Imagenes { get; set; } = new();
     }
 
+    public class ImagenUploadDto
+    {
+        public IFormFile Imagen { get; set; }
+    }
+
     [ApiController]
     [Route("api/[controller]")]
     public class EmprendimientosController : ControllerBase
     {
         private readonly IEmprendimientoService _service;
         private readonly IWebHostEnvironment _env;
-        private readonly IMultimediaRepository _multimediaRepo;
         private readonly ICategoriaService _categoriaService;
 
         public EmprendimientosController(
             IEmprendimientoService service,
             IWebHostEnvironment env,
-            IMultimediaRepository multimediaRepo,
             ICategoriaService categoriaService)
         {
             _service = service;
             _env = env;
-            _multimediaRepo = multimediaRepo;
             _categoriaService = categoriaService;
         }
 
@@ -72,7 +74,6 @@ namespace RedMujer_Backend.controllers
                 await _service.ActualizarImagenAsync(nuevo.Id_Emprendimiento, rutaImagen);
                 nuevo.Imagen = rutaImagen;
             }
-            // Retornamos el DTO de respuesta
             var respuesta = new EmprendimientoDto
             {
                 Id_Emprendimiento = nuevo.Id_Emprendimiento,
@@ -106,34 +107,6 @@ namespace RedMujer_Backend.controllers
         {
             await _service.EliminarAsync(id);
             return NoContent();
-        }
-
-        // =========== MULTIMEDIA ===========
-        [HttpPost("{id}/multimedia")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> SubirMultimedia(int id, [FromForm] MultimediaUploadDto dto)
-        {
-            if (dto.Archivo == null || dto.Archivo.Length == 0)
-                return BadRequest("No se recibió ningún archivo.");
-
-            var existe = await _service.ExisteAsync(id);
-            if (!existe)
-                return NotFound("Emprendimiento no encontrado.");
-
-            string subCarpeta = "imagenes_emprendimiento";
-            var ruta = await GuardarArchivoMultimedia(id, dto.Archivo, subCarpeta);
-
-            var multimedia = new Multimedia
-            {
-                Id_Emprendimiento = id,
-                Tipo_Multimedia = TipoMultimedia.imagen,
-                Ruta = ruta,
-                Descripcion = dto.Descripcion,
-                Vigencia = true
-            };
-
-            await _multimediaRepo.AgregarMultimediaAsync(multimedia);
-            return Ok(new { ruta });
         }
 
         // =========== IMAGEN PRINCIPAL ===========
@@ -192,6 +165,7 @@ namespace RedMujer_Backend.controllers
         }
 
         // =========== IMÁGENES ADICIONALES ===========
+
         [HttpGet("{id}/imagenes-emprendimiento")]
         public IActionResult GetImagenesEmprendimiento(int id)
         {
@@ -212,6 +186,58 @@ namespace RedMujer_Backend.controllers
 
             return Ok(new { imagenes });
         }
+        [HttpDelete("{id}/imagenes-emprendimiento/{nombreArchivo}")]
+        public IActionResult EliminarImagenEspecifica(int id, string nombreArchivo)
+        {
+            if (string.IsNullOrWhiteSpace(nombreArchivo))
+                return BadRequest("Nombre de archivo inválido.");
+
+            // Seguridad básica: evita path traversal
+            nombreArchivo = Path.GetFileName(nombreArchivo);
+
+            var carpeta = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", id.ToString(), "imagenes_emprendimiento");
+            var rutaCompleta = Path.Combine(carpeta, nombreArchivo);
+
+            if (!System.IO.File.Exists(rutaCompleta))
+                return NotFound("No existe esa imagen para este emprendimiento.");
+
+            System.IO.File.Delete(rutaCompleta);
+            return NoContent();
+        }
+
+        // POST para agregar imágenes de emprendimiento (adicionales)
+        [HttpPost("{id}/imagenes-emprendimiento")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> SubirImagenesEmprendimiento(int id, [FromForm] ImagenesUploadDto dto)
+        {
+            var imagenes = dto.Imagenes;
+            if (imagenes == null || imagenes.Count == 0)
+                return BadRequest("No se recibieron archivos.");
+
+            var existe = await _service.ExisteAsync(id);
+            if (!existe)
+                return NotFound();
+
+            var carpeta = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", id.ToString(), "imagenes_emprendimiento");
+            Directory.CreateDirectory(carpeta);
+
+            var rutas = new List<string>();
+            foreach (var imagen in imagenes)
+            {
+                var nombreArchivo = Path.GetFileName(imagen.FileName);
+                var rutaCompleta = Path.Combine(carpeta, nombreArchivo);
+
+                using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+                {
+                    await imagen.CopyToAsync(stream);
+                }
+
+                var urlRelativa = Path.Combine("media", "emprendimientos", id.ToString(), "imagenes_emprendimiento", nombreArchivo).Replace("\\", "/");
+                rutas.Add(urlRelativa);
+            }
+
+            return Created("", new { rutas });
+        }
 
         [HttpPut("{id}/imagenes-emprendimiento")]
         [Consumes("multipart/form-data")]
@@ -226,13 +252,6 @@ namespace RedMujer_Backend.controllers
                 return NotFound();
 
             var carpeta = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", id.ToString(), "imagenes_emprendimiento");
-
-            if (Directory.Exists(carpeta))
-            {
-                var archivos = Directory.GetFiles(carpeta);
-                foreach (var archivo in archivos)
-                    System.IO.File.Delete(archivo);
-            }
             Directory.CreateDirectory(carpeta);
 
             var rutas = new List<string>();
@@ -301,22 +320,6 @@ namespace RedMujer_Backend.controllers
             }
 
             return Path.Combine("emprendimientos", idEmprendimiento.ToString(), "imagen_principal", nombreArchivo).Replace("\\", "/");
-        }
-
-        private async Task<string> GuardarArchivoMultimedia(int idEmprendimiento, IFormFile archivo, string subCarpeta)
-        {
-            var nombreArchivo = Path.GetFileName(archivo.FileName);
-            var carpetaDestino = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", idEmprendimiento.ToString(), subCarpeta);
-            Directory.CreateDirectory(carpetaDestino);
-
-            var rutaCompleta = Path.Combine(carpetaDestino, nombreArchivo);
-
-            using (var stream = new FileStream(rutaCompleta, FileMode.Create))
-            {
-                await archivo.CopyToAsync(stream);
-            }
-
-            return Path.Combine("emprendimientos", idEmprendimiento.ToString(), subCarpeta, nombreArchivo).Replace("\\", "/");
         }
     }
 }
