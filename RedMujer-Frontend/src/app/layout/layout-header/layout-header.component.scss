@@ -1,0 +1,13 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; // Evita barras de desplazamiento
+}
+
+.app-container {
+    height: 100%; // Asegúrate de tener un contenedor principal que ocupe toda la altura
+    background-color: #eee; // Cambia esto al color de fondo que desees
+    display: flex;
+    flex-direction: column; // Esto permite manejar el layout interno (header, contenido, etc.)
+}

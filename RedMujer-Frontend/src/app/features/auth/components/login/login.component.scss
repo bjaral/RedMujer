@@ -1,11 +1,16 @@
 @use '../../../../../styles.scss' as *;
 
+html, body {
+    margin: 0;
+    height: 100%;
+  }
+
 .login-container {
     background-color: #eee;
     display: flex;
     padding: 2rem;
     gap: 3rem;
-    min-height: 90vh;
+    overflow: hidden;
     justify-content: center;
 }
 
