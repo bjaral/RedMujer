@@ -93,6 +93,7 @@ namespace RedMujer_Backend.controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Actualizar(int id, [FromForm] EmprendimientoCreateDto dto)
         {
+            // Este PUT no borra imágenes si no recibe ninguna
             string? rutaImagen = null;
             if (dto.Imagen != null)
                 rutaImagen = await GuardarImagenPrincipal(id, dto.Imagen);
@@ -129,7 +130,7 @@ namespace RedMujer_Backend.controllers
         {
             var imagen = dto.Imagen;
             if (imagen == null || imagen.Length == 0)
-                return BadRequest("No se recibió ningún archivo.");
+                return NoContent(); // No elimina ni modifica nada si no recibe archivo
 
             var existe = await _service.ExisteAsync(id);
             if (!existe)
@@ -186,6 +187,7 @@ namespace RedMujer_Backend.controllers
 
             return Ok(new { imagenes });
         }
+
         [HttpDelete("{id}/imagenes-emprendimiento/{nombreArchivo}")]
         public IActionResult EliminarImagenEspecifica(int id, string nombreArchivo)
         {
@@ -245,7 +247,7 @@ namespace RedMujer_Backend.controllers
         {
             var imagenes = dto.Imagenes;
             if (imagenes == null || imagenes.Count == 0)
-                return BadRequest("No se recibieron archivos.");
+                return NoContent(); // No elimina ni modifica nada si no recibe archivos
 
             var existe = await _service.ExisteAsync(id);
             if (!existe)
