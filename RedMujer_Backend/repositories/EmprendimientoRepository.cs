@@ -41,6 +41,7 @@ namespace RedMujer_Backend.repositories
             return enumVal.ToString();
         }
 
+        // ==== CORREGIDO: acepta PresencialYOnline Y Presencial y Online ====
         private TipoModalidad? StringToModalidad(string? modalidad)
         {
             if (string.IsNullOrWhiteSpace(modalidad))
@@ -54,7 +55,8 @@ namespace RedMujer_Backend.repositories
             if (string.Equals(modalidad, "Online", StringComparison.OrdinalIgnoreCase))
                 return TipoModalidad.Online;
 
-            if (string.Equals(modalidad, "Presencial y Online", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(modalidad, "PresencialYOnline", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(modalidad, "Presencial y Online", StringComparison.OrdinalIgnoreCase))
                 return TipoModalidad.PresencialYOnline;
 
             return null;
