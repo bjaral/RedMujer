@@ -38,4 +38,32 @@ export class EmprendimientoFormService {
 
     return forkJoin(requests);
   }
+
+  obtenerEmprendimientoPorId(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
+
+  /*obtenerMultimediaPorEmprendimiento(id: number): Observable<any[]> {
+
+  }
+
+  actualizarEmprendimiento(id: number, data: any, imagen: File | null): Observable<any> {
+    const formData = new FormData();
+    formData.append('RUT', data.rut);
+    formData.append('Nombre', data.nombre);
+    formData.append('Descripcion', data.descripcion || '');
+    formData.append('Modalidad', data.modalidad);
+    formData.append('Horario_Atencion', data.horario_Atencion);
+    formData.append('Vigencia', 'true');
+    if (imagen) {
+      formData.append('Imagen', imagen);
+    }
+
+    return this.http.put<any>(`${this.apiUrl}/${id}`, formData);
+  }
+
+  actualizarMultimedia() {
+
+  }*/
+
 }

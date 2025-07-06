@@ -24,14 +24,15 @@ export const routes: Routes = [
         { 'path': 'registro', 'component': RegistroComponent },
         { 'path': 'login', 'component': LoginComponent },
     ]},
+
+    //Vistas con sidebar de emprendimiento
     { 'path': '', 'component': SidebarEmpComponent, 'children': [
         { 'path': 'nuevo-emprendimiento', 'component': NuevoEmprendimientoComponent },
-        { 'path': 'editar-emprendimiento', 'component': EditarEmprendimientoComponent },
+        { 'path': 'editar-emprendimiento/:id', 'component': EditarEmprendimientoComponent },
         { 'path': 'perfil', 'component': PerfilComponent},
         { 'path': 'mis-emprendimientos', 'component': MisEmprendimientosComponent}
     ]},
 
     //  Vistas sin layout
-    
 
 ];
