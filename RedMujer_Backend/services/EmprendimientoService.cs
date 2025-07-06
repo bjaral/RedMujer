@@ -15,16 +15,22 @@ namespace RedMujer_Backend.services
             _repo = repo;
         }
 
+        // --- Mapea string a Enum de forma segura (case insensitive, admite espacios) ---
         private TipoModalidad? MapearModalidad(string? modalidad)
         {
             if (string.IsNullOrWhiteSpace(modalidad)) return null;
-            modalidad = modalidad.Trim().ToLower();
 
+            // Quita espacios, compara sin distinguir mayúsculas/minúsculas
+            if (Enum.TryParse<TipoModalidad>(modalidad.Replace(" ", ""), true, out var result))
+                return result;
+
+            // Opcional: fallback manual
+            modalidad = modalidad.Trim().ToLower();
             return modalidad switch
             {
                 "presencial" => TipoModalidad.Presencial,
                 "online" => TipoModalidad.Online,
-                "presencial y online" => TipoModalidad.PresencialYOnline,
+                "presencialyonline" => TipoModalidad.PresencialYOnline,
                 _ => null
             };
         }
