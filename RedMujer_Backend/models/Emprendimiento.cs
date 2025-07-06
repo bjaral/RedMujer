@@ -15,7 +15,7 @@ namespace RedMujer_Backend.models
         public string? RUT { get; set; }
         public string Nombre { get; set; } = string.Empty;
         public string Descripcion { get; set; } = string.Empty;
-        public TipoModalidad? Modalidad { get; set; }  // Nullable
+        public TipoModalidad? Modalidad { get; set; }
         public string? Horario_Atencion { get; set; }
         public bool Vigencia { get; set; }
         public string? Imagen { get; set; }

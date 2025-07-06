@@ -11,7 +11,6 @@ using Microsoft.Extensions.Hosting;
 
 namespace RedMujer_Backend.controllers
 {
-    // DTO para múltiples imágenes (si lo usas)
     public class ImagenesUploadDto
     {
         public List<IFormFile> Imagenes { get; set; } = new();
@@ -123,12 +122,12 @@ namespace RedMujer_Backend.controllers
             if (string.IsNullOrEmpty(ruta))
                 return NotFound("No hay imagen principal para este emprendimiento.");
 
-            // Construye la URL completa basada en la ruta guardada en la BD
             var urlRelativa = Path.Combine("media", ruta).Replace("\\", "/");
             var urlCompleta = $"{Request.Scheme}://{Request.Host}/{urlRelativa}";
 
             return Ok(new { url = urlCompleta });
         }
+
         [HttpPut("{id}/imagen-principal")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> ActualizarImagenPrincipal(int id, [FromForm] ImagenUploadDto dto)
@@ -141,7 +140,6 @@ namespace RedMujer_Backend.controllers
             if (!existe)
                 return NotFound();
 
-            // Borra anterior
             var rutaAnterior = await _service.ObtenerRutaImagenPrincipalAsync(id);
             if (!string.IsNullOrEmpty(rutaAnterior))
             {
@@ -150,7 +148,6 @@ namespace RedMujer_Backend.controllers
                     System.IO.File.Delete(rutaFisica);
             }
 
-            // Guarda nueva
             var rutaNueva = await GuardarImagenPrincipal(id, imagen);
             await _service.ActualizarImagenPrincipalAsync(id, rutaNueva);
 
@@ -171,8 +168,6 @@ namespace RedMujer_Backend.controllers
             await _service.ActualizarImagenPrincipalAsync(id, null);
             return NoContent();
         }
-
-        // === Imágenes múltiples SOLO EN DISCO ===
 
         [HttpGet("{id}/imagenes-emprendimiento")]
         public IActionResult GetImagenesEmprendimiento(int id)
@@ -209,7 +204,6 @@ namespace RedMujer_Backend.controllers
 
             var carpeta = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", id.ToString(), "imagenes_emprendimiento");
 
-            // Borra anteriores
             if (Directory.Exists(carpeta))
             {
                 var archivos = Directory.GetFiles(carpeta);
@@ -249,8 +243,6 @@ namespace RedMujer_Backend.controllers
 
             return NoContent();
         }
-
-        // === Helpers ===
 
         private async Task<string?> GuardarImagenPrincipal(int idEmprendimiento, IFormFile? imagen)
         {

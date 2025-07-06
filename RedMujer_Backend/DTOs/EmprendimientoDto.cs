@@ -17,7 +17,7 @@ namespace RedMujer_Backend.DTOs
         public string Descripcion { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La modalidad es obligatoria")]
-        public string? Modalidad { get; set; }
+        public required string Modalidad { get; set; }
 
         public string? Horario_Atencion { get; set; }
 
