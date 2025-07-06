@@ -60,5 +60,18 @@ namespace RedMujer_Backend.repositories
                 "UPDATE \"Categorias\" SET vigencia = false WHERE \"id_categoria\" = @Id_Categoria",
                 new { Id_Categoria = id });
         }
+
+        // MÉTODO NUEVO: CATEGORÍAS POR EMPRENDIMIENTO
+        public async Task<IEnumerable<Categoria>> GetCategoriasPorEmprendimientoAsync(int idEmprendimiento)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            var query = @"
+                SELECT c.* 
+                FROM ""Emprendimiento_categoria"" ec
+                JOIN ""Categorias"" c ON ec.id_categoria = c.id_categoria
+                WHERE ec.id_emprendimiento = @IdEmprendimiento AND c.vigencia = true
+            ";
+            return await connection.QueryAsync<Categoria>(query, new { IdEmprendimiento = idEmprendimiento });
+        }
     }
 }

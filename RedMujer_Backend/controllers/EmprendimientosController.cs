@@ -22,15 +22,18 @@ namespace RedMujer_Backend.controllers
         private readonly IEmprendimientoService _service;
         private readonly IWebHostEnvironment _env;
         private readonly IMultimediaRepository _multimediaRepo;
+        private readonly ICategoriaService _categoriaService;
 
         public EmprendimientosController(
             IEmprendimientoService service,
             IWebHostEnvironment env,
-            IMultimediaRepository multimediaRepo)
+            IMultimediaRepository multimediaRepo,
+            ICategoriaService categoriaService)
         {
             _service = service;
             _env = env;
             _multimediaRepo = multimediaRepo;
+            _categoriaService = categoriaService;
         }
 
         // =========== GETS ===========
@@ -173,7 +176,6 @@ namespace RedMujer_Backend.controllers
             return Ok(new { ruta = rutaNueva });
         }
 
-
         [HttpDelete("{id}/imagen-principal")]
         public async Task<IActionResult> EliminarImagenPrincipal(int id)
         {
@@ -263,6 +265,16 @@ namespace RedMujer_Backend.controllers
                 System.IO.File.Delete(archivo);
 
             return NoContent();
+        }
+
+        // =========== ENDPOINT DE CATEGORIAS DE EMPRENDIMIENTO ===========
+        [HttpGet("/emprendimientos/{idEmprendimiento}/categorias")]
+        public async Task<ActionResult<IEnumerable<CategoriaDto>>> GetCategoriasPorEmprendimiento(int idEmprendimiento)
+        {
+            var categorias = await _categoriaService.ObtenerCategoriasPorEmprendimientoAsync(idEmprendimiento);
+            if (categorias == null || !categorias.Any())
+                return NotFound("No se encontraron categorías para el emprendimiento.");
+            return Ok(categorias);
         }
 
         // =========== MÉTODOS DE GUARDADO DE IMÁGENES ===========

@@ -11,5 +11,6 @@ namespace RedMujer_Backend.services
         Task CrearAsync(CategoriaDto dto);
         Task ActualizarAsync(int id, CategoriaDto dto);
         Task EliminarAsync(int id);
+        Task<IEnumerable<CategoriaDto>> ObtenerCategoriasPorEmprendimientoAsync(int idEmprendimiento);
     }
 }
