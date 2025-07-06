@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,13 @@ export class EmprendimientoFormService {
 
   constructor(private http: HttpClient) {}
 
+  //Nuevo emprendimiento
+
   crearEmprendimiento(data: any, imagen: File | null): Observable<any> {
     const formData = new FormData();
     formData.append('RUT', data.rut);
     formData.append('Nombre', data.nombre);
-    formData.append('Descripcion', data.descripcion || '');
+    formData.append('Descripcion', data.descripcion || null);
     formData.append('Modalidad', data.modalidad);
     formData.append('Horario_Atencion', data.horario_Atencion);
     formData.append('Vigencia', 'true');
@@ -39,31 +42,35 @@ export class EmprendimientoFormService {
     return forkJoin(requests);
   }
 
+  //Editar emprendimiento
+
   obtenerEmprendimientoPorId(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
 
-  /*obtenerMultimediaPorEmprendimiento(id: number): Observable<any[]> {
-
-  }
-
-  actualizarEmprendimiento(id: number, data: any, imagen: File | null): Observable<any> {
-    const formData = new FormData();
-    formData.append('RUT', data.rut);
-    formData.append('Nombre', data.nombre);
-    formData.append('Descripcion', data.descripcion || '');
-    formData.append('Modalidad', data.modalidad);
-    formData.append('Horario_Atencion', data.horario_Atencion);
-    formData.append('Vigencia', 'true');
-    if (imagen) {
-      formData.append('Imagen', imagen);
-    }
-
+  actualizarEmprendimiento(id: number, formData: FormData): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${id}`, formData);
   }
 
-  actualizarMultimedia() {
+  borrarImagenPrincipal(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}/imagen-principal`); 
+  }
 
-  }*/
+  obtenerMultimediaPorId(id: number): Observable<string[]> {
+    return this.http.get<{ imagenes: string[] }>(`${this.apiUrl}/${id}/imagenes-emprendimiento`)
+    .pipe(map(response => response.imagenes));
+  }
+
+  actualizarMultimedia(id: number, archivos: File[]): Observable<any> {
+    const formData = new FormData();
+    archivos.forEach((archivo) => {
+      formData.append('Imagenes', archivo);
+    });
+    return this.http.put<any>(`${this.apiUrl}/${id}/imagenes-emprendimiento`, formData);
+  }
+
+  borrarImagenAdicional(id: number, nombreArchivo: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}/imagenes-emprendimiento/${nombreArchivo}`);
+  }
 
 }

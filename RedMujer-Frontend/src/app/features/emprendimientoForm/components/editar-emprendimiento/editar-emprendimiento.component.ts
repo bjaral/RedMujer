@@ -1,12 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { EmprendimientoFormService } from '../../services/emprendimiento-form.service';
-import { Router } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
-import { OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-nuevo-emprendimiento',
@@ -16,24 +13,22 @@ import { OnInit } from '@angular/core';
   styleUrl: './editar-emprendimiento.component.scss'
 })
 
-export class EditarEmprendimientoComponent implements OnInit{
+export class EditarEmprendimientoComponent implements OnInit {
 
   formulario: FormGroup;
   imagenSeleccionada: string | ArrayBuffer | null = null;
   imagenesExtras: string[] = [];
+  imagenesExtrasData: { preview: string; file: File }[] = [];
   imagenPrincipalFile: File | null = null;
-  imagenesExtrasFile: File[] = [];
+  idEmprendimiento!: number;
 
-  private idEmprendimiento!: number;
-
-  constructor(private fb: FormBuilder, private emprendimientoFormService: EmprendimientoFormService, private router: Router, private route: ActivatedRoute) {
+  constructor(private fb: FormBuilder, private emprendimientoFormService: EmprendimientoFormService, private router: Router,private route: ActivatedRoute) {
     this.formulario = this.fb.group({
       rut: ['', Validators.required],
       nombre: ['', Validators.required],
       descripcion: [''],
       modalidad: ['', Validators.required],
       horario_Atencion: ['', Validators.required],
-      imagen: ['']
     });
   }
 
@@ -52,10 +47,23 @@ export class EditarEmprendimientoComponent implements OnInit{
         this.formulario.patchValue({
           rut: emprendimiento.rut,
           nombre: emprendimiento.nombre,
-          descripcion: emprendimiento.descripcion || '',
-          modalidad: emprendimiento.modalidad ?? '',
+          descripcion: (emprendimiento.descripcion && emprendimiento.descripcion !== 'null') ? emprendimiento.descripcion : '',
+          modalidad: emprendimiento.modalidad,
           horario_Atencion: emprendimiento.horario_Atencion,
-          imagen: emprendimiento.imagen || ''
+        });
+
+        if (emprendimiento.imagen) {
+          this.imagenSeleccionada = `http://localhost:5145/media/${emprendimiento.imagen}`;
+        }
+
+        this.emprendimientoFormService.obtenerMultimediaPorId(id).subscribe({
+          next: (imagenes) => {
+            this.imagenesExtras = imagenes;
+            this.imagenesExtrasData = [];
+          },
+          error: (err) => {
+            console.error('Error al cargar las imágenes secundarias', err);
+          }
         });
       },
       error: (error) => {
@@ -63,7 +71,7 @@ export class EditarEmprendimientoComponent implements OnInit{
         alert('Ocurrió un error al cargar el emprendimiento. Por favor, intenténtelo de nuevo');
         this.router.navigate(['/mis-emprendimientos']);
       }
-    })
+    });
   }
 
   onFileSelected(event: Event): void {
@@ -79,15 +87,27 @@ export class EditarEmprendimientoComponent implements OnInit{
   }
 
   removeImagenPrincipal(): void {
-    this.imagenPrincipalFile = null;
-    this.imagenSeleccionada = null;
+    const confirmar = confirm('¿Estás segura de querer eliminar la imagen principal?');
+    if (!confirmar) return;
+
+    this.emprendimientoFormService.borrarImagenPrincipal(this.idEmprendimiento).subscribe({
+      next: () => {
+        this.imagenPrincipalFile = null;
+        this.imagenSeleccionada = null;
+        alert('Imagen principal eliminada correctamente.');
+      },
+      error: (err) => {
+        console.error('Error al eliminar la imagen principal', err);
+        alert('Ocurrió un error al eliminar la imagen principal. Por favor, intenténtelo de nuevo.');
+      }
+    });
   }
 
   onExtraImagesSelected(event: Event): void {
     const files = (event.target as HTMLInputElement).files;
     if (files) {
       const selectedCount = files.length;
-      const currentCount = this.imagenesExtras.length;
+      const currentCount = this.imagenesExtras.length + this.imagenesExtrasData.length;
       if (currentCount + selectedCount > 5) {
         alert('Solo puedes subir un máximo de 5 imágenes adicionales.');
         return;
@@ -97,8 +117,9 @@ export class EditarEmprendimientoComponent implements OnInit{
         const reader = new FileReader();
         reader.onload = () => {
           if (reader.result) {
-            this.imagenesExtras.push(reader.result as string);
-            this.imagenesExtrasFile.push(file as File);
+            const preview = reader.result as string;
+            this.imagenesExtras.push(preview);
+            this.imagenesExtrasData.push({ preview, file });
           }
         };
         reader.readAsDataURL(file);
@@ -107,8 +128,29 @@ export class EditarEmprendimientoComponent implements OnInit{
   }
 
   removeExtraImage(index: number): void {
-    this.imagenesExtras.splice(index, 1);
-    this.imagenesExtrasFile.splice(index, 1);
+    const confirmar = confirm('¿Estás segura de querer eliminar esta imagen?');
+    if (!confirmar) return;
+
+    const valor = this.imagenesExtras[index];
+
+    if (valor && typeof valor === 'string' && !valor.startsWith('data:')) {
+      const nombreArchivo = valor.split('/').pop() || valor;
+
+      this.emprendimientoFormService.borrarImagenAdicional(this.idEmprendimiento, nombreArchivo).subscribe({
+        next: () => {
+          this.imagenesExtras.splice(index, 1);
+          alert('Imagen eliminada correctamente.');
+        },
+        error: (err) => {
+          console.error('Error al eliminar la imagen adicional', err);
+          alert('Ocurrió un error al eliminar la imagen adicional. Por favor, intenténtelo de nuevo.');
+        }
+      });
+    } else {
+      this.imagenesExtras.splice(index, 1);
+      const i = this.imagenesExtrasData.findIndex(img => img.preview === valor);
+      if (i > -1) this.imagenesExtrasData.splice(i, 1);
+    }
   }
 
   onSubmit() {
@@ -117,51 +159,43 @@ export class EditarEmprendimientoComponent implements OnInit{
       return;
     }
 
-    const formData = this.formulario.value;
-    const imagenInput = document.querySelector<HTMLInputElement>('input[type="file"]:not([multiple])');
-    const imagenPrincipal = imagenInput?.files?.[0] ?? null;
+    const data = this.formulario.value;
+    const formData = new FormData();
 
-    this.emprendimientoFormService.crearEmprendimiento(formData, imagenPrincipal).subscribe({
-      next: (response) => {
-        const idEmprendimiento = response?.id_Emprendimiento;
-        if (!idEmprendimiento) {
-          alert('Error: no se recibió el ID del emprendimiento creado.');
-          return;
-        }
+    formData.append('RUT', data.rut);
+    formData.append('Nombre', data.nombre);
+    formData.append('Descripcion', data.descripcion || '');
+    formData.append('Modalidad', data.modalidad);
+    formData.append('Horario_Atencion', data.horario_Atencion);
+    formData.append('Vigencia', 'true');
 
-        if (this.imagenesExtrasFile.length > 0) {
-          this.emprendimientoFormService.subirMultimedia(idEmprendimiento, this.imagenesExtrasFile).subscribe({
+    if (this.imagenPrincipalFile) {
+      formData.append('Imagen', this.imagenPrincipalFile);
+    }
+
+    this.emprendimientoFormService.actualizarEmprendimiento(this.idEmprendimiento, formData).subscribe({
+      next: () => {
+        const filesToUpload = this.imagenesExtrasData.map(img => img.file);
+        if (filesToUpload.length > 0) {
+          this.emprendimientoFormService.actualizarMultimedia(this.idEmprendimiento, filesToUpload).subscribe({
             next: () => {
-              alert('Emprendimiento creado y multimedia subida exitosamente.');
-              this.limpiarFormulario();
-              this.router.navigate(['/perfil']);
+              alert('Emprendimiento e imágenes actualizados correctamente.');
+              this.router.navigate(['/mis-emprendimientos']);
             },
             error: (err) => {
-              console.error('Error al subir multimedia', err);
-              alert('Emprendimiento creado, pero hubo un error al subir las imágenes adicionales.');
-              this.router.navigate(['/perfil']);
+              console.error('Error al actualizar las imágenes adicionales', err);
+              alert('El emprendimiento y la imagen principal se actualizaron correctamente, pero ocurrió un error al actualizar las imágenes adicionales.');
             }
           });
         } else {
-          alert('Emprendimiento creado exitosamente.');
-          this.limpiarFormulario();
-          this.router.navigate(['/perfil']);
+          alert('Emprendimiento actualizado correctamente, pero no se añadieron imágenes adicionales.');
+          this.router.navigate(['/mis-emprendimientos']);
         }
       },
       error: (error) => {
-        console.error('Error al crear el emprendimiento', error);
-        alert('Ocurrió un error al crear el emprendimiento.');
+        console.error('Error al actualizar el emprendimiento', error);
+        alert('Ocurrió un error al actualizar el emprendimiento.');
       }
     });
   }
-
-
-  private limpiarFormulario(): void {
-    this.formulario.reset();
-    this.imagenSeleccionada = null;
-    this.imagenPrincipalFile = null;
-    this.imagenesExtras = [];
-    this.imagenesExtrasFile = [];
-  }
-
 }

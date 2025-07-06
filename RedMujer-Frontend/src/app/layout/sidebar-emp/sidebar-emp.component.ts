@@ -23,7 +23,7 @@ export class SidebarEmpComponent {
   }
 
   confirmarLogout() {
-    const confirmacion = confirm('¿Estás seguro de que deseas cerrar sesión?');
+    const confirmacion = confirm('¿Estás segura de que deseas cerrar sesión?');
     if (confirmacion) {
       this.router.navigate(['/']);
     }
