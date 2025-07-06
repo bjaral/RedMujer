@@ -85,8 +85,7 @@ export class NuevoEmprendimientoComponent {
     }
 
     const formData = this.formulario.value;
-    const imagenInput = document.querySelector<HTMLInputElement>('input[type="file"]:not([multiple])');
-    const imagenPrincipal = imagenInput?.files?.[0] ?? null;
+    const imagenPrincipal = this.imagenPrincipalFile;
 
     this.emprendimientoFormService.crearEmprendimiento(formData, imagenPrincipal).subscribe({
       next: (response) => {

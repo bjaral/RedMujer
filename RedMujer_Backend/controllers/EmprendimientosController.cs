@@ -257,10 +257,17 @@ namespace RedMujer_Backend.controllers
             if (imagen == null || imagen.Length == 0)
                 return null;
 
-            var nombreArchivo = Path.GetFileName(imagen.FileName);
+            //var nombreArchivo = Path.GetFileName(imagen.FileName);
             var carpetaDestino = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", idEmprendimiento.ToString(), "imagen_principal");
             Directory.CreateDirectory(carpetaDestino);
 
+            var archivosAntiguos = Directory.GetFiles(carpetaDestino);
+            foreach (var archivo in archivosAntiguos)
+            {
+                System.IO.File.Delete(archivo);
+            }
+
+            var nombreArchivo = Path.GetFileName(imagen.FileName);
             var rutaCompleta = Path.Combine(carpetaDestino, nombreArchivo);
 
             using (var stream = new FileStream(rutaCompleta, FileMode.Create))
