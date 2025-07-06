@@ -1,42 +1,63 @@
 using Dapper;
 using Npgsql;
-using System.Data;
 using RedMujer_Backend.models;
-using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
 
-namespace RedMujer_Backend.repositories
+public class MultimediaRepository : IMultimediaRepository
 {
-    public class MultimediaRepository : IMultimediaRepository
+    private readonly string _connectionString;
+
+    public MultimediaRepository(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connectionString;
+        _connectionString = configuration.GetConnectionString("DefaultConnection");
+    }
 
-        public MultimediaRepository(IConfiguration configuration)
-        {
-            _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("DefaultConnection")!;
-        }
+    private NpgsqlConnection CrearConexion() => new NpgsqlConnection(_connectionString);
 
-        private IDbConnection CreateConnection() => new NpgsqlConnection(_connectionString);
+    // Obtener multimedia por ID
+    public async Task<Multimedia?> GetByIdAsync(int idMultimedia)
+    {
+        using var connection = CrearConexion();
+        return await connection.QueryFirstOrDefaultAsync<Multimedia>(
+            "SELECT * FROM \"Multimedias\" WHERE id_multimedia = @Id", new { Id = idMultimedia });
+    }
 
-        public async Task AgregarMultimediaAsync(Multimedia multimedia)
-        {
-            const string query = @"
-                INSERT INTO ""Multimedias"" 
-                    (id_emprendimiento, tipo_multimedia, ruta, descripcion, vigencia)
-                VALUES 
-                    (@Id_Emprendimiento, @Tipo_Multimedia::tipo_multimedia, @Ruta, @Descripcion, @vigencia)
-            ";
-            using var connection = CreateConnection();
-            await connection.ExecuteAsync(query, new
-            {
-                multimedia.Id_Emprendimiento,
-                Tipo_Multimedia = multimedia.Tipo_Multimedia.ToString(),
-                multimedia.Ruta,
-                multimedia.Descripcion,
-                multimedia.Vigencia
-            });
-        }
+    // Listar multimedia por emprendimiento
+    public async Task<IEnumerable<Multimedia>> GetByEmprendimientoIdAsync(int idEmprendimiento)
+    {
+        using var connection = CrearConexion();
+        return await connection.QueryAsync<Multimedia>(
+            "SELECT * FROM \"Multimedias\" WHERE id_emprendimiento = @Id", new { Id = idEmprendimiento });
+    }
+
+    // Agregar nuevo multimedia
+    public async Task<int> AddAsync(Multimedia multimedia)
+    {
+        using var connection = CrearConexion();
+        var id = await connection.ExecuteScalarAsync<int>(
+            @"INSERT INTO ""Multimedias"" (id_emprendimiento, ruta, descripcion, vigencia, tipo_multimedia)
+              VALUES (@Id_Emprendimiento, @Ruta, @Descripcion, @Vigencia, @Tipo_Multimedia)
+              RETURNING id_multimedia;",
+            multimedia);
+        return id;
+    }
+
+    // Actualizar multimedia (solo descripción y vigencia)
+    public async Task UpdateAsync(Multimedia multimedia)
+    {
+        using var connection = CrearConexion();
+        await connection.ExecuteAsync(
+            @"UPDATE ""Multimedias"" SET
+                descripcion = @Descripcion,
+                vigencia = @Vigencia
+              WHERE id_multimedia = @Id_Multimedia;",
+            multimedia);
+    }
+
+    // Eliminar multimedia por ID
+    public async Task DeleteAsync(int idMultimedia)
+    {
+        using var connection = CrearConexion();
+        await connection.ExecuteAsync(
+            "DELETE FROM \"Multimedias\" WHERE id_multimedia = @Id", new { Id = idMultimedia });
     }
 }

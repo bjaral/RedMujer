@@ -1,25 +1,11 @@
 using RedMujer_Backend.models;
-using System.Threading.Tasks;
-using RedMujer_Backend.repositories;
+using RedMujer_Backend.DTOs;
 
-namespace RedMujer_Backend.services
+public interface IMultimediaService
 {
-    public interface IMultimediaService
-    {
-        Task AgregarMultimediaAsync(Multimedia multimedia);
-    }
-
-    public class MultimediaService : IMultimediaService
-    {
-        private readonly IMultimediaRepository _repo;
-        public MultimediaService(IMultimediaRepository repo)
-        {
-            _repo = repo;
-        }
-
-        public async Task AgregarMultimediaAsync(Multimedia multimedia)
-        {
-            await _repo.AgregarMultimediaAsync(multimedia);
-        }
-    }
+    Task<IEnumerable<Multimedia>> ListarPorEmprendimientoAsync(int idEmprendimiento);
+    Task<Multimedia?> GetByIdAsync(int idMultimedia);
+    Task<int> SubirMultimediaAsync(int idEmprendimiento, MultimediaUploadDto dto, string mediaRootPath);
+    Task EliminarMultimediaAsync(int idMultimedia, string mediaRootPath);
+    Task UpdateAsync(Multimedia multimedia);
 }

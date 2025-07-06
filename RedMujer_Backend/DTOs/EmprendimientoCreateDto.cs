@@ -9,5 +9,5 @@ public class EmprendimientoCreateDto
     public string Modalidad { get; set; } = "";
     public string? Horario_Atencion { get; set; }
     public bool Vigencia { get; set; }
-    public IFormFile? Imagen { get; set; }  // archivo subido
+    public IFormFile? Imagen { get; set; }  
 }
