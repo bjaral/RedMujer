@@ -48,39 +48,29 @@ export class EmprendimientoFormService {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
 
-  /*obtenerImagenPorId(id: number): Observable<string> {
-    return this.http.get<{ url: string }>(`${this.apiUrl}/${id}/imagen-principal`)
-    .pipe(
-      map(response => response.url)
-    );
-  }
-
-  obtenerMultimediaPorId(id: number): Observable<string[]> {
-    return this.http.get<{ imagenes: string[] }>(`${this.apiUrl}/${id}/imagenes-emprendimiento`)
-      .pipe(
-        map(response => response.imagenes)
-      );
-
-  }*/
-
   actualizarEmprendimiento(id: number, formData: FormData): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${id}`, formData);
   }
 
-  /*actualizarImagenPrincipal(id: number, imagen: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('Imagen', imagen);
-
-    return this.http.put<any>(`${this.apiUrl}/${id}/imagen-principal`, formData);
+  borrarImagenPrincipal(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}/imagen-principal`); 
   }
 
-  actualizarMultimedia(id: number, archivos: File[], descripcion = '', tipo = 'imagen'): Observable<any> {
+  obtenerMultimediaPorId(id: number): Observable<string[]> {
+    return this.http.get<{ imagenes: string[] }>(`${this.apiUrl}/${id}/imagenes-emprendimiento`)
+    .pipe(map(response => response.imagenes));
+  }
+
+  actualizarMultimedia(id: number, archivos: File[]): Observable<any> {
     const formData = new FormData();
-    archivos.forEach((archivo, index) => {
-      formData.append('Imagenes', archivo, archivo.name);
+    archivos.forEach((archivo) => {
+      formData.append('Imagenes', archivo);
     });
-    formData.append('Descripcion', descripcion || '');
-    return this.http.put(`${this.apiUrl}/${id}/imagenes-emprendimiento`, formData);
-  }*/
+    return this.http.put<any>(`${this.apiUrl}/${id}/imagenes-emprendimiento`, formData);
+  }
+
+  borrarImagenAdicional(id: number, nombreArchivo: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}/imagenes-emprendimiento/${nombreArchivo}`);
+  }
 
 }
