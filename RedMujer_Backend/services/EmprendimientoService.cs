@@ -32,7 +32,6 @@ namespace RedMujer_Backend.services
             };
         }
 
-        // --- GETS ahora devuelven DTOs ---
         public async Task<IEnumerable<EmprendimientoDto>> GetAllAsync()
         {
             var lista = await _repo.GetAllAsync();
@@ -51,7 +50,6 @@ namespace RedMujer_Backend.services
             return e == null ? null : MapToDto(e);
         }
 
-        // --- CREAR Y ACTUALIZAR usan el DTO de entrada (POST/PUT) ---
         public async Task<Emprendimiento> CrearAsync(EmprendimientoCreateDto dto, string? rutaImagen)
         {
             var entidad = new Emprendimiento
@@ -60,7 +58,7 @@ namespace RedMujer_Backend.services
                 Nombre = dto.Nombre,
                 Descripcion = dto.Descripcion,
                 Horario_Atencion = dto.Horario_Atencion,
-                Vigencia = dto.Vigencia,
+                Vigencia = dto.Vigencia ?? false,
                 Imagen = !string.IsNullOrEmpty(rutaImagen) ? rutaImagen.Replace("\\", "/") : null,
                 Modalidad = MapearModalidad(dto.Modalidad)
             };
@@ -71,19 +69,21 @@ namespace RedMujer_Backend.services
 
         public async Task ActualizarAsync(int id, EmprendimientoCreateDto dto, string? rutaImagen)
         {
-            var emprendimiento = new Emprendimiento
-            {
-                Id_Emprendimiento = id,
-                RUT = dto.RUT,
-                Nombre = dto.Nombre,
-                Descripcion = dto.Descripcion,
-                Horario_Atencion = dto.Horario_Atencion,
-                Vigencia = dto.Vigencia,
-                Imagen = !string.IsNullOrEmpty(rutaImagen) ? rutaImagen.Replace("\\", "/") : null,
-                Modalidad = MapearModalidad(dto.Modalidad)
-            };
+            var emprendimientoExistente = await _repo.GetByIdAsync(id);
+            if (emprendimientoExistente == null)
+                throw new KeyNotFoundException("Emprendimiento no encontrado");
 
-            await _repo.ActualizarEmprendimientoAsync(emprendimiento);
+            emprendimientoExistente.RUT = dto.RUT;
+            emprendimientoExistente.Nombre = dto.Nombre;
+            emprendimientoExistente.Descripcion = dto.Descripcion;
+            emprendimientoExistente.Horario_Atencion = dto.Horario_Atencion;
+            emprendimientoExistente.Vigencia = dto.Vigencia ?? emprendimientoExistente.Vigencia;
+            emprendimientoExistente.Modalidad = MapearModalidad(dto.Modalidad);
+
+            if (!string.IsNullOrEmpty(rutaImagen))
+                emprendimientoExistente.Imagen = rutaImagen.Replace("\\", "/");
+
+            await _repo.ActualizarEmprendimientoAsync(emprendimientoExistente);
         }
 
         public async Task<Emprendimiento> ActualizarImagenAsync(int idEmprendimiento, string? rutaImagen)
@@ -119,7 +119,6 @@ namespace RedMujer_Backend.services
             await _repo.UpdateImagenPrincipalAsync(id, ruta);
         }
 
-        // --- Mapear modelo -> DTO para GETs ---
         private EmprendimientoDto MapToDto(Emprendimiento e)
         {
             return new EmprendimientoDto
