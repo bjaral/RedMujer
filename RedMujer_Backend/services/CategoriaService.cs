@@ -1,24 +1,25 @@
-using RedMujer_Backend.DTOs;
-using RedMujer_Backend.models;
-using RedMujer_Backend.repositories;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using RedMujer_Backend.repositories;
+using RedMujer_Backend.DTOs;
+using RedMujer_Backend.models;
 
 namespace RedMujer_Backend.services
 {
     public class CategoriaService : ICategoriaService
     {
-        private readonly ICategoriaRepository _repo;
+        private readonly ICategoriaRepository _categoriaRepository;
 
-        public CategoriaService(ICategoriaRepository repo)
+        public CategoriaService(ICategoriaRepository categoriaRepository)
         {
-            _repo = repo;
+            _categoriaRepository = categoriaRepository;
         }
 
+        // GET todos
         public async Task<IEnumerable<CategoriaDto>> GetAllAsync()
         {
-            var categorias = await _repo.GetAllAsync();
+            var categorias = await _categoriaRepository.GetAllAsync();
             return categorias.Select(c => new CategoriaDto
             {
                 Id_Categoria = c.Id_Categoria,
@@ -28,19 +29,23 @@ namespace RedMujer_Backend.services
             });
         }
 
+        // GET por id
         public async Task<CategoriaDto?> GetByIdAsync(int id)
         {
-            var c = await _repo.GetByIdAsync(id);
-            if (c == null) return null;
+            var categoria = await _categoriaRepository.GetByIdAsync(id);
+            if (categoria == null)
+                return null;
+
             return new CategoriaDto
             {
-                Id_Categoria = c.Id_Categoria,
-                Descripcion = c.Descripcion,
-                Vigencia = c.Vigencia,
-                Grupo_Categoria = c.Grupo_Categoria
+                Id_Categoria = categoria.Id_Categoria,
+                Descripcion = categoria.Descripcion,
+                Vigencia = categoria.Vigencia,
+                Grupo_Categoria = categoria.Grupo_Categoria
             };
         }
 
+        // Crear
         public async Task CrearAsync(CategoriaDto dto)
         {
             var categoria = new Categoria
@@ -49,24 +54,39 @@ namespace RedMujer_Backend.services
                 Vigencia = dto.Vigencia,
                 Grupo_Categoria = dto.Grupo_Categoria
             };
-            await _repo.CrearAsync(categoria);
+            await _categoriaRepository.CrearAsync(categoria);
         }
 
+        // Actualizar
         public async Task ActualizarAsync(int id, CategoriaDto dto)
         {
-            var categoria = await _repo.GetByIdAsync(id);
-            if (categoria != null)
+            var categoria = new Categoria
             {
-                categoria.Descripcion = dto.Descripcion;
-                categoria.Vigencia = dto.Vigencia;
-                categoria.Grupo_Categoria = dto.Grupo_Categoria;
-                await _repo.ActualizarAsync(categoria);
-            }
+                Id_Categoria = id,
+                Descripcion = dto.Descripcion,
+                Vigencia = dto.Vigencia,
+                Grupo_Categoria = dto.Grupo_Categoria
+            };
+            await _categoriaRepository.ActualizarAsync(categoria);
         }
 
+        // Eliminar
         public async Task EliminarAsync(int id)
         {
-            await _repo.EliminarAsync(id);
+            await _categoriaRepository.EliminarAsync(id);
+        }
+
+        // Obtener categorías por emprendimiento
+        public async Task<IEnumerable<CategoriaDto>> ObtenerCategoriasPorEmprendimientoAsync(int idEmprendimiento)
+        {
+            var categorias = await _categoriaRepository.GetCategoriasPorEmprendimientoAsync(idEmprendimiento);
+            return categorias.Select(c => new CategoriaDto
+            {
+                Id_Categoria = c.Id_Categoria,
+                Descripcion = c.Descripcion,
+                Vigencia = c.Vigencia,
+                Grupo_Categoria = c.Grupo_Categoria
+            });
         }
     }
 }
