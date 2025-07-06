@@ -3,6 +3,7 @@ using RedMujer_Backend.models;
 using RedMujer_Backend.repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace RedMujer_Backend.services
 {
@@ -15,16 +16,12 @@ namespace RedMujer_Backend.services
             _repo = repo;
         }
 
-        // --- Mapea string a Enum de forma segura (case insensitive, admite espacios) ---
         private TipoModalidad? MapearModalidad(string? modalidad)
         {
             if (string.IsNullOrWhiteSpace(modalidad)) return null;
-
-            // Quita espacios, compara sin distinguir mayúsculas/minúsculas
             if (Enum.TryParse<TipoModalidad>(modalidad.Replace(" ", ""), true, out var result))
                 return result;
 
-            // Opcional: fallback manual
             modalidad = modalidad.Trim().ToLower();
             return modalidad switch
             {
@@ -35,17 +32,27 @@ namespace RedMujer_Backend.services
             };
         }
 
-        public async Task<IEnumerable<Emprendimiento>> GetAllAsync()
+        // --- GETS ahora devuelven DTOs ---
+        public async Task<IEnumerable<EmprendimientoDto>> GetAllAsync()
         {
-            return await _repo.GetAllAsync();
+            var lista = await _repo.GetAllAsync();
+            return lista.Select(e => MapToDto(e));
         }
 
-        public async Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad)
+        public async Task<IEnumerable<EmprendimientoDto>> GetRandomAsync(int cantidad)
         {
-            return await _repo.GetRandomAsync(cantidad);
+            var lista = await _repo.GetRandomAsync(cantidad);
+            return lista.Select(e => MapToDto(e));
         }
 
-        public async Task<Emprendimiento> CrearAsync(EmprendimientoDto dto, string? rutaImagen)
+        public async Task<EmprendimientoDto?> GetByIdAsync(int id)
+        {
+            var e = await _repo.GetByIdAsync(id);
+            return e == null ? null : MapToDto(e);
+        }
+
+        // --- CREAR Y ACTUALIZAR usan el DTO de entrada (POST/PUT) ---
+        public async Task<Emprendimiento> CrearAsync(EmprendimientoCreateDto dto, string? rutaImagen)
         {
             var entidad = new Emprendimiento
             {
@@ -57,13 +64,12 @@ namespace RedMujer_Backend.services
                 Imagen = !string.IsNullOrEmpty(rutaImagen) ? rutaImagen.Replace("\\", "/") : null,
                 Modalidad = MapearModalidad(dto.Modalidad)
             };
-
             var id = await _repo.InsertarEmprendimientoAsync(entidad);
             entidad.Id_Emprendimiento = id;
             return entidad;
         }
 
-        public async Task ActualizarAsync(int id, EmprendimientoDto dto, string? rutaImagen)
+        public async Task ActualizarAsync(int id, EmprendimientoCreateDto dto, string? rutaImagen)
         {
             var emprendimiento = new Emprendimiento
             {
@@ -92,11 +98,6 @@ namespace RedMujer_Backend.services
             return emprendimiento;
         }
 
-        public async Task<Emprendimiento?> GetByIdAsync(int id)
-        {
-            return await _repo.GetByIdAsync(id);
-        }
-
         public async Task EliminarAsync(int id)
         {
             await _repo.EliminarEmprendimientoAsync(id);
@@ -116,6 +117,28 @@ namespace RedMujer_Backend.services
         public async Task ActualizarImagenPrincipalAsync(int id, string? ruta)
         {
             await _repo.UpdateImagenPrincipalAsync(id, ruta);
+        }
+
+        // --- Mapear modelo -> DTO para GETs ---
+        private EmprendimientoDto MapToDto(Emprendimiento e)
+        {
+            return new EmprendimientoDto
+            {
+                Id_Emprendimiento = e.Id_Emprendimiento,
+                RUT = e.RUT,
+                Nombre = e.Nombre,
+                Descripcion = e.Descripcion,
+                Horario_Atencion = e.Horario_Atencion,
+                Vigencia = e.Vigencia,
+                Imagen = e.Imagen,
+                Modalidad = e.Modalidad switch
+                {
+                    TipoModalidad.PresencialYOnline => "Presencial y Online",
+                    TipoModalidad.Presencial => "Presencial",
+                    TipoModalidad.Online => "Online",
+                    _ => ""
+                }
+            };
         }
     }
 }

@@ -7,7 +7,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
 
 namespace RedMujer_Backend.controllers
 {
@@ -34,6 +33,7 @@ namespace RedMujer_Backend.controllers
             _multimediaRepo = multimediaRepo;
         }
 
+        // =========== GETS ===========
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -49,7 +49,7 @@ namespace RedMujer_Backend.controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Emprendimiento>> GetById(int id)
+        public async Task<ActionResult<EmprendimientoDto>> GetById(int id)
         {
             var emprendimiento = await _service.GetByIdAsync(id);
             if (emprendimiento == null)
@@ -57,9 +57,10 @@ namespace RedMujer_Backend.controllers
             return Ok(emprendimiento);
         }
 
+        // =========== CREAR ===========
         [HttpPost]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Crear([FromForm] EmprendimientoDto dto)
+        public async Task<IActionResult> Crear([FromForm] EmprendimientoCreateDto dto)
         {
             var nuevo = await _service.CrearAsync(dto, null);
             if (dto.Imagen != null)
@@ -68,18 +69,35 @@ namespace RedMujer_Backend.controllers
                 await _service.ActualizarImagenAsync(nuevo.Id_Emprendimiento, rutaImagen);
                 nuevo.Imagen = rutaImagen;
             }
-            return CreatedAtAction(nameof(GetById), new { id = nuevo.Id_Emprendimiento }, nuevo);
+            // Retornamos el DTO de respuesta
+            var respuesta = new EmprendimientoDto
+            {
+                Id_Emprendimiento = nuevo.Id_Emprendimiento,
+                RUT = nuevo.RUT,
+                Nombre = nuevo.Nombre,
+                Descripcion = nuevo.Descripcion,
+                Modalidad = nuevo.Modalidad?.ToString() ?? "",
+                Horario_Atencion = nuevo.Horario_Atencion,
+                Vigencia = nuevo.Vigencia,
+                Imagen = nuevo.Imagen
+            };
+            return CreatedAtAction(nameof(GetById), new { id = nuevo.Id_Emprendimiento }, respuesta);
         }
 
+        // =========== ACTUALIZAR ===========
         [HttpPut("{id}")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Actualizar(int id, [FromForm] EmprendimientoDto dto)
+        public async Task<IActionResult> Actualizar(int id, [FromForm] EmprendimientoCreateDto dto)
         {
-            var rutaImagen = await GuardarImagenPrincipal(id, dto.Imagen);
+            string? rutaImagen = null;
+            if (dto.Imagen != null)
+                rutaImagen = await GuardarImagenPrincipal(id, dto.Imagen);
+
             await _service.ActualizarAsync(id, dto, rutaImagen);
             return NoContent();
         }
 
+        // =========== ELIMINAR ===========
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(int id)
         {
@@ -87,6 +105,7 @@ namespace RedMujer_Backend.controllers
             return NoContent();
         }
 
+        // =========== MULTIMEDIA ===========
         [HttpPost("{id}/multimedia")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> SubirMultimedia(int id, [FromForm] MultimediaUploadDto dto)
@@ -114,7 +133,7 @@ namespace RedMujer_Backend.controllers
             return Ok(new { ruta });
         }
 
-        // === Imagen principal ===
+        // =========== IMAGEN PRINCIPAL ===========
         [HttpGet("{id}/imagen-principal")]
         public async Task<IActionResult> GetImagenPrincipal(int id)
         {
@@ -154,6 +173,7 @@ namespace RedMujer_Backend.controllers
             return Ok(new { ruta = rutaNueva });
         }
 
+
         [HttpDelete("{id}/imagen-principal")]
         public async Task<IActionResult> EliminarImagenPrincipal(int id)
         {
@@ -169,6 +189,7 @@ namespace RedMujer_Backend.controllers
             return NoContent();
         }
 
+        // =========== IMÁGENES ADICIONALES ===========
         [HttpGet("{id}/imagenes-emprendimiento")]
         public IActionResult GetImagenesEmprendimiento(int id)
         {
@@ -244,12 +265,12 @@ namespace RedMujer_Backend.controllers
             return NoContent();
         }
 
+        // =========== MÉTODOS DE GUARDADO DE IMÁGENES ===========
         private async Task<string?> GuardarImagenPrincipal(int idEmprendimiento, IFormFile? imagen)
         {
             if (imagen == null || imagen.Length == 0)
                 return null;
 
-            //var nombreArchivo = Path.GetFileName(imagen.FileName);
             var carpetaDestino = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", idEmprendimiento.ToString(), "imagen_principal");
             Directory.CreateDirectory(carpetaDestino);
 
