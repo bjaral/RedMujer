@@ -20,8 +20,7 @@
             <mat-select [(ngModel)]="selectedComuna" (ngModelChange)="filtrarEmprendimientos()"
                 placeholder="Selec. Comuna" class="custom-select">
                 <mat-option value="todas">Todas</mat-option>
-                <!-- Mostrar comunas filtradas solo si hay una región seleccionada -->
-                <mat-option *ngFor="let comuna of comunasFiltradas" [value]="comuna.id_comuna">
+                <mat-option *ngFor="let comuna of comunasFiltradas" [value]="comuna.id_Comuna">
                     {{comuna.nombre}}
                 </mat-option>
             </mat-select>
