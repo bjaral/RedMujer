@@ -1,55 +1,53 @@
 <div class="search-container">
     <div class="search-bar">
-        <mat-form-field class="search-field" appearance="outline">
-            <mat-icon matPrefix>search</mat-icon>
-            <input matInput 
-                   [(ngModel)]="searchTerm" 
-                   (ngModelChange)="filtrarEmprendimientos()"
-                   placeholder="¿Qué tema te gustaría cubrir?"
-                   [value]="searchTerm">
-        </mat-form-field>
+        <div class="search-input-wrapper">
+            <mat-icon class="search-icon">search</mat-icon>
+            <input class="search-input" [(ngModel)]="searchTerm" (ngModelChange)="filtrarEmprendimientos()"
+                placeholder="¿Qué emprendimiento te gustaría encontrar?" [value]="searchTerm">
+        </div>
 
-        <mat-form-field appearance="outline">
-            <mat-label>Selec. Región</mat-label>
-            <mat-select [(ngModel)]="selectedRegion" (ngModelChange)="filtrarEmprendimientos()">
-                <mat-option value="">Todas</mat-option>
-                <mat-option *ngFor="let region of regiones" [value]="region.id">
+        <div class="select-wrapper">
+            <mat-select [(ngModel)]="selectedRegion" (ngModelChange)="onRegionChange()" placeholder="Selec. Región"
+                class="custom-select">
+                <mat-option value="todas">Todas</mat-option>
+                <mat-option *ngFor="let region of regiones" [value]="region.id_Region">
                     {{region.nombre}}
                 </mat-option>
             </mat-select>
-        </mat-form-field>
+        </div>
 
-        <mat-form-field appearance="outline">
-            <mat-label>Selec. Comuna</mat-label>
-            <mat-select [(ngModel)]="selectedComuna" (ngModelChange)="filtrarEmprendimientos()">
-                <mat-option value="">Todas</mat-option>
-                <mat-option *ngFor="let comuna of comunas" [value]="comuna.id">
+        <div class="select-wrapper">
+            <mat-select [(ngModel)]="selectedComuna" (ngModelChange)="filtrarEmprendimientos()"
+                placeholder="Selec. Comuna" class="custom-select">
+                <mat-option value="todas">Todas</mat-option>
+                <!-- Mostrar comunas filtradas solo si hay una región seleccionada -->
+                <mat-option *ngFor="let comuna of comunasFiltradas" [value]="comuna.id_Comuna">
                     {{comuna.nombre}}
                 </mat-option>
             </mat-select>
-        </mat-form-field>
+        </div>
 
-        <mat-form-field appearance="outline">
-            <mat-label>Modalidad</mat-label>
-            <mat-select [(ngModel)]="selectedModo" (ngModelChange)="filtrarEmprendimientos()">
-                <mat-option value="">Todas</mat-option>
+        <div class="select-wrapper">
+            <mat-select [(ngModel)]="selectedModo" (ngModelChange)="filtrarEmprendimientos()" placeholder="Selec. Modo"
+                class="custom-select">
+                <mat-option value="todas">Todas</mat-option>
                 <mat-option *ngFor="let modo of modos" [value]="modo.id">
                     {{modo.nombre}}
                 </mat-option>
             </mat-select>
-        </mat-form-field>
+        </div>
 
-        <mat-form-field appearance="outline">
-            <mat-label>Categoría</mat-label>
-            <mat-select [(ngModel)]="selectedCategoria" (ngModelChange)="filtrarEmprendimientos()">
-                <mat-option value="">Todas</mat-option>
+        <div class="select-wrapper">
+            <mat-select [(ngModel)]="selectedCategoria" (ngModelChange)="filtrarEmprendimientos()"
+                placeholder="Selec. Categoría" class="custom-select">
+                <mat-option value="todas">Todas</mat-option>
                 <mat-option *ngFor="let categoria of categorias" [value]="categoria.id">
                     {{categoria.nombre}}
                 </mat-option>
             </mat-select>
-        </mat-form-field>
+        </div>
 
-        <button mat-fab color="primary" class="search-button" (click)="buscarEmprendimientos()">
+        <button class="search-button" (click)="buscarEmprendimientos()">
             <mat-icon>search</mat-icon>
         </button>
     </div>
@@ -59,31 +57,31 @@
     <div class="section-container">
         <div class="results-info">
             <p class="results-count">{{ contadorTexto }}</p>
-            <mat-form-field appearance="outline" class="sort-select">
-                <mat-label>Ordenar por:</mat-label>
-                <mat-select [(value)]="sortOrder" (selectionChange)="aplicarOrden()">
-                    <mat-option value="default">Por defecto</mat-option>
-                    <mat-option value="nombre-asc">Nombre A-Z</mat-option>
-                    <mat-option value="nombre-desc">Nombre Z-A</mat-option>
-                    <mat-option value="fecha-reciente">Más recientes</mat-option>
-                    <mat-option value="fecha-antigua">Más antiguos</mat-option>
-                    <mat-option value="10">10 por página</mat-option>
-                    <mat-option value="20">20 por página</mat-option>
-                    <mat-option value="30">30 por página</mat-option>
-                </mat-select>
-            </mat-form-field>
+
+            <div class="sort-wrapper">
+                <span class="sort-label">Mostrar emprendimientos:</span>
+                <div class="select-container">
+                    <mat-select [(value)]="sortOrder" (selectionChange)="aplicarOrden()" class="custom-sort-select">
+                        <mat-option value="default">Por defecto</mat-option>
+                        <mat-option value="nombre-asc">Nombre A-Z</mat-option>
+                        <mat-option value="nombre-desc">Nombre Z-A</mat-option>
+                        <mat-option value="fecha-reciente">Más recientes</mat-option>
+                        <mat-option value="fecha-antigua">Más antiguos</mat-option>
+                        <mat-option value="10">10 por página</mat-option>
+                        <mat-option value="20">20 por página</mat-option>
+                        <mat-option value="30">30 por página</mat-option>
+                    </mat-select>
+                </div>
+            </div>
         </div>
 
         <ng-container *ngIf="!loading; else cargando">
             <div class="emprendimientos-grid">
-                <div class="emprendimiento-card" 
-                     *ngFor="let emp of emprendimientosPaginados; let i = index"
-                     [style.animation-delay]="i * 0.1 + 's'">
+                <div class="emprendimiento-card" *ngFor="let emp of emprendimientosPaginados; let i = index"
+                    [style.animation-delay]="i * 0.1 + 's'">
                     <div class="card-image">
-                        <img [src]="emp.imagen"
-                             [alt]="'Imagen de ' + emp.nombre"
-                             (error)="onImageError($event)"
-                             loading="lazy">
+                        <img [src]="emp.imagen" [alt]="'Imagen de ' + emp.nombre" (error)="onImageError($event)"
+                            loading="lazy">
                         <div class="card-overlay">
                             <button mat-fab class="quick-view-btn" (click)="verDetalles(emp)">
                                 <mat-icon>visibility</mat-icon>
@@ -110,15 +108,9 @@
             </div>
 
             <!-- Paginación -->
-            <mat-paginator 
-                *ngIf="totalItems > itemsPorPagina"
-                [length]="totalItems"
-                [pageSize]="itemsPorPagina"
-                [pageIndex]="paginaActual"
-                [pageSizeOptions]="[10, 20, 30]"
-                (page)="onPageChange($event)"
-                showFirstLastButtons
-                aria-label="Seleccionar página de emprendimientos">
+            <mat-paginator *ngIf="totalItems > itemsPorPagina" [length]="totalItems" [pageSize]="itemsPorPagina"
+                [pageIndex]="paginaActual" [pageSizeOptions]="[10, 20, 30]" (page)="onPageChange($event)"
+                showFirstLastButtons aria-label="Seleccionar página de emprendimientos">
             </mat-paginator>
         </ng-container>
 
