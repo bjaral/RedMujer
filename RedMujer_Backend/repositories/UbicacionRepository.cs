@@ -53,5 +53,17 @@ namespace RedMujer_Backend.repositories
             await connection.ExecuteAsync(
                 "UPDATE \"Ubicaciones\" SET \"vigencia\" = false WHERE \"id_ubicacion\" = @Id", new { Id = id });
         }
+        // MÉTODO NUEVO: CATEGORÍAS POR EMPRENDIMIENTO
+        public async Task<IEnumerable<Ubicacion>> GetUbicacionesPorEmprendimientoAsync(int id_Emprendimiento)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            var query = @"
+                SELECT c.* 
+                FROM ""Emprendimiento_ubicacion"" ec
+                JOIN ""Ubicaciones"" c ON ec.id_ubicacion = c.id_ubicacion
+                WHERE ec.id_emprendimiento = @Id_Emprendimiento AND c.vigencia = true
+            ";
+            return await connection.QueryAsync<Ubicacion>(query, new { Id_Emprendimiento = id_Emprendimiento });
+        }
     }
 }
