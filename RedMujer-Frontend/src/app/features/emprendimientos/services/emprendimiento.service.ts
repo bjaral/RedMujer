@@ -54,28 +54,41 @@ export class EmprendimientoService {
     );
   }
 
-  getUbicacionDeEmprendimiento(idEmprendimiento: number): Observable<any> {
+getUbicacionDeEmprendimiento(idEmprendimiento: number): Observable<any> {
   return this.http.get<any>(`${this.url}/EmprendimientoUbicacion`).pipe(
     map((ubicacionRelaciones: any[]) => {
-      // Buscar la relación entre el emprendimiento y su ubicación
-      const ubicacionRelacion = ubicacionRelaciones.find(rel => rel.idEmprendimiento === idEmprendimiento);
+      console.log('[Paso 1] Relaciones obtenidas:', ubicacionRelaciones);
+
+      const ubicacionRelacion = ubicacionRelaciones.find(rel => rel.idEmprendimiento == idEmprendimiento);
       if (!ubicacionRelacion) {
         throw new Error('No se encontró la relación entre emprendimiento y ubicación');
       }
-      
+
       const idComuna = ubicacionRelacion.idUbicacion;
-      return idComuna; // Devolver solo el id de la comuna para seguir el flujo
+      console.log(`[Paso 2] idComuna encontrado para emprendimiento ${idEmprendimiento}:`, idComuna);
+      return idComuna;
     }),
     switchMap((idComuna: number) => {
-      // Obtener la comuna y luego la región usando `switchMap`
       return this.getComunaById(idComuna).pipe(
+        map((comuna: any) => {
+          console.log(`[Paso 3] Comuna obtenida con id ${idComuna}:`, comuna);
+          return comuna;
+        }),
         switchMap((comuna: any) => {
           const idRegion = comuna.id_Region;
+          console.log(`[Paso 4] idRegion desde comuna ${comuna.nombre}:`, idRegion);
+
           return this.getRegionById(idRegion).pipe(
-            map((region: any) => ({
-              comuna: comuna.nombre,
-              region: region.nombre
-            }))
+            map((region: any) => {
+              console.log(`[Paso 5] Región obtenida con id ${idRegion}:`, region);
+
+              const ubicacionFinal = {
+                comuna: comuna.nombre,
+                region: region.nombre
+              };
+              console.log('[Paso 6] Ubicación final:', ubicacionFinal);
+              return ubicacionFinal;
+            })
           );
         })
       );
