@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using RedMujer_Backend.DTOs;
 using RedMujer_Backend.services;
 
+using RedMujer_Backend.models;
+
 namespace RedMujer_Backend.controllers
 {
     [ApiController]
@@ -26,6 +28,16 @@ namespace RedMujer_Backend.controllers
             return Ok(categorias);
         }
 
+
+        // endpoint para los enums de grupo_categoria
+        [HttpGet("grupos")]
+        public ActionResult<IEnumerable<string>> GetGruposCategoria()
+        {
+            var grupos = Enum.GetNames(typeof(GrupoCategoria));
+            return Ok(grupos);
+        }
+
+
         // GET: /categorias/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoriaDto>> GetById(int id)
@@ -38,15 +50,15 @@ namespace RedMujer_Backend.controllers
 
         // POST: /categorias
         [HttpPost]
-        public async Task<ActionResult> Crear([FromBody] CategoriaDto dto)
+        public async Task<IActionResult> Crear(CategoriaCreateDto dto)
         {
             await _categoriaService.CrearAsync(dto);
-            return CreatedAtAction(nameof(GetAll), null);
+            return Ok();
         }
 
         // PUT: /categorias/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult> Actualizar(int id, [FromBody] CategoriaDto dto)
+        public async Task<ActionResult> Actualizar(int id, [FromBody] CategoriaCreateDto dto)
         {
             await _categoriaService.ActualizarAsync(id, dto);
             return NoContent();

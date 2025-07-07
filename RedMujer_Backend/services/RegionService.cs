@@ -17,7 +17,7 @@ namespace RedMujer_Backend.services
         public async Task<IEnumerable<Region>> GetAllAsync() => await _repo.GetAllAsync();
         public async Task<Region?> GetByIdAsync(int id) => await _repo.GetByIdAsync(id);
 
-        public async Task CrearAsync(RegionDto dto)
+        public async Task CrearAsync(RegionCreateDto dto)
         {
             var region = new Region
             {
@@ -27,7 +27,7 @@ namespace RedMujer_Backend.services
             await _repo.InsertAsync(region);
         }
 
-        public async Task ActualizarAsync(int id, RegionDto dto)
+        public async Task ActualizarAsync(int id, RegionCreateDto dto)
         {
             var region = new Region
             {

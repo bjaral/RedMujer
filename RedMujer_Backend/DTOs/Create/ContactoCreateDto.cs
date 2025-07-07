@@ -1,8 +1,7 @@
 using RedMujer_Backend.models;
-
 namespace RedMujer_Backend.DTOs
 {
-    public class ContactoDto
+    public class ContactoCreateDto
     {
         public int Id_Contacto { get; set; }
         public int Id_Emprendimiento { get; set; }

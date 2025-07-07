@@ -32,34 +32,61 @@ namespace RedMujer_Backend.repositories
             );
         }
 
-        public async Task InsertAsync(Plataforma plataforma)
+        public async Task<int> InsertAsync(Plataforma plataforma)
         {
             using var connection = new NpgsqlConnection(_connectionString);
-            await connection.ExecuteAsync(
-                "INSERT INTO \"Plataforma\" (\"id_emprendimiento\", \"ruta\", \"descripcion\", \"vigencia\", \"tipo_plataforma\") VALUES (@Id_Emprendimiento, @Ruta, @Descripcion, @vigencia, @Tipo_Plataforma)",
-                new {
-                    plataforma.Id_Emprendimiento,
-                    plataforma.Ruta,
-                    plataforma.Descripcion,
-                    plataforma.Vigencia,
-                    Tipo_Plataforma = plataforma.Tipo_Plataforma.ToString()
-                });
+            
+            var query = @"
+                INSERT INTO ""Plataforma""
+                    (""id_emprendimiento"", ""ruta"", ""descripcion"", ""vigencia"", ""tipo_plataforma"")
+                VALUES
+                    (@Id_Emprendimiento, @Ruta, @Descripcion, @Vigencia, @Tipo_Plataforma::tipo_plataforma)
+                RETURNING id_plataforma;
+            ";
+
+            var id = await connection.ExecuteScalarAsync<int>(query, new
+            {
+                plataforma.Id_Emprendimiento,
+                plataforma.Ruta,
+                plataforma.Descripcion,
+                plataforma.Vigencia,
+                Tipo_Plataforma = plataforma.Tipo_Plataforma.ToString()
+            });
+
+            return id;
         }
 
-        public async Task UpdateAsync(Plataforma plataforma)
+
+        public async Task<int> UpdateAsync(Plataforma plataforma)
         {
             using var connection = new NpgsqlConnection(_connectionString);
-            await connection.ExecuteAsync(
-                "UPDATE \"Plataforma\" SET \"id_emprendimiento\" = @Id_Emprendimiento, \"ruta\" = @Ruta, \"descripcion\" = @Descripcion, \"vigencia\" = @vigencia, \"tipo_plataforma\" = @Tipo_Plataforma WHERE \"id_plataforma\" = @Id_Plataforma",
-                new {
-                    plataforma.Id_Emprendimiento,
-                    plataforma.Ruta,
-                    plataforma.Descripcion,
-                    plataforma.Vigencia,
-                    Tipo_Plataforma = plataforma.Tipo_Plataforma.ToString(),
-                    plataforma.Id_Plataforma
-                });
+
+            var query = @"
+                UPDATE ""Plataforma""
+                SET 
+                    ""id_emprendimiento"" = @Id_Emprendimiento,
+                    ""ruta"" = @Ruta,
+                    ""descripcion"" = @Descripcion,
+                    ""vigencia"" = @Vigencia,
+                    ""tipo_plataforma"" = @Tipo_Plataforma::tipo_plataforma
+                WHERE ""id_plataforma"" = @Id_Plataforma
+                RETURNING id_plataforma;
+            ";
+
+            var id = await connection.QuerySingleAsync<int>(query, new
+            {
+                plataforma.Id_Emprendimiento,
+                plataforma.Ruta,
+                plataforma.Descripcion,
+                plataforma.Vigencia,
+                Tipo_Plataforma = plataforma.Tipo_Plataforma.ToString(),
+                plataforma.Id_Plataforma
+            });
+
+            return id;
         }
+
+
 
         public async Task DeleteAsync(int id)
         {

@@ -28,7 +28,7 @@ namespace RedMujer_Backend.repositories
             using var connection = new NpgsqlConnection(_connectionString);
             return await connection.QueryFirstOrDefaultAsync<PersonaEmprendimiento>(
                 @"SELECT * FROM ""Persona_emprendimiento""
-                  WHERE ""id_persona"" = @IdPersona AND ""id_emprendimiento"" = @IdEmprendimiento",
+                  WHERE ""id_persona"" = @Id_Persona AND ""id_emprendimiento"" = @Id_Emprendimiento",
                 new { IdPersona = idPersona, IdEmprendimiento = idEmprendimiento });
         }
 
@@ -38,7 +38,7 @@ namespace RedMujer_Backend.repositories
             await connection.ExecuteAsync(
                 @"INSERT INTO ""Persona_emprendimiento""
                 (""id_persona"", ""id_emprendimiento"")
-                VALUES (@IdPersona, @IdEmprendimiento)",
+                VALUES (@Id_Persona, @Id_Emprendimiento)",
                 pe);
         }
 
@@ -47,7 +47,7 @@ namespace RedMujer_Backend.repositories
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
                 @"DELETE FROM ""Persona_emprendimiento""
-                  WHERE ""id_persona"" = @IdPersona AND ""id_emprendimiento"" = @IdEmprendimiento",
+                  WHERE ""id_persona"" = @Id_Persona AND ""id_emprendimiento"" = @Id_Emprendimiento",
                 new { IdPersona = idPersona, IdEmprendimiento = idEmprendimiento });
         }
     }

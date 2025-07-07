@@ -21,8 +21,8 @@ namespace RedMujer_Backend.services
             var items = await _repo.GetAllAsync();
             return items.Select(pe => new PersonaEmprendimientoDto
             {
-                IdPersona = pe.IdPersona,
-                IdEmprendimiento = pe.IdEmprendimiento
+                Id_Persona = pe.Id_Persona,
+                Id_Emprendimiento = pe.Id_Emprendimiento
             });
         }
 
@@ -33,8 +33,8 @@ namespace RedMujer_Backend.services
 
             return new PersonaEmprendimientoDto
             {
-                IdPersona = pe.IdPersona,
-                IdEmprendimiento = pe.IdEmprendimiento
+                Id_Persona = pe.Id_Persona,
+                Id_Emprendimiento = pe.Id_Emprendimiento
             };
         }
 
@@ -42,8 +42,8 @@ namespace RedMujer_Backend.services
         {
             var pe = new PersonaEmprendimiento
             {
-                IdPersona = dto.IdPersona,
-                IdEmprendimiento = dto.IdEmprendimiento
+                Id_Persona = dto.Id_Persona,
+                Id_Emprendimiento = dto.Id_Emprendimiento
             };
             await _repo.InsertAsync(pe);
         }

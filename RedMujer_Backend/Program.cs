@@ -12,6 +12,12 @@ using RedMujer_Backend.services;
 var builder = WebApplication.CreateBuilder(args);
 
 // === AUTENTICACIÓN JWT ===
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new InvalidOperationException("Jwt:Key no está configurado en la configuración.");
+}
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -22,9 +28,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                Encoding.UTF8.GetBytes(jwtKey))
         };
     });
+
 
 builder.Services.AddAuthorization();
 
@@ -68,7 +75,12 @@ builder.Services.AddCors(options =>
                         .AllowAnyMethod());
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 
 
@@ -111,6 +123,10 @@ builder.Services.AddScoped<IEmprendimientoUbicacionService, EmprendimientoUbicac
 builder.Services.AddScoped<IPersonaEmprendimientoRepository, PersonaEmprendimientoRepository>();
 builder.Services.AddScoped<IPersonaEmprendimientoService, PersonaEmprendimientoService>();
 
+builder.Services.AddScoped<IPlataformaRepository, PlataformaRepository>();
+builder.Services.AddScoped<IPlataformaService, PlataformaService>();
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -131,6 +147,7 @@ app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "RedMujer API V1");
 });
+
 
 var mediaPath = Path.Combine(Directory.GetCurrentDirectory(), "media");
 if (!Directory.Exists(mediaPath))

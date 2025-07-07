@@ -21,10 +21,10 @@ namespace RedMujer_Backend.services
             var contactos = await _repo.GetAllAsync();
             return contactos.Select(c => new ContactoDto
             {
-                IdEmprendimiento = c.IdEmprendimiento,
+                Id_Emprendimiento = c.Id_Emprendimiento,
                 Valor = c.Valor,
                 Vigencia = c.Vigencia,
-                TipoContacto = c.TipoContacto
+                Tipo_Contacto = c.Tipo_Contacto
             });
         }
 
@@ -35,34 +35,34 @@ namespace RedMujer_Backend.services
 
             return new ContactoDto
             {
-                IdEmprendimiento = c.IdEmprendimiento,
+                Id_Emprendimiento = c.Id_Emprendimiento,
                 Valor = c.Valor,
                 Vigencia = c.Vigencia,
-                TipoContacto = c.TipoContacto
+                Tipo_Contacto = c.Tipo_Contacto
             };
         }
 
-        public async Task CrearAsync(ContactoDto dto)
+        public async Task CrearAsync(ContactoCreateDto dto)
         {
             var contacto = new Contacto
             {
-                IdEmprendimiento = dto.IdEmprendimiento,
+                Id_Emprendimiento = dto.Id_Emprendimiento,
                 Valor = dto.Valor,
                 Vigencia = dto.Vigencia,
-                TipoContacto = dto.TipoContacto
+                Tipo_Contacto = dto.Tipo_Contacto
             };
             await _repo.InsertAsync(contacto);
         }
 
-        public async Task ActualizarAsync(int id, ContactoDto dto)
+        public async Task ActualizarAsync(int id, ContactoCreateDto dto)
         {
             var contacto = new Contacto
             {
-                IdContacto = id,
-                IdEmprendimiento = dto.IdEmprendimiento,
+                Id_Contacto = id,
+                Id_Emprendimiento = dto.Id_Emprendimiento,
                 Valor = dto.Valor,
                 Vigencia = dto.Vigencia,
-                TipoContacto = dto.TipoContacto
+                Tipo_Contacto = dto.Tipo_Contacto
             };
             await _repo.UpdateAsync(contacto);
         }

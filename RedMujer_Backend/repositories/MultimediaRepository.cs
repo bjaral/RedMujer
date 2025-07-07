@@ -8,7 +8,7 @@ public class MultimediaRepository : IMultimediaRepository
 
     public MultimediaRepository(IConfiguration configuration)
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection");
+        _connectionString = configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
     }
 
     private NpgsqlConnection CrearConexion() => new NpgsqlConnection(_connectionString);

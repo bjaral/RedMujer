@@ -21,7 +21,7 @@ namespace RedMujer_Backend.services
             var personas = await _repo.GetAllAsync();
             return personas.Select(p => new PersonaDto
             {
-                IdUbicacion = p.IdUbicacion,
+                Id_Ubicacion = p.Id_Ubicacion,
                 RUN = p.RUN,
                 Nombre = p.Nombre,
                 PrimerApellido = p.PrimerApellido,
@@ -38,7 +38,7 @@ namespace RedMujer_Backend.services
 
             return new PersonaDto
             {
-                IdUbicacion = p.IdUbicacion,
+                Id_Ubicacion = p.Id_Ubicacion,
                 RUN = p.RUN,
                 Nombre = p.Nombre,
                 PrimerApellido = p.PrimerApellido,
@@ -52,7 +52,7 @@ namespace RedMujer_Backend.services
         {
             var persona = new Persona
             {
-                IdUbicacion = dto.IdUbicacion,
+                Id_Ubicacion = dto.Id_Ubicacion,
                 RUN = dto.RUN,
                 Nombre = dto.Nombre,
                 PrimerApellido = dto.PrimerApellido,
@@ -67,8 +67,8 @@ namespace RedMujer_Backend.services
         {
             var persona = new Persona
             {
-                IdPersona = id,
-                IdUbicacion = dto.IdUbicacion,
+                Id_Persona = id,
+                Id_Ubicacion = dto.Id_Ubicacion,
                 RUN = dto.RUN,
                 Nombre = dto.Nombre,
                 PrimerApellido = dto.PrimerApellido,

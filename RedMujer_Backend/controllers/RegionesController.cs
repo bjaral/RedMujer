@@ -29,14 +29,14 @@ namespace RedMujer_Backend.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] RegionDto dto)
+        public async Task<IActionResult> Post([FromBody] RegionCreateDto dto)
         {
             await _service.CrearAsync(dto);
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] RegionDto dto)
+        public async Task<IActionResult> Put(int id, [FromBody] RegionCreateDto dto)
         {
             await _service.ActualizarAsync(id, dto);
             return Ok();

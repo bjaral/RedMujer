@@ -1,8 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using RedMujer_Backend.DTOs;
+using RedMujer_Backend.models;
 using RedMujer_Backend.services;
 using System.Threading.Tasks;
+using System.Reflection;
+using System.Runtime.Serialization;
+
 using Microsoft.AspNetCore.Authorization;
+
+
 
 namespace RedMujer_Backend.Controllers
 {
@@ -19,6 +25,27 @@ namespace RedMujer_Backend.Controllers
         [HttpGet]
         public async Task<IActionResult> Get() 
             => Ok(await _service.GetAllAsync());
+
+
+        [HttpGet("tipos")]
+        public ActionResult<IEnumerable<string>> GetTiposRegistro()
+        {
+            var tipos = Enum.GetValues(typeof(TipoRegistro))
+                .Cast<TipoRegistro>()
+                .Select(v => GetEnumMemberValue(v))
+                .ToList();
+
+            return Ok(tipos);
+        }
+
+        private static string GetEnumMemberValue(TipoRegistro value)
+        {
+            var memberInfo = typeof(TipoRegistro).GetMember(value.ToString()).FirstOrDefault();
+            var attribute = memberInfo?.GetCustomAttribute<EnumMemberAttribute>();
+            return attribute?.Value ?? value.ToString();
+        }
+
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
