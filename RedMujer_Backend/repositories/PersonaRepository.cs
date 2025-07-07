@@ -34,29 +34,37 @@ namespace RedMujer_Backend.repositories
                 new { Id = id });
         }
 
-        public async Task InsertAsync(Persona persona)
+        public async Task<int> InsertAsync(Persona persona)
         {
             using var connection = new NpgsqlConnection(_connectionString);
-            await connection.ExecuteAsync(
+
+            var id = await connection.ExecuteScalarAsync<int>(
                 @"INSERT INTO ""Personas"" 
-                (""id_ubicacion"", ""RUN"", ""nombre"", ""primer_apellido"", ""segundo_apellido"", ""vigencia"", ""usuario_id"") 
-                VALUES (@IdUbicacion, @RUN, @Nombre, @PrimerApellido, @SegundoApellido, @vigencia, @UsuarioId)",
+                    (""id_ubicacion"", ""id_usuario"", ""RUN"", ""nombre"", ""primer_apellido"", ""segundo_apellido"", ""vigencia"")
+                  VALUES 
+                    (@Id_Ubicacion, @Id_Usuario, @RUN, @Nombre, @PrimerApellido, @SegundoApellido, @Vigencia)
+                  RETURNING ""id_persona"";",
                 persona);
+
+            persona.Id_Persona = id;
+            return id;
         }
+
+
 
         public async Task UpdateAsync(Persona persona)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
                 @"UPDATE ""Personas"" SET 
-                    ""id_ubicacion"" = @IdUbicacion,
+                    ""id_ubicacion"" = @Id_Ubicacion,
+                    ""id_usuario"" = @Id_Usuario,
                     ""RUN"" = @RUN,
                     ""nombre"" = @Nombre,
                     ""primer_apellido"" = @PrimerApellido,
                     ""segundo_apellido"" = @SegundoApellido,
-                    ""vigencia"" = @vigencia,
-                    ""usuario_id"" = @UsuarioId
-                WHERE ""id_persona"" = @IdPersona",
+                    ""vigencia"" = @vigencia
+                WHERE ""id_persona"" = @Id_Persona",
                 persona);
         }
 

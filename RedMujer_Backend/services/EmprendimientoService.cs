@@ -139,5 +139,9 @@ namespace RedMujer_Backend.services
                 }
             };
         }
+        public async Task<IEnumerable<Emprendimiento>> ObtenerPorPersonaAsync(int id_Persona)
+        {
+            return await _repo.GetByPersonaIdAsync(id_Persona);
+        }
     }
 }

@@ -36,6 +36,7 @@ namespace RedMujer_Backend.services
 
             return new ContactoDto
             {
+                Id_Contacto = c.Id_Contacto,
                 Id_Emprendimiento = c.Id_Emprendimiento,
                 Valor = c.Valor,
                 Vigencia = c.Vigencia,
