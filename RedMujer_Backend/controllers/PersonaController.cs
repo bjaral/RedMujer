@@ -11,9 +11,11 @@ namespace RedMujer_Backend.Controllers
     public class PersonasController : ControllerBase
     {
         private readonly IPersonaService _service;
-        public PersonasController(IPersonaService service)
+        private readonly IEmprendimientoService _emprendimientoService;
+        public PersonasController(IPersonaService service, IEmprendimientoService emprendimientoService)
         {
             _service = service;
+            _emprendimientoService = emprendimientoService;
         }
 
         [HttpGet]
@@ -28,14 +30,16 @@ namespace RedMujer_Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] PersonaDto dto)
+        public async Task<IActionResult> Post([FromBody] PersonaCreateDto dto)
         {
-            await _service.CrearAsync(dto);
-            return Ok();
+            var id = await _service.CrearAsync(dto);
+            return CreatedAtAction(nameof(Get), new { id }, new { id });
         }
 
+
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] PersonaDto dto)
+        public async Task<IActionResult> Put(int id, [FromBody] PersonaCreateDto dto)
         {
             await _service.ActualizarAsync(id, dto);
             return Ok();
@@ -47,5 +51,12 @@ namespace RedMujer_Backend.Controllers
             await _service.EliminarAsync(id);
             return NoContent();
         }
+        [HttpGet("{idPersona}/emprendimientos")]
+        public async Task<IActionResult> GetEmprendimientosPorPersona(int idPersona)
+        {
+            var emprendimientos = await _emprendimientoService.ObtenerPorPersonaAsync(idPersona);
+            return Ok(emprendimientos);
+        }
+
     }
 }

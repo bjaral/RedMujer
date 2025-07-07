@@ -2,9 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RedMujer_Backend.DTOs
 {
-    public class PersonaDto
+    public class PersonaCreateDto
     {
-        public int Id_Persona { get; set; }
         public int Id_Ubicacion { get; set; }
         public int Id_Usuario { get; set; } 
         public required string RUN { get; set; }
@@ -12,6 +11,5 @@ namespace RedMujer_Backend.DTOs
         public required string PrimerApellido { get; set; }
         public required string SegundoApellido { get; set; }
         public bool Vigencia { get; set; } = true;
-        
     }
 }
