@@ -4,9 +4,8 @@
         <h2>Nuestra red de emprendedoras</h2>
         <p>RedMujer el desarrollo integral de mujeres emprendedoras, entregando formación, mentorías y redes de apoyo.
             Conecta con otras empresarias, fortalece tus habilidades y haz crecer tu negocio.</p>
-        <button mat-button routerLink="/registro">¡Únete ahora!</button>
         <div class="login-ilustracion">
-            <img src="assets/images/redmujer.png" alt="Ilustración RedMujer">
+            <img src="assets/images/mujer-zapato.jpg" alt="Ilustración RedMujer Login">
         </div>
     </section>
     <section class="login-panel">
@@ -29,7 +28,9 @@
                 </mat-icon>
             </mat-form-field>
             <a routerLink="/forgot-password">Recuperar Contraseña</a>
-            <button mat-raised-button color="primary" (click)="onSubmit()">Iniciar Sesión</button>
+            <button mat-raised-button color="primary" (click)="onSubmit()" class="login-button">Iniciar Sesión</button>
+            <div class="separator"></div>
+            <button mat-button routerLink="/registro" class="register-button">¡Únete ahora!</button>
         </form>
     </section>
 </section>
