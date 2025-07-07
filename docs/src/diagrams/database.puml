@@ -1,0 +1,233 @@
+@startuml database-diagram
+title Red Mujer - Base de datos
+
+!include style/mono-voyant.puml
+
+skinparam backgroundColor transparent
+
+' === Entidades ENUM (catálogos de valores) ===
+entity ENUM_TIPO_CONTACTO <<enumEntity>> {
+    telefono
+    correo
+}
+
+entity ENUM_MODALIDAD <<enumEntity>> {
+    Presencial
+    Online
+    PresencialYOnline
+}
+
+entity ENUM_TIPO_PLATAFORMA <<enumEntity>> {
+    red_social
+    sitio_web
+    mercado_online
+    aplicacion_movil
+    otro
+}
+
+entity ENUM_GRUPO_CATEGORIA <<enumEntity>>{
+    AlimentosYBebidas,
+    ArtesaniaYManualidades,
+    ModaYBelleza,
+    TecnologiaYServiciosDigitales,
+    Servicios,
+    SaludYBienestar,
+    HogarYJardineria
+}
+
+entity ENUM_TIPO_MULTIMEDIA <<enumEntity>> {
+    video
+    imagen
+}
+
+entity ENUM_TIPO_USUARIO <<enumEntity>> {
+    admin
+    emprendedora
+    visitante
+}
+
+entity ENUM_TIPO_REGISTRO <<enumEntity>> {
+    inicio_sesion
+    cierre_sesion
+    creacion_cuenta
+    actualizacion_perfil
+    eliminacion_cuenta
+    creacion_emprendimiento
+    actualizacion_emprendimiento
+    eliminacion_emprendimiento
+    carga_multimedia
+    error
+}
+
+
+
+
+
+' === Entidades ===
+
+entity CONTACTOS {
+    id_contacto : int NOT NULL
+    --
+    id_emprendimiento: INT NOT NULL
+    --
+    tipo_contacto : ENUM
+    valor : VARCHAR(100)
+    vigencia : BOOLEAN
+}
+
+entity EMPRENDIMIENTOS{
+    id_emprendimiento : int NOT NULL
+    --
+    RUT : VARCHAR(50) UNIQUE
+    nombre : varchar(50)
+    descripcion : TEXT
+    modalidad : ENUM
+    horario_atencion : TEXT
+    fecha_inicio : DATE
+    vigencia : BOOLEAN
+}
+
+entity PLATAFORMAS {
+    id_plataforma : INT NOT NULL
+    --
+    id_emprendimiento : int NOT NULL
+    --
+    tipo_plataforma ENUM
+    ruta : varchar(2048)
+    descripcion : TEXT
+    vigencia : BOOLEAN
+}
+
+entity EMPRENDIMIENTO_CATEGORIA <<intermedias>>{
+    id_categoria : INT NOT NULL
+    --
+    id_emprendimiento : INT NOT NULL
+}
+
+entity CATEGORIAS{
+    id_categoria : INT NOT NULL
+    --
+    nombre : varchar(127)
+    grupo_categoria ENUM
+    descripcion VARCHAR(255)
+    vigencia BOOLEAN
+}
+entity EMPRENDIMIENTO_UBICACION <<intermedias>>{
+    id_ubicacion : INT NOT NULL
+    id_emprendimiento : INT NOT NULL
+}
+
+entity UBICACIONES{
+    id_ubicacion : INT NOT NULL
+    --
+    id_emprendimiento : INT NOT NULL
+    --
+    id_comuna : INT NOT NULL
+    --
+    calle : VARCHAR (100)
+    numero : VARCHAR (10)
+    referencia : varchar(255)
+    vigencia : VARCHAR(255)
+}
+
+entity COMUNAS{
+    id_comuna : INT NOT NULL
+    --
+    id_emprendimiento : INT NOT NULL
+    --
+    nombre : varchar(50)
+    vigencia BOOLEAN
+}
+
+entity REGIONES{
+    id_region : INT NOT NULL
+    --
+    nombre : varchar(50)
+    vigencia BOOLEAN
+}
+
+entity MULTIMEDIAS{
+    id_multimedia : INT NOT NULL
+    --
+    id_emprendimiento : INT NOT NULL
+    --
+    tipo_multimedia ENUM
+    ruta VARCHAR(2048)
+    descripcion TEXT
+    vigencia BOOLEAN
+}
+
+entity PERSONAS{
+    id_persona : INT NOT NULL
+    --
+    id_contacto : INT NOT NULL
+    --
+    id_ubicacion : INT NOT NULL
+    --
+    RUN : VARCHAR(50) UNIQUE
+    nombre : varchar(50)
+    apellido_paterno : varchar(50)
+    apellido_materno : varchar(50)
+    vigencia : BOOLEAN
+}
+
+entity PERSONA_EMPRENDIMIENTO <<intermedias>>{
+    id_persona : INT NOT NULL
+    --
+    id_emprendimiento : INT NOT NULL
+}
+entity USUARIOS{
+    id_usuario : INT NOT NULL
+    --
+    usuario : varchar(50) NOT NULL
+    contrasenna : varchar(50) NOT NULL
+    tipo_usuario : ENUM
+    vigencia : BOOLEAN
+}
+
+entity REGISTROS{
+    id_registro : INT NOT NULL
+    --
+    id_usuario : INT NOT NULL
+    --
+    fecha : DATETIME
+    valor_actual
+    tipo_registro ENUM
+    funcion
+}
+
+
+
+
+
+' === Relaciones ===
+' === Relaciones de ENUMS ===
+CONTACTOS }o--|| ENUM_TIPO_CONTACTO : "usa"
+EMPRENDIMIENTOS }o--|| ENUM_MODALIDAD : "usa"
+PLATAFORMAS }o--|| ENUM_TIPO_PLATAFORMA : "usa"
+CATEGORIAS }o--|| ENUM_GRUPO_CATEGORIA : "usa"
+MULTIMEDIAS }o--|| ENUM_TIPO_MULTIMEDIA : "usa"
+USUARIOS }o--|| ENUM_TIPO_USUARIO : "usa"
+REGISTROS }o--|| ENUM_TIPO_REGISTRO : "usa"
+
+USUARIOS ||--{ REGISTROS : "crea"
+USUARIOS ||--{ PERSONAS : "es usuario de"
+PERSONAS ||--o{ PERSONA_EMPRENDIMIENTO : "es dueño de"
+PERSONA_EMPRENDIMIENTO }--|| EMPRENDIMIENTOS : "es dueño de"
+PERSONAS ||--{ UBICACIONES : "tiene"
+UBICACIONES }--|| COMUNAS : "se encuentra\n en"
+COMUNAS }--|| REGIONES : "pertenece a"
+UBICACIONES ||--{ EMPRENDIMIENTO_UBICACION : "tiene"
+EMPRENDIMIENTOS ||--{ EMPRENDIMIENTO_UBICACION : "tiene"
+EMPRENDIMIENTOS ||--{ EMPRENDIMIENTO_CATEGORIA : "tiene"
+EMPRENDIMIENTO_CATEGORIA }--|| CATEGORIAS : "pertenece a"
+EMPRENDIMIENTOS ||--{ MULTIMEDIAS : "tiene"
+EMPRENDIMIENTOS ||--{ PLATAFORMAS : "publica en"
+EMPRENDIMIENTOS ||--{ CONTACTOS : "tiene"
+
+
+
+' === SQL ===
+
+
+@enduml
