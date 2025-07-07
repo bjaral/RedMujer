@@ -10,6 +10,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatOptionModule } from '@angular/material/core';
+import { MatSelect } from '@angular/material/select';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 export const MATERIAL_IMPORTS = [
   MatButtonModule,
@@ -23,5 +25,7 @@ export const MATERIAL_IMPORTS = [
   MatFormFieldModule,
   MatStepperModule,
   MatProgressSpinner,
-  MatOptionModule
+  MatOptionModule,
+  MatSelect,
+  MatPaginatorModule
 ]

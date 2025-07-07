@@ -47,14 +47,14 @@ namespace RedMujer_Backend.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ComunaDto dto)
+        public async Task<IActionResult> Post([FromBody] ComunaCreateDto dto)
         {
             await _service.CrearAsync(dto);
             return Ok();
         }
 
         [HttpPut("{id_comuna:int}")]
-        public async Task<IActionResult> Put(int id_comuna, [FromBody] ComunaDto dto)
+        public async Task<IActionResult> Put(int id_comuna, [FromBody] ComunaCreateDto dto)
         {
             await _service.ActualizarAsync(id_comuna, dto);
             return Ok();

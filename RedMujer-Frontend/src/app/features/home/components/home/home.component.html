@@ -75,7 +75,7 @@
       <ng-container *ngFor="let emp of random; let i = index">
         <div class="emprendimiento-card" [style.animation-delay]="i * 100 + 'ms'">
           <div class="card-image">
-            <img [src]="emp.imagen || 'assets/images/emprendimiento-placeholder.png'" alt="Imagen del emprendimiento">
+            <img [src]="emp.imagen" [alt]="'Imagen de ' + emp.nombre" (error)="onImageError($event)" loading="lazy">
             <div class="card-overlay">
               <button mat-fab class="quick-view-btn" color="primary">
                 <mat-icon>visibility</mat-icon>

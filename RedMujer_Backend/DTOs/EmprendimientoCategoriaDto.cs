@@ -2,7 +2,7 @@ namespace RedMujer_Backend.DTOs
 {
     public class EmprendimientoCategoriaDto
     {
-        public int IdCategoria { get; set; }
-        public int IdEmprendimiento { get; set; }
+        public int Id_Categoria { get; set; }
+        public int Id_Emprendimiento { get; set; }
     }
 }

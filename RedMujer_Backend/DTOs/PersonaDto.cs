@@ -4,7 +4,7 @@ namespace RedMujer_Backend.DTOs
 {
     public class PersonaDto
     {
-        public int IdUbicacion { get; set; }
+        public int Id_Ubicacion { get; set; }
 
         public required string RUN { get; set; }
         public required string Nombre { get; set; }

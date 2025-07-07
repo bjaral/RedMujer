@@ -5,6 +5,16 @@ namespace RedMujer_Backend.models
 {
     public class Plataforma
     {
+        // Enum anidado
+        public enum TipoPlataforma
+        {
+            red_social,
+            sitio_web,
+            mercado_online,
+            aplicacion_movil,
+            otro
+        }
+        
         [Key]
         public int Id_Plataforma { get; set; }
 
@@ -25,14 +35,6 @@ namespace RedMujer_Backend.models
         [Required]
         public TipoPlataforma Tipo_Plataforma { get; set; }
 
-        // Enum anidado
-        public enum TipoPlataforma
-        {
-            red_social,
-            sitio_web,
-            mercado_online,
-            aplicacion_movil,
-            otro
-        }
+        
     }
 }

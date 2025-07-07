@@ -20,7 +20,7 @@ namespace RedMujer_Backend.services
         public async Task<IEnumerable<Ubicacion>> GetAllAsync() => await _repo.GetAllAsync();
         public async Task<Ubicacion?> GetByIdAsync(int id) => await _repo.GetByIdAsync(id);
 
-        public async Task<int> CrearAsync(UbicacionDto dto)
+        public async Task<int> CrearAsync(UbicacionCreateDto dto)
         {
             var comuna = await _comunaRepo.GetByIdsAsync(dto.Id_Region, dto.Id_Comuna);
             if (comuna == null)
@@ -37,7 +37,7 @@ namespace RedMujer_Backend.services
             return await _repo.InsertAsync(ubicacion);
         }
 
-        public async Task ActualizarAsync(int id, UbicacionDto dto)
+        public async Task ActualizarAsync(int id, UbicacionCreateDto dto)
         {
             // Puedes repetir la validación aquí si tiene sentido para tu negocio
             var comuna = await _comunaRepo.GetByIdsAsync(dto.Id_Region, dto.Id_Comuna);

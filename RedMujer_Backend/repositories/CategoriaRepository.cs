@@ -36,8 +36,8 @@ namespace RedMujer_Backend.repositories
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
                 @"INSERT INTO ""Categorias"" 
-                (""descripcion"", ""vigencia"", ""grupo_categoria"") 
-                VALUES (@Descripcion, @vigencia, @Grupo_Categoria)",
+                (""nombre"", ""descripcion"", ""vigencia"", ""grupo_categoria"") 
+                VALUES (@Nombre, @Descripcion, @vigencia, @Grupo_Categoria)",
                 categoria);
         }
 
@@ -46,6 +46,7 @@ namespace RedMujer_Backend.repositories
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
                 @"UPDATE ""Categorias"" SET 
+                    ""nombre"" = @Nombre,
                     ""descripcion"" = @Descripcion,
                     ""vigencia"" = @vigencia,
                     ""grupo_categoria"" = @Grupo_Categoria

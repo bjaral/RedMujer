@@ -10,6 +10,7 @@ import { SidebarEmpComponent } from './layout/sidebar-emp/sidebar-emp.component'
 import { LayoutHeaderComponent } from './layout/layout-header/layout-header.component';
 import { PerfilComponent } from './features/profile/components/perfil/perfil.component';
 import { MisEmprendimientosComponent } from './features/profile/components/mis-emprendimientos/mis-emprendimientos.component';
+import { DetalleEmprendimientoComponent } from './features/emprendimientos/components/detalle-emprendimiento/detalle-emprendimiento.component';
 
 export const routes: Routes = [
 
@@ -17,6 +18,7 @@ export const routes: Routes = [
     { 'path': '', 'component': LayoutComponent, 'children': [
         { 'path': '', 'component': HomeComponent },
         { 'path': 'emprendimientos', 'component': EmprendimientosComponent },
+        { 'path': 'emprendimientos/:id', 'component': DetalleEmprendimientoComponent},
     ]},
 
     // Vistas sólo con header

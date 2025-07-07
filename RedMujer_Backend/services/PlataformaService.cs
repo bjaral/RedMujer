@@ -4,7 +4,7 @@ using RedMujer_Backend.repositories;
 
 namespace RedMujer_Backend.services
 {
-    public class PlataformaService
+    public class PlataformaService : IPlataformaService
     {
         private readonly IPlataformaRepository _repository;
 
@@ -42,7 +42,7 @@ namespace RedMujer_Backend.services
             };
         }
 
-        public async Task AddAsync(PlataformaDto dto)
+        public async Task<int> CrearAsync(PlataformaCreateDto dto)
         {
             var plataforma = new Plataforma
             {
@@ -52,10 +52,11 @@ namespace RedMujer_Backend.services
                 Vigencia = dto.Vigencia,
                 Tipo_Plataforma = Enum.Parse<Plataforma.TipoPlataforma>(dto.Tipo_Plataforma)
             };
-            await _repository.InsertAsync(plataforma);
+            var id = await _repository.InsertAsync(plataforma);
+            return id;
         }
 
-        public async Task UpdateAsync(int id, PlataformaDto dto)
+        public async Task<int> ActualizarAsync(int id, PlataformaCreateDto dto)
         {
             var plataforma = new Plataforma
             {
@@ -67,6 +68,8 @@ namespace RedMujer_Backend.services
                 Tipo_Plataforma = Enum.Parse<Plataforma.TipoPlataforma>(dto.Tipo_Plataforma)
             };
             await _repository.UpdateAsync(plataforma);
+
+            return id;
         }
 
         public async Task DeleteAsync(int id)
