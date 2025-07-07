@@ -24,7 +24,7 @@
         <mat-select formControlName="modalidad">
           <mat-option value="Presencial">Presencial</mat-option>
           <mat-option value="Online">Online</mat-option>
-          <mat-option value="PresencialYOnline">Presencial y online</mat-option>
+          <mat-option value="PresencialYOnline">Híbrida</mat-option>
         </mat-select>
       </mat-form-field>
 
@@ -37,7 +37,7 @@
     <div class="form-col-right">
       <div class="image-upload" (click)="uploadInput.click()">
         <mat-icon>upload</mat-icon>
-        <span>Subir imagen principal</span>
+        <span class="image-text">Subir imagen principal</span>
         <input #uploadInput type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
       </div>
 
@@ -50,7 +50,7 @@
 
       <div class="extra-images-upload" (click)="extraUploadInput.click()">
         <mat-icon>collections</mat-icon>
-        <span>Agregar hasta 5 fotos adicionales</span>
+        <span class="image-text">Agregar hasta 5 fotos adicionales</span>
         <small *ngIf="imagenesExtras.length > 0">{{ imagenesExtras.length }}/5 imágenes subidas</small>
         <input #extraUploadInput type="file" multiple accept="image/*" (change)="onExtraImagesSelected($event)" hidden/>
       </div>

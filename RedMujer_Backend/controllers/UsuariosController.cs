@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
+
 namespace RedMujer_Backend.controllers
 {
     [ApiController]
@@ -36,6 +37,15 @@ namespace RedMujer_Backend.controllers
             usuario.Contrasenna = "";
             return Ok(usuario);
         }
+
+        [HttpGet("tipos")]
+        public ActionResult<IEnumerable<string>> GetTiposUsuario()
+        {
+            var tipos = Enum.GetNames(typeof(TipoUsuario));
+            return Ok(tipos);
+        }
+
+
 
         [HttpPost]
         public async Task<ActionResult> Crear([FromBody] UsuarioDto dto)

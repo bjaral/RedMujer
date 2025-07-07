@@ -660,7 +660,6 @@
   & > * {
     flex: 0 0 auto;
     scroll-snap-align: start;
-    // Ajusta el ancho de los ítems según tu diseño
     min-width: 250px;
     max-width: 350px;
   }

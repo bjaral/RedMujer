@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RedMujer_Backend.services;
+using RedMujer_Backend.models;
 using RedMujer_Backend.DTOs;
 using Microsoft.AspNetCore.Authorization;
 
@@ -10,9 +11,9 @@ namespace RedMujer_Backend.controllers
     [Route("api/[controller]")]
     public class PlataformaController : ControllerBase
     {
-        private readonly PlataformaService _service;
+        private readonly IPlataformaService _service;
 
-        public PlataformaController(PlataformaService service)
+        public PlataformaController(IPlataformaService service)
         {
             _service = service;
         }
@@ -24,6 +25,13 @@ namespace RedMujer_Backend.controllers
             return Ok(plataformas);
         }
 
+        [HttpGet("tipo")]
+        public ActionResult<IEnumerable<string>> GetTipoPlataforma()
+        {
+            var tipos = Enum.GetNames(typeof(Plataforma.TipoPlataforma));
+            return Ok(tipos);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -33,16 +41,18 @@ namespace RedMujer_Backend.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] PlataformaDto dto)
+        public async Task<IActionResult> Post([FromBody] PlataformaCreateDto dto)
         {
-            await _service.AddAsync(dto);
-            return CreatedAtAction(nameof(Get), new { id = dto.Id_Plataforma }, dto);
+            var id = await _service.CrearAsync(dto);
+            return CreatedAtAction(nameof(Get), new { id }, new { id });
         }
 
+
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] PlataformaDto dto)
+        public async Task<IActionResult> Put(int id, [FromBody] PlataformaCreateDto dto)
         {
-            await _service.UpdateAsync(id, dto);
+            await _service.ActualizarAsync(id, dto);
             return NoContent();
         }
         [Authorize(Roles = "admin")]

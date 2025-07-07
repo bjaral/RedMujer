@@ -1,8 +1,8 @@
 namespace RedMujer_Backend.models {
     
     public class Persona {
-        public int IdPersona { get; set; }
-        public int IdUbicacion { get; set; }
+        public int Id_Persona { get; set; }
+        public int Id_Ubicacion { get; set; }
         public string RUN { get; set; } = string.Empty;
         public string Nombre { get; set; } = string.Empty;
         public string PrimerApellido { get; set; } = string.Empty;

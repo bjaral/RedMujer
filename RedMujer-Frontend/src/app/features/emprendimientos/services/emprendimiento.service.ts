@@ -11,8 +11,16 @@ export class EmprendimientoService {
 
   private url = 'http://localhost:5145/api'
 
+  getByIdImg(id: number): Observable<any> {
+    return this.http.get<any>(`${this.url}/Emprendimientos/${id}/imagenes-emprendimiento`);
+  }
+
   getAll(): Observable<any> {
     return this.http.get<any>(`${this.url}/Emprendimientos`);
+  }
+
+  getById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.url}/Emprendimientos/${id}`);
   }
 
   getByCategory(category: string): Observable<any> {

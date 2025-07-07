@@ -13,13 +13,15 @@ h2 {
 }
 
 .card {
-  max-width: 950px;
+  max-width: 100%;
   width: 100%;
   margin: 0 auto;
   background: $background-color;
   padding: 3rem 3rem 2rem;
   border-radius: 1.5rem;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.07);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .formulario {
@@ -29,10 +31,14 @@ h2 {
   background: #ffffff;
   padding: 3rem;
   border-radius: 1.5rem;
+  overflow: hidden;
+  box-sizing: border-box;
 
   @media (max-width: 768px) {
     flex-direction: column;
-    padding: 2rem;
+    padding: 1.5rem;
+    gap: 1rem;
+
   }
 
   .form-col-left,
@@ -44,12 +50,14 @@ h2 {
 
     @media (max-width: 768px) {
       width: 100%;
+      gap: 1rem;
+      max-width: 100%;
     }
   }
 
   mat-form-field {
     width: 100%;
-    max-width: 500px;
+    max-width: 100%;
 
     .mat-form-field-outline {
       border-color: rgba(0, 0, 0, 0.1);
@@ -68,8 +76,7 @@ h2 {
     }
   }
 
-  .image-upload,
-  .extra-images-upload {
+  .upload-box {
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -88,15 +95,22 @@ h2 {
       border-color: $primary-color;
     }
 
+    &.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
     mat-icon {
       font-size: 2rem;
       color: $primary-color;
     }
 
-    span {
+    .image-text {
       color: $primary-color;
       font-weight: 600;
       font-family: $font-family-main;
+      text-align: center;
     }
 
     small {
@@ -111,10 +125,18 @@ h2 {
     }
   }
 
+  .image-upload {
+    @extend .upload-box;
+  }
+
+  .extra-images-upload {
+    @extend .upload-box;
+  }
+
   .preview-container {
     position: relative;
     margin: 1rem auto 0 auto;
-    max-width: 200px;
+    max-width: 300px;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -128,7 +150,7 @@ h2 {
       display: block;
     }
   }
-  
+
   .extra-preview {
     margin-top: 1rem;
     display: flex;
@@ -219,4 +241,5 @@ h2 {
       align-self: stretch;
     }
   }
+
 }

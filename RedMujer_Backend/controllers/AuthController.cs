@@ -56,7 +56,12 @@ namespace RedMujer_Backend.controllers
 
         private string GenerateJwtToken(Usuario user)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var keyString = _configuration["Jwt:Key"];
+            if (string.IsNullOrEmpty(keyString))
+                throw new InvalidOperationException("Jwt:Key no está configurado.");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
+
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]

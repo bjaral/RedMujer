@@ -28,8 +28,7 @@ export class NuevoEmprendimientoComponent {
       nombre: ['', Validators.required],
       descripcion: [''],
       modalidad: ['', Validators.required],
-      horario_Atencion: ['', Validators.required],
-      imagen: ['']
+      horario_Atencion: ['', Validators.required]
     });
   }
 
@@ -46,6 +45,8 @@ export class NuevoEmprendimientoComponent {
   }
 
   removeImagenPrincipal(): void {
+    const confirmar = confirm('¿Estás segura de querer eliminar la imagen principal?');
+    if (!confirmar) return;
     this.imagenPrincipalFile = null;
     this.imagenSeleccionada = null;
   }
@@ -74,6 +75,8 @@ export class NuevoEmprendimientoComponent {
   }
 
   removeExtraImage(index: number): void {
+    const confirmar = confirm('¿Estás segura de querer eliminar esta imagen?');
+    if (!confirmar) return;
     this.imagenesExtras.splice(index, 1);
     this.imagenesExtrasFile.splice(index, 1);
   }
@@ -84,17 +87,27 @@ export class NuevoEmprendimientoComponent {
       return;
     }
 
-    const formData = this.formulario.value;
-    const imagenPrincipal = this.imagenPrincipalFile;
+    const formData = new FormData();
+    const data = this.formulario.value;
 
-    this.emprendimientoFormService.crearEmprendimiento(formData, imagenPrincipal).subscribe({
+    formData.append('RUT', data.rut);
+    formData.append('Nombre', data.nombre);
+    formData.append('Descripcion', data.descripcion || '');
+    formData.append('Modalidad', data.modalidad);
+    formData.append('Horario_Atencion', data.horario_Atencion);
+    formData.append('Vigencia', 'true');
+    if (this.imagenPrincipalFile) {
+      formData.append('Imagen', this.imagenPrincipalFile);
+    }
+
+    this.emprendimientoFormService.crearEmprendimiento(formData).subscribe({
       next: (response) => {
         const idEmprendimiento = response?.id_Emprendimiento;
         if (!idEmprendimiento) {
           alert('Error: no se recibió el ID del emprendimiento creado.');
           return;
         }
-
+        
         if (this.imagenesExtrasFile.length > 0) {
           this.emprendimientoFormService.subirMultimedia(idEmprendimiento, this.imagenesExtrasFile).subscribe({
             next: () => {
@@ -104,7 +117,7 @@ export class NuevoEmprendimientoComponent {
             },
             error: (err) => {
               console.error('Error al subir multimedia', err);
-              alert('Emprendimiento creado, pero hubo un error al subir las imágenes adicionales.');
+              alert('Emprendimiento creado, pero hubo un error al subir las imágenes adicionales,');
               this.router.navigate(['/mis-emprendimientos']);
             }
           });
@@ -114,13 +127,12 @@ export class NuevoEmprendimientoComponent {
           this.router.navigate(['/mis-emprendimientos']);
         }
       },
-      error: (error) => {
-        console.error('Error al crear el emprendimiento', error);
+      error: (err) => {
+        console.error('Error al crear el emprendimiento', err);
         alert('Ocurrió un error al crear el emprendimiento.');
       }
     });
   }
-
 
   private limpiarFormulario(): void {
     this.formulario.reset();
@@ -128,6 +140,14 @@ export class NuevoEmprendimientoComponent {
     this.imagenPrincipalFile = null;
     this.imagenesExtras = [];
     this.imagenesExtrasFile = [];
+  }
+
+  get maximoImagenesExtrasAlcanzado(): boolean {
+    return this.imagenesExtras.length >= 5;
+  }
+
+  get imagenPrincipalDeshabilitada(): boolean {
+    return this.imagenPrincipalFile !== null;
   }
 
 }

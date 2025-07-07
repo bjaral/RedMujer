@@ -66,7 +66,7 @@ namespace RedMujer_Backend.services
             });
         }
 
-        public async Task CrearAsync(ComunaDto dto)
+        public async Task CrearAsync(ComunaCreateDto dto)
         {
             var comuna = new Comuna
             {
@@ -77,7 +77,7 @@ namespace RedMujer_Backend.services
             await _repo.CrearAsync(comuna);
         }
 
-        public async Task ActualizarAsync(int idComuna, ComunaDto dto)
+        public async Task ActualizarAsync(int idComuna, ComunaCreateDto dto)
         {
             var comuna = new Comuna
             {

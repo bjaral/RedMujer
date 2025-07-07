@@ -23,7 +23,7 @@ namespace RedMujer_Backend.services
             var registros = await _repo.GetAllAsync();
             return registros.Select(r => new RegistroDto
             {
-                UsuarioId = r.UsuarioId,
+                Id_Usuario = r.Id_Usuario,
                 Fecha = r.Fecha,
                 ValorActual = r.ValorActual,
                 TipoRegistro = GetEnumMemberValue(r.TipoRegistro)
@@ -37,7 +37,7 @@ namespace RedMujer_Backend.services
 
             return new RegistroDto
             {
-                UsuarioId = r.UsuarioId,
+                Id_Usuario = r.Id_Usuario,
                 Fecha = r.Fecha,
                 ValorActual = r.ValorActual,
                 TipoRegistro = GetEnumMemberValue(r.TipoRegistro)
@@ -50,7 +50,7 @@ namespace RedMujer_Backend.services
 
             var registro = new Registro
             {
-                UsuarioId = dto.UsuarioId,
+                Id_Usuario = dto.Id_Usuario,
                 Fecha = dto.Fecha,
                 ValorActual = dto.ValorActual,
                 TipoRegistro = tipoEnum
@@ -64,8 +64,8 @@ namespace RedMujer_Backend.services
 
             var registro = new Registro
             {
-                IdRegistro = id,
-                UsuarioId = dto.UsuarioId,
+                Id_Registro = id,
+                Id_Usuario = dto.Id_Usuario,
                 Fecha = dto.Fecha,
                 ValorActual = dto.ValorActual,
                 TipoRegistro = tipoEnum
@@ -83,9 +83,10 @@ namespace RedMujer_Backend.services
         {
             foreach (var field in typeof(TipoRegistro).GetFields())
             {
-                var attribute = Attribute.GetCustomAttribute(field, typeof(EnumMemberAttribute)) as EnumMemberAttribute;
-                if (attribute != null && attribute.Value == value)
-                    return (TipoRegistro)field.GetValue(null);
+                var attribute = field.GetValue(null);
+                if (attribute is TipoRegistro tipoRegistro)
+                    return tipoRegistro;
+
             }
             throw new ArgumentException("TipoRegistro no válido: " + value);
         }
@@ -97,8 +98,9 @@ namespace RedMujer_Backend.services
             var memInfo = type.GetMember(tipo.ToString());
             var attributes = memInfo[0].GetCustomAttributes(typeof(EnumMemberAttribute), false);
             return attributes.Length > 0
-                ? ((EnumMemberAttribute)attributes[0]).Value
+                ? (attributes[0] as EnumMemberAttribute)?.Value ?? tipo.ToString()
                 : tipo.ToString();
+
         }
     }
 }

@@ -31,8 +31,8 @@ namespace RedMujer_Backend.repositories
             {
                 lista.Add(new Registro
                 {
-                    IdRegistro = r.id_registro,
-                    UsuarioId = r.id_usuario,
+                    Id_Registro = r.id_registro,
+                    Id_Usuario = r.id_usuario,
                     Fecha = r.fecha,
                     ValorActual = r.valor_actual,
                     TipoRegistro = ParseTipoRegistro(r.tipo_registro)
@@ -52,8 +52,8 @@ namespace RedMujer_Backend.repositories
 
             return new Registro
             {
-                IdRegistro = r.id_registro,
-                UsuarioId = r.id_usuario,
+                Id_Registro = r.id_registro,
+                Id_Usuario = r.id_usuario,
                 Fecha = r.fecha,
                 ValorActual = r.valor_actual,
                 TipoRegistro = ParseTipoRegistro(r.tipo_registro)
@@ -69,7 +69,7 @@ namespace RedMujer_Backend.repositories
                 VALUES (@UsuarioId, @Fecha, @ValorActual, @TipoRegistro::tipo_registro)",
                 new
                 {
-                    registro.UsuarioId,
+                    registro.Id_Usuario,
                     registro.Fecha,
                     registro.ValorActual,
                     TipoRegistro = GetEnumMemberValue(registro.TipoRegistro)
@@ -88,11 +88,11 @@ namespace RedMujer_Backend.repositories
                 WHERE ""id_registro"" = @IdRegistro",
                 new
                 {
-                    registro.UsuarioId,
+                    registro.Id_Usuario,
                     registro.Fecha,
                     registro.ValorActual,
                     TipoRegistro = GetEnumMemberValue(registro.TipoRegistro),
-                    registro.IdRegistro
+                    registro.Id_Registro
                 });
         }
 
@@ -109,21 +109,35 @@ namespace RedMujer_Backend.repositories
         {
             var type = typeof(TipoRegistro);
             var memInfo = type.GetMember(tipo.ToString());
-            var attributes = memInfo[0].GetCustomAttributes(typeof(EnumMemberAttribute), false);
-            return attributes.Length > 0
-                ? ((EnumMemberAttribute)attributes[0]).Value
-                : tipo.ToString();
+
+            if (memInfo.Length == 0)
+                return tipo.ToString();
+
+            var attribute = memInfo[0].GetCustomAttributes(typeof(EnumMemberAttribute), false)
+                                    .OfType<EnumMemberAttribute>()
+                                    .FirstOrDefault();
+
+            return attribute?.Value ?? tipo.ToString();
         }
+
+
 
         private static TipoRegistro ParseTipoRegistro(string value)
         {
-            foreach (var field in typeof(TipoRegistro).GetFields())
+            foreach (var field in typeof(TipoRegistro).GetFields(BindingFlags.Public | BindingFlags.Static))
             {
                 var attribute = Attribute.GetCustomAttribute(field, typeof(EnumMemberAttribute)) as EnumMemberAttribute;
                 if (attribute != null && attribute.Value == value)
-                    return (TipoRegistro)field.GetValue(null);
+                {
+                    var enumValue = field.GetValue(null);
+                    if (enumValue == null)
+                        throw new ArgumentException("El valor del enum es nulo para: " + value);
+
+                    return (TipoRegistro)enumValue;
+                }
             }
             throw new ArgumentException("Tipo de registro no válido: " + value);
         }
+
     }
 }

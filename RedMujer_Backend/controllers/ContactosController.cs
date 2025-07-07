@@ -3,6 +3,7 @@ using RedMujer_Backend.DTOs;
 using RedMujer_Backend.services;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using RedMujer_Backend.models;
 
 namespace RedMujer_Backend.Controllers
 {
@@ -19,6 +20,14 @@ namespace RedMujer_Backend.Controllers
         [HttpGet]
         public async Task<IActionResult> Get() => Ok(await _service.GetAllAsync());
 
+        [HttpGet("tipos_contacto")]
+        public ActionResult<IEnumerable<string>> GetTiposContacto()
+        {
+            var tipos = Enum.GetNames(typeof(Contacto.TipoContacto));
+            return Ok(tipos);
+        }
+
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -28,14 +37,14 @@ namespace RedMujer_Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ContactoDto dto)
+        public async Task<IActionResult> Post([FromBody] ContactoCreateDto dto)
         {
             await _service.CrearAsync(dto);
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] ContactoDto dto)
+        public async Task<IActionResult> Put(int id, [FromBody] ContactoCreateDto dto)
         {
             await _service.ActualizarAsync(id, dto);
             return Ok();
