@@ -1,0 +1,23 @@
+@use '../../../../../styles.scss' as *;
+
+.contenedor-principal {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+
+
+    .informacion-principal{
+        max-width: 800px;
+        overflow: auto;
+    }
+  }
+
+  .nombre-emprendimiento  {
+    font-size: 3rem;
+    font-weight: 600;
+    color: $secondary-color;
+    
+    line-height: 1.3;
+  }
