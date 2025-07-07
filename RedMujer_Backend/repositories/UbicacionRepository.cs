@@ -1,6 +1,7 @@
 using Dapper;
 using Npgsql;
 using RedMujer_Backend.models;
+using RedMujer_Backend.DTOs;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -54,16 +55,23 @@ namespace RedMujer_Backend.repositories
                 "UPDATE \"Ubicaciones\" SET \"vigencia\" = false WHERE \"id_ubicacion\" = @Id", new { Id = id });
         }
         // MÉTODO NUEVO: CATEGORÍAS POR EMPRENDIMIENTO
-        public async Task<IEnumerable<Ubicacion>> GetUbicacionesPorEmprendimientoAsync(int id_Emprendimiento)
+        public async Task<IEnumerable<UbicacionDto>> GetUbicacionesPorEmprendimientoAsync(int id_Emprendimiento)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             var query = @"
-                SELECT c.* 
-                FROM ""Emprendimiento_ubicacion"" ec
-                JOIN ""Ubicaciones"" c ON ec.id_ubicacion = c.id_ubicacion
-                WHERE ec.id_emprendimiento = @Id_Emprendimiento AND c.vigencia = true
-            ";
-            return await connection.QueryAsync<Ubicacion>(query, new { Id_Emprendimiento = id_Emprendimiento });
+                    SELECT u.""id_ubicacion"" as Id_Ubicacion,
+                        u.""id_comuna"" as Id_Comuna,
+                        c.""id_region"" as Id_Region,
+                        u.""calle"" as Calle,
+                        u.""numero"" as Numero,
+                        u.""referencia"" as Referencia,
+                        u.""vigencia"" as Vigencia
+                    FROM ""Emprendimiento_ubicacion"" eu
+                    JOIN ""Ubicaciones"" u ON eu.""id_ubicacion"" = u.""id_ubicacion""
+                    JOIN ""Comunas"" c ON u.""id_comuna"" = c.""id_comuna""
+                    WHERE eu.""id_emprendimiento"" = @Id_Emprendimiento AND u.""vigencia"" = true
+                ";
+            return await connection.QueryAsync<UbicacionDto>(query, new { Id_Emprendimiento = id_Emprendimiento });
         }
     }
 }
