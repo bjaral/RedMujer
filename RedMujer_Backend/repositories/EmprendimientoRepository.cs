@@ -211,5 +211,18 @@ namespace RedMujer_Backend.repositories
                 await connection.ExecuteAsync(sql, new { Ruta = ruta, Id = id });
             }
         }
+        // obtener los emprendimientos de una persona
+        public async Task<IEnumerable<Emprendimiento>> GetByPersonaIdAsync(int id_Persona)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            var query = @"
+                SELECT e.*
+                FROM ""Emprendimientos"" e
+                INNER JOIN ""Persona_emprendimiento"" pe ON e.""id_emprendimiento"" = pe.""id_emprendimiento""
+                WHERE pe.""id_persona"" = @Id_Persona
+            ";
+
+            return await connection.QueryAsync<Emprendimiento>(query, new { Id_Persona = id_Persona });
+        }
     }
 }

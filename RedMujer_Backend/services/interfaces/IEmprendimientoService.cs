@@ -11,11 +11,13 @@ namespace RedMujer_Backend.services
         Task<IEnumerable<EmprendimientoDto>> GetRandomAsync(int cantidad);
         Task<EmprendimientoDto?> GetByIdAsync(int id);
         Task<Emprendimiento> CrearAsync(EmprendimientoCreateDto dto, string? rutaImagen);
-        Task ActualizarAsync(int id, EmprendimientoCreateDto dto, string? rutaImagen);    
+        Task ActualizarAsync(int id, EmprendimientoCreateDto dto, string? rutaImagen);
         Task EliminarAsync(int id);
         Task<Emprendimiento> ActualizarImagenAsync(int idEmprendimiento, string? rutaImagen);
         Task<bool> ExisteAsync(int idEmprendimiento);
         Task<string?> ObtenerRutaImagenPrincipalAsync(int id);
         Task ActualizarImagenPrincipalAsync(int id, string? ruta);
+        // obtener los emprendimientos de una persona
+        Task<IEnumerable<Emprendimiento>> ObtenerPorPersonaAsync(int idPersona);
     }
 }

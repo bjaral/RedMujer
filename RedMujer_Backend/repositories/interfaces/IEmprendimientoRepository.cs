@@ -14,5 +14,7 @@ namespace RedMujer_Backend.repositories
         Task<int> InsertarEmprendimientoAsync(Emprendimiento e);
         Task<string?> GetImagenPrincipalAsync(int id);
         Task UpdateImagenPrincipalAsync(int id, string? ruta);
+        // obtener los emprendimientos de una persona
+        Task<IEnumerable<Emprendimiento>> GetByPersonaIdAsync(int idPersona);
     }
 }

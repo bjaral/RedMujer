@@ -21,13 +21,15 @@ namespace RedMujer_Backend.services
             var personas = await _repo.GetAllAsync();
             return personas.Select(p => new PersonaDto
             {
+                Id_Persona = p.Id_Persona,
                 Id_Ubicacion = p.Id_Ubicacion,
+                Id_Usuario = p.Id_Usuario,
                 RUN = p.RUN,
                 Nombre = p.Nombre,
                 PrimerApellido = p.PrimerApellido,
                 SegundoApellido = p.SegundoApellido,
-                Vigencia = p.Vigencia,
-                UsuarioId = p.UsuarioId
+                Vigencia = p.Vigencia
+                
             });
         }
 
@@ -38,43 +40,48 @@ namespace RedMujer_Backend.services
 
             return new PersonaDto
             {
+                Id_Persona = p.Id_Persona,
                 Id_Ubicacion = p.Id_Ubicacion,
+                Id_Usuario = p.Id_Usuario,
                 RUN = p.RUN,
                 Nombre = p.Nombre,
                 PrimerApellido = p.PrimerApellido,
                 SegundoApellido = p.SegundoApellido,
-                Vigencia = p.Vigencia,
-                UsuarioId = p.UsuarioId
+                Vigencia = p.Vigencia
+                
             };
         }
 
-        public async Task CrearAsync(PersonaDto dto)
+        public async Task<int> CrearAsync(PersonaCreateDto dto)
         {
             var persona = new Persona
             {
                 Id_Ubicacion = dto.Id_Ubicacion,
+                Id_Usuario = dto.Id_Usuario,
                 RUN = dto.RUN,
                 Nombre = dto.Nombre,
                 PrimerApellido = dto.PrimerApellido,
                 SegundoApellido = dto.SegundoApellido,
-                Vigencia = dto.Vigencia,
-                UsuarioId = dto.UsuarioId
+                Vigencia = dto.Vigencia
+                
             };
-            await _repo.InsertAsync(persona);
+            int id = await _repo.InsertAsync(persona);
+            return id;
         }
 
-        public async Task ActualizarAsync(int id, PersonaDto dto)
+        public async Task ActualizarAsync(int id, PersonaCreateDto dto)
         {
             var persona = new Persona
             {
                 Id_Persona = id,
                 Id_Ubicacion = dto.Id_Ubicacion,
+                Id_Usuario = dto.Id_Usuario,
                 RUN = dto.RUN,
                 Nombre = dto.Nombre,
                 PrimerApellido = dto.PrimerApellido,
                 SegundoApellido = dto.SegundoApellido,
-                Vigencia = dto.Vigencia,
-                UsuarioId = dto.UsuarioId
+                Vigencia = dto.Vigencia
+                
             };
             await _repo.UpdateAsync(persona);
         }
