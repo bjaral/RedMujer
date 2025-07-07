@@ -21,7 +21,7 @@
                 placeholder="Selec. Comuna" class="custom-select">
                 <mat-option value="todas">Todas</mat-option>
                 <!-- Mostrar comunas filtradas solo si hay una región seleccionada -->
-                <mat-option *ngFor="let comuna of comunasFiltradas" [value]="comuna.id_Comuna">
+                <mat-option *ngFor="let comuna of comunasFiltradas" [value]="comuna.id_comuna">
                     {{comuna.nombre}}
                 </mat-option>
             </mat-select>
@@ -93,6 +93,8 @@
                         <p class="card-description">{{ emp.descripcion }}</p>
                         <div class="card-tags">
                             <span class="tag">{{ emp.modalidad || 'Sin modalidad' }}</span>
+                            <span class="tag">{{ emp.region || 'Sin región' }}</span>
+                            <span class="tag">{{ emp.id_Emprendimiento || 'Sin id' }}</span>
                             <span class="tag" *ngFor="let categoria of emp.categorias">
                                 {{ categoria.nombre }}
                             </span>

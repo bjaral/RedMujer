@@ -10,7 +10,7 @@ import { forkJoin, Observable } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
 export interface Emprendimiento {
-  id: string;
+  id_Emprendimiento: string;
   nombre: string;
   descripcion: string;
   imagen?: string;
@@ -65,54 +65,66 @@ export class EmprendimientosComponent implements OnInit {
   }
 
   getEmprendimientos(): void {
-    this.loading = true;
+  this.loading = true;
+  const useCategories = true;
 
-    const useCategories = true;
-
-    if (useCategories) {
-      this.emprendimientoService.getAllWithCategories().subscribe({
-        next: (data: Emprendimiento[]) => {
-          // Obtener la ubicación de cada emprendimiento
-          const emprendimientosConUbicacion$ = data.map((emp: Emprendimiento) => {
-            return this.emprendimientoService.getUbicacionDeEmprendimiento(Number(emp.id)).pipe(
-              map((ubicacion: any) => {
-                // Asignar la región y comuna al emprendimiento
-                emp.region = ubicacion.region;
-                emp.comuna = ubicacion.comuna;
-                return emp;
-              }),
-              catchError(err => {
-                console.error('Error al obtener ubicación de emprendimiento', err);
-                return [];
-              })
-            );
-          });
-
-          // Hacer todas las peticiones en paralelo usando forkJoin
-          forkJoin(emprendimientosConUbicacion$).subscribe({
-            next: (emprendimientosConUbicacion: Emprendimiento[]) => {
-              this.emprendimientos = emprendimientosConUbicacion;
-              this.emprendimientosFiltrados = [...this.emprendimientos];
-              this.totalItems = this.emprendimientos.length;
-              this.extractCategorias();
-              this.aplicarOrden();
-              this.loading = false;
-            },
-            error: (err: any) => {
-              console.error('Error al cargar las ubicaciones de los emprendimientos', err);
-              this.loading = false;
-            }
-          });
-        },
-        error: (err) => {
-          console.error('Error al cargar emprendimientos con categorías:', err);
-          this.loadEmprendimientosSinCategorias();
-        }
-      });
-    } else {
-      this.loadEmprendimientosSinCategorias();
-    }
+  if (useCategories) {
+    this.emprendimientoService.getAllWithCategories().subscribe({
+      next: (data: Emprendimiento[]) => {
+        this.asignarUbicacionesAEmprendimientos(data);
+      },
+      error: (err) => {
+        console.error('Error al cargar emprendimientos con categorías:', err);
+        this.emprendimientoService.getAll().subscribe({
+          next: (data: Emprendimiento[]) => this.asignarUbicacionesAEmprendimientos(data),
+          error: (err) => {
+            console.error('Error al cargar emprendimientos sin categorías:', err);
+            this.loading = false;
+          }
+        });
+      }
+    });
+  } else {
+    this.emprendimientoService.getAll().subscribe({
+      next: (data: Emprendimiento[]) => this.asignarUbicacionesAEmprendimientos(data),
+      error: (err) => {
+        console.error('Error al cargar emprendimientos sin categorías:', err);
+        this.loading = false;
+      }
+    });
   }
+}
+
+  private asignarUbicacionesAEmprendimientos(emprendimientos: Emprendimiento[]): void {
+  const emprendimientosConUbicacion$ = emprendimientos.map((emp: Emprendimiento) => {
+    return this.emprendimientoService.getUbicacionDeEmprendimiento(Number(emp.id_Emprendimiento)).pipe(
+      map((ubicacion: any) => {
+        emp.region = ubicacion.region;
+        emp.comuna = ubicacion.comuna;
+        return emp;
+      }),
+      catchError(err => {
+        console.error(`Error al obtener ubicación del emprendimiento con id ${emp.id_Emprendimiento}`, err);
+        return [emp]; // Devuelve el mismo emp aunque no tenga ubicación, para no perderlo
+      })
+    );
+  });
+
+  forkJoin(emprendimientosConUbicacion$).subscribe({
+    next: (emprendimientosConUbicacion: Emprendimiento[]) => {
+      this.emprendimientos = emprendimientosConUbicacion;
+      this.emprendimientosFiltrados = [...this.emprendimientos];
+      this.totalItems = this.emprendimientos.length;
+      this.extractCategorias();
+      this.aplicarOrden();
+      this.loading = false;
+    },
+    error: (err: any) => {
+      console.error('Error al cargar ubicaciones de los emprendimientos', err);
+      this.loading = false;
+    }
+  });
+}
 
   private loadEmprendimientosSinCategorias(): void {
     this.emprendimientoService.getAll().subscribe({
@@ -177,33 +189,45 @@ export class EmprendimientosComponent implements OnInit {
   }
 
   onRegionChange(): void {
-    if (this.selectedRegion && this.selectedRegion !== 'todas') {
-      // Encontrar la región seleccionada para obtener su ID
-      const regionSeleccionada = this.regiones.find(r => r.id_Region.toString() === this.selectedRegion);
+  console.log('Región seleccionada:', this.selectedRegion); // Debug
+  
+  if (this.selectedRegion && this.selectedRegion !== 'todas') {
+    // Encontrar la región seleccionada para obtener su ID
+    const regionSeleccionada = this.regiones.find(r => r.id_Region === this.selectedRegion);
+    
+    console.log('Región encontrada:', regionSeleccionada); // Debug
 
-      if (regionSeleccionada) {
-        // Cargar comunas de la región seleccionada
-        this.ubicacionService.comunasPorRegion(regionSeleccionada.id_Region).subscribe({
-          next: (comunas) => {
-            this.comunasFiltradas = comunas;
-            // Resetear comuna seleccionada
-            this.selectedComuna = 'todas';
-            // Aplicar filtros después de cargar comunas
-            this.filtrarEmprendimientos();
-          },
-          error: (err) => {
-            console.error('Error al cargar comunas por región', err);
-            this.comunasFiltradas = [];
-          }
-        });
-      }
+    if (regionSeleccionada) {
+      // Cargar comunas de la región seleccionada
+      this.ubicacionService.comunasPorRegion(regionSeleccionada.id_Region).subscribe({
+        next: (comunas) => {
+          console.log('Comunas recibidas:', comunas); // Debug
+          this.comunasFiltradas = comunas;
+          // Resetear comuna seleccionada
+          this.selectedComuna = 'todas';
+          // Aplicar filtros después de cargar comunas
+          this.filtrarEmprendimientos();
+        },
+        error: (err) => {
+          console.error('Error al cargar comunas por región', err);
+          this.comunasFiltradas = [];
+          this.selectedComuna = 'todas';
+        }
+      });
     } else {
-      // Si no hay región seleccionada, limpiar comunas filtradas
+      console.log('No se encontró la región seleccionada');
       this.comunasFiltradas = [];
       this.selectedComuna = 'todas';
       this.filtrarEmprendimientos();
     }
+  } else {
+    // Si no hay región seleccionada o es "todas", limpiar comunas filtradas
+    console.log('Limpiando comunas filtradas');
+    this.comunasFiltradas = [];
+    this.selectedComuna = 'todas';
+    this.filtrarEmprendimientos();
   }
+}
 
   filtrarEmprendimientos(): void {
     let resultados: Emprendimiento[] = [...this.emprendimientos];
@@ -220,7 +244,7 @@ export class EmprendimientosComponent implements OnInit {
     if (this.selectedRegion && this.selectedRegion !== 'todas') {
       resultados = resultados.filter((emp: Emprendimiento) => {
         // Buscar la región por nombre en el array de regiones
-        const regionSeleccionada = this.regiones.find(r => r.id_Region.toString() === this.selectedRegion);
+        const regionSeleccionada = this.regiones.find(r => r.id_Region === this.selectedRegion);
         return regionSeleccionada && emp.region === regionSeleccionada.nombre;
       });
     }
@@ -228,7 +252,7 @@ export class EmprendimientosComponent implements OnInit {
     if (this.selectedComuna && this.selectedComuna !== 'todas') {
       resultados = resultados.filter((emp: Emprendimiento) => {
         // Buscar la comuna por nombre en el array de comunas filtradas
-        const comunaSeleccionada = this.comunasFiltradas.find(c => c.id_Comuna.toString() === this.selectedComuna);
+        const comunaSeleccionada = this.comunasFiltradas.find(c => c.id_Comuna === this.selectedComuna);
         return comunaSeleccionada && emp.comuna === comunaSeleccionada.nombre;
       });
     }
@@ -317,7 +341,7 @@ export class EmprendimientosComponent implements OnInit {
   }
 
   verDetalles(emp: Emprendimiento): void {
-    this.router.navigate(['/emprendimientos', emp.id]);
+    this.router.navigate(['/emprendimientos', emp.id_Emprendimiento]);
   }
 
   get contadorTexto(): string {
