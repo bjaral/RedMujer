@@ -6,22 +6,22 @@ import { FormsModule } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { UbicacionService } from '../../services/ubicacion.service';
 import { Router } from '@angular/router';
-import { forkJoin, Observable } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 export interface Emprendimiento {
-  id_Emprendimiento: string;
+  id_Emprendimiento: number;
   nombre: string;
   descripcion: string;
   imagen?: string;
   categorias?: any[];
   categoriasTexto?: string;
-  region_id?: string;
   region?: string;
-  comuna_id?: string;
   comuna?: string;
   modalidad?: string;
   fecha_inicio?: Date;
+  id_Comuna?: number;
+  id_Region?: number;
 }
 
 @Component({
@@ -65,83 +65,57 @@ export class EmprendimientosComponent implements OnInit {
   }
 
   getEmprendimientos(): void {
-  this.loading = true;
-  const useCategories = true;
+    this.loading = true;
 
-  if (useCategories) {
-    this.emprendimientoService.getAllWithCategories().subscribe({
+    this.emprendimientoService.getAll().subscribe({
       next: (data: Emprendimiento[]) => {
         this.asignarUbicacionesAEmprendimientos(data);
       },
       error: (err) => {
-        console.error('Error al cargar emprendimientos con categorías:', err);
-        this.emprendimientoService.getAll().subscribe({
-          next: (data: Emprendimiento[]) => this.asignarUbicacionesAEmprendimientos(data),
-          error: (err) => {
-            console.error('Error al cargar emprendimientos sin categorías:', err);
-            this.loading = false;
-          }
-        });
-      }
-    });
-  } else {
-    this.emprendimientoService.getAll().subscribe({
-      next: (data: Emprendimiento[]) => this.asignarUbicacionesAEmprendimientos(data),
-      error: (err) => {
-        console.error('Error al cargar emprendimientos sin categorías:', err);
+        console.error('Error al cargar emprendimientos:', err);
         this.loading = false;
       }
     });
   }
-}
 
   private asignarUbicacionesAEmprendimientos(emprendimientos: Emprendimiento[]): void {
-  const emprendimientosConUbicacion$ = emprendimientos.map((emp: Emprendimiento) => {
-    return this.emprendimientoService.getUbicacionDeEmprendimiento(Number(emp.id_Emprendimiento)).pipe(
-      map((ubicacion: any) => {
-        emp.region = ubicacion.region;
-        emp.comuna = ubicacion.comuna;
-        return emp;
-      }),
-      catchError(err => {
-        console.error(`Error al obtener ubicación del emprendimiento con id ${emp.id_Emprendimiento}`, err);
-        return [emp]; // Devuelve el mismo emp aunque no tenga ubicación, para no perderlo
-      })
-    );
-  });
+    const emprendimientosConUbicacion$ = emprendimientos.map((emp: Emprendimiento) => {
+      return this.emprendimientoService.getUbicacionDeEmprendimiento(Number(emp.id_Emprendimiento)).pipe(
+        map((ubicacion: any) => {
+          emp.region = ubicacion.region;
+          emp.comuna = ubicacion.comuna;
+          emp.id_Comuna = ubicacion.id_Comuna;
+          emp.id_Region = ubicacion.id_Region;
 
-  forkJoin(emprendimientosConUbicacion$).subscribe({
-    next: (emprendimientosConUbicacion: Emprendimiento[]) => {
-      this.emprendimientos = emprendimientosConUbicacion;
-      this.emprendimientosFiltrados = [...this.emprendimientos];
-      this.totalItems = this.emprendimientos.length;
-      this.extractCategorias();
-      this.aplicarOrden();
-      this.loading = false;
-    },
-    error: (err: any) => {
-      console.error('Error al cargar ubicaciones de los emprendimientos', err);
-      this.loading = false;
-    }
-  });
-}
-
-  private loadEmprendimientosSinCategorias(): void {
-    this.emprendimientoService.getAll().subscribe({
-      next: (data: Emprendimiento[]) => {
-        this.emprendimientos = data.map((emp: Emprendimiento) => {
           if (emp.imagen) {
             emp.imagen = `http://localhost:5145/media/${emp.imagen}`;
           }
+
           return emp;
-        });
+        }),
+        catchError(err => {
+          console.error(`Error al obtener ubicación del emprendimiento con id ${emp.id_Emprendimiento}:`, err);
+
+          if (emp.imagen) {
+            emp.imagen = `http://localhost:5145/media/${emp.imagen}`;
+          }
+
+          return of(emp);
+        })
+      );
+    });
+
+    forkJoin(emprendimientosConUbicacion$).subscribe({
+      next: (emprendimientosConUbicacion: Emprendimiento[]) => {
+        this.emprendimientos = emprendimientosConUbicacion;
         this.emprendimientosFiltrados = [...this.emprendimientos];
         this.totalItems = this.emprendimientos.length;
+        this.extractCategorias();
         this.aplicarOrden();
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Error al cargar emprendimientos:', err);
+      error: (err: any) => {
+        console.error('Error al cargar ubicaciones de los emprendimientos:', err);
         this.loading = false;
       }
     });
@@ -175,11 +149,9 @@ export class EmprendimientosComponent implements OnInit {
       { id: 'PresencialYOnline', nombre: 'Híbrida' }
     ];
 
-    // Cargar todas las comunas pero no mostrarlas inicialmente
     this.ubicacionService.comunas().subscribe({
       next: (comunas) => {
         this.comunas = comunas;
-        // Inicializar comunasFiltradas vacío para mostrar solo "Todas"
         this.comunasFiltradas = [];
       },
       error: (err) => {
@@ -189,45 +161,28 @@ export class EmprendimientosComponent implements OnInit {
   }
 
   onRegionChange(): void {
-  console.log('Región seleccionada:', this.selectedRegion); // Debug
-  
-  if (this.selectedRegion && this.selectedRegion !== 'todas') {
-    // Encontrar la región seleccionada para obtener su ID
-    const regionSeleccionada = this.regiones.find(r => r.id_Region === this.selectedRegion);
-    
-    console.log('Región encontrada:', regionSeleccionada); // Debug
+    if (this.selectedRegion && this.selectedRegion !== 'todas') {
+      const regionId = Number(this.selectedRegion);
 
-    if (regionSeleccionada) {
-      // Cargar comunas de la región seleccionada
-      this.ubicacionService.comunasPorRegion(regionSeleccionada.id_Region).subscribe({
+      this.ubicacionService.comunasPorRegion(regionId).subscribe({
         next: (comunas) => {
-          console.log('Comunas recibidas:', comunas); // Debug
           this.comunasFiltradas = comunas;
-          // Resetear comuna seleccionada
           this.selectedComuna = 'todas';
-          // Aplicar filtros después de cargar comunas
           this.filtrarEmprendimientos();
         },
         error: (err) => {
           console.error('Error al cargar comunas por región', err);
           this.comunasFiltradas = [];
           this.selectedComuna = 'todas';
+          this.filtrarEmprendimientos();
         }
       });
     } else {
-      console.log('No se encontró la región seleccionada');
       this.comunasFiltradas = [];
       this.selectedComuna = 'todas';
       this.filtrarEmprendimientos();
     }
-  } else {
-    // Si no hay región seleccionada o es "todas", limpiar comunas filtradas
-    console.log('Limpiando comunas filtradas');
-    this.comunasFiltradas = [];
-    this.selectedComuna = 'todas';
-    this.filtrarEmprendimientos();
   }
-}
 
   filtrarEmprendimientos(): void {
     let resultados: Emprendimiento[] = [...this.emprendimientos];
@@ -242,19 +197,17 @@ export class EmprendimientosComponent implements OnInit {
     }
 
     if (this.selectedRegion && this.selectedRegion !== 'todas') {
-      resultados = resultados.filter((emp: Emprendimiento) => {
-        // Buscar la región por nombre en el array de regiones
-        const regionSeleccionada = this.regiones.find(r => r.id_Region === this.selectedRegion);
-        return regionSeleccionada && emp.region === regionSeleccionada.nombre;
-      });
+      const regionId = Number(this.selectedRegion);
+      resultados = resultados.filter((emp: Emprendimiento) => 
+        emp.id_Region === regionId
+      );
     }
 
     if (this.selectedComuna && this.selectedComuna !== 'todas') {
-      resultados = resultados.filter((emp: Emprendimiento) => {
-        // Buscar la comuna por nombre en el array de comunas filtradas
-        const comunaSeleccionada = this.comunasFiltradas.find(c => c.id_Comuna === this.selectedComuna);
-        return comunaSeleccionada && emp.comuna === comunaSeleccionada.nombre;
-      });
+      const comunaId = Number(this.selectedComuna);
+      resultados = resultados.filter((emp: Emprendimiento) => 
+        emp.id_Comuna === comunaId
+      );
     }
 
     if (this.selectedModo && this.selectedModo !== 'todas') {
