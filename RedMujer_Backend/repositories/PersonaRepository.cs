@@ -12,7 +12,6 @@ namespace RedMujer_Backend.repositories
         private readonly IConfiguration _config;
         private readonly string _connectionString = string.Empty;
 
-
         public PersonaRepository(IConfiguration config)
         {
             _config = config;
@@ -23,14 +22,34 @@ namespace RedMujer_Backend.repositories
         {
             using var connection = new NpgsqlConnection(_connectionString);
             return await connection.QueryAsync<Persona>(
-                "SELECT * FROM \"Personas\" WHERE vigencia = true");
+                @"SELECT 
+                    ""id_persona"" as Id_Persona,
+                    ""id_ubicacion"" as Id_Ubicacion,
+                    ""id_usuario"" as Id_Usuario,
+                    ""RUN"",
+                    ""nombre"" as Nombre,
+                    ""primer_apellido"" as PrimerApellido,
+                    ""segundo_apellido"" as SegundoApellido,
+                    ""vigencia"" as Vigencia
+                FROM ""Personas"" 
+                WHERE vigencia = true");
         }
 
         public async Task<Persona?> GetByIdAsync(int id)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             return await connection.QueryFirstOrDefaultAsync<Persona>(
-                "SELECT * FROM \"Personas\" WHERE \"id_persona\" = @Id AND vigencia = true",
+                @"SELECT 
+                    ""id_persona"" as Id_Persona,
+                    ""id_ubicacion"" as Id_Ubicacion,
+                    ""id_usuario"" as Id_Usuario,
+                    ""RUN"",
+                    ""nombre"" as Nombre,
+                    ""primer_apellido"" as PrimerApellido,
+                    ""segundo_apellido"" as SegundoApellido,
+                    ""vigencia"" as Vigencia
+                FROM ""Personas"" 
+                WHERE ""id_persona"" = @Id AND vigencia = true",
                 new { Id = id });
         }
 
@@ -50,8 +69,6 @@ namespace RedMujer_Backend.repositories
             return id;
         }
 
-
-
         public async Task UpdateAsync(Persona persona)
         {
             using var connection = new NpgsqlConnection(_connectionString);
@@ -63,7 +80,7 @@ namespace RedMujer_Backend.repositories
                     ""nombre"" = @Nombre,
                     ""primer_apellido"" = @PrimerApellido,
                     ""segundo_apellido"" = @SegundoApellido,
-                    ""vigencia"" = @vigencia
+                    ""vigencia"" = @Vigencia
                 WHERE ""id_persona"" = @Id_Persona",
                 persona);
         }
