@@ -37,7 +37,7 @@ namespace RedMujer_Backend.repositories
             await connection.ExecuteAsync(
                 @"INSERT INTO ""Contactos"" 
                 (""id_emprendimiento"", ""valor"", ""vigencia"", ""tipo_contacto"") 
-                VALUES (@IdEmprendimiento, @Valor, @vigencia, @TipoContacto)",
+                VALUES (@IdEmprendimiento, @Valor, @vigencia, @Tipo_Contacto)",
                 contacto);
         }
 
@@ -49,7 +49,7 @@ namespace RedMujer_Backend.repositories
                     ""id_emprendimiento"" = @IdEmprendimiento,
                     ""valor"" = @Valor,
                     ""vigencia"" = @vigencia,
-                    ""tipo_contacto"" = @TipoContacto
+                    ""tipo_contacto"" = @Tipo_Contacto
                 WHERE ""id_contacto"" = @IdContacto",
                 contacto);
         }

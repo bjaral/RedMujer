@@ -17,7 +17,7 @@ namespace RedMujer_Backend.controllers
 
     public class ImagenUploadDto
     {
-        public IFormFile Imagen { get; set; }
+        public IFormFile? Imagen { get; set; }
     }
 
     [ApiController]
@@ -61,6 +61,14 @@ namespace RedMujer_Backend.controllers
                 return NotFound();
             return Ok(emprendimiento);
         }
+
+        [HttpGet("modalidades")]
+        public ActionResult<IEnumerable<string>> GetTiposModalidades()
+        {
+            var modalidades = Enum.GetNames(typeof(TipoModalidad));
+            return Ok(modalidades);
+        }
+
 
         // =========== CREAR ===========
         [HttpPost]

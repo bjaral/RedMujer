@@ -12,7 +12,7 @@ namespace RedMujer_Backend.DTOs
         public string Modalidad { get; set; } = "";
         public string? Horario_Atencion { get; set; }
         public bool Vigencia { get; set; }
-        public string? Imagen { get; set; }  // aquí va la ruta/url de la imagen
+        public string? Imagen { get; set; } // aquí va la ruta/url de la imagen
 
     }
 }

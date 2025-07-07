@@ -30,8 +30,8 @@ public enum TipoRegistro
 
     public class Registro
     {
-        public int IdRegistro { get; set; }
-        public int UsuarioId { get; set; }
+        public int Id_Registro { get; set; }
+        public int Id_Usuario { get; set; }
         public DateTime Fecha { get; set; }
         public string? ValorActual { get; set; }
         public TipoRegistro TipoRegistro { get; set; } // <--- Aquí está el tipo de registro

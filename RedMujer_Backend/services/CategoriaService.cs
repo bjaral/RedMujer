@@ -23,6 +23,7 @@ namespace RedMujer_Backend.services
             return categorias.Select(c => new CategoriaDto
             {
                 Id_Categoria = c.Id_Categoria,
+                Nombre = c.Nombre,
                 Descripcion = c.Descripcion,
                 Vigencia = c.Vigencia,
                 Grupo_Categoria = c.Grupo_Categoria
@@ -39,6 +40,7 @@ namespace RedMujer_Backend.services
             return new CategoriaDto
             {
                 Id_Categoria = categoria.Id_Categoria,
+                Nombre = categoria.Nombre,
                 Descripcion = categoria.Descripcion,
                 Vigencia = categoria.Vigencia,
                 Grupo_Categoria = categoria.Grupo_Categoria
@@ -46,10 +48,11 @@ namespace RedMujer_Backend.services
         }
 
         // Crear
-        public async Task CrearAsync(CategoriaDto dto)
+        public async Task CrearAsync(CategoriaCreateDto dto)
         {
             var categoria = new Categoria
             {
+                Nombre = dto.Nombre,
                 Descripcion = dto.Descripcion,
                 Vigencia = dto.Vigencia,
                 Grupo_Categoria = dto.Grupo_Categoria
@@ -57,12 +60,14 @@ namespace RedMujer_Backend.services
             await _categoriaRepository.CrearAsync(categoria);
         }
 
+
         // Actualizar
-        public async Task ActualizarAsync(int id, CategoriaDto dto)
+        public async Task ActualizarAsync(int id, CategoriaCreateDto dto)
         {
             var categoria = new Categoria
             {
                 Id_Categoria = id,
+                Nombre = dto.Nombre,
                 Descripcion = dto.Descripcion,
                 Vigencia = dto.Vigencia,
                 Grupo_Categoria = dto.Grupo_Categoria
@@ -83,6 +88,7 @@ namespace RedMujer_Backend.services
             return categorias.Select(c => new CategoriaDto
             {
                 Id_Categoria = c.Id_Categoria,
+                Nombre = c.Nombre,
                 Descripcion = c.Descripcion,
                 Vigencia = c.Vigencia,
                 Grupo_Categoria = c.Grupo_Categoria
