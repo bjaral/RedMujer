@@ -1,3 +1,7 @@
+# generated files
+*out
+out/
+
 #vscode
 *.vscode
 
