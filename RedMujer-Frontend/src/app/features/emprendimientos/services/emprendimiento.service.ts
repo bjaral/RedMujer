@@ -26,38 +26,60 @@ export class EmprendimientoService {
 
   // Obtener todos los emprendimientos con sus categorías
   getAllWithCategories(): Observable<any[]> {
-  return this.getAll().pipe(
-    switchMap((emprendimientos: any[]) => { // Use switchMap here
-      // Crear un array de observables para obtener las categorías de cada emprendimiento
-      const emprendimientosConCategorias = emprendimientos.map(emp => {
-        return this.getCategories(emp.id).pipe(
-          map(categorias => ({
-            ...emp,
-            categorias: categorias,
-            categoriasTexto: categorias.map((cat: any) => cat.nombre).join(', ')
-          }))
-        );
-      });
+    return this.getAll().pipe(
+      switchMap((emprendimientos: any[]) => { // Use switchMap here
+        // Crear un array de observables para obtener las categorías de cada emprendimiento
+        const emprendimientosConCategorias = emprendimientos.map(emp => {
+          return this.getCategories(emp.id).pipe(
+            map(categorias => ({
+              ...emp,
+              categorias: categorias,
+              categoriasTexto: categorias.map((cat: any) => cat.nombre).join(', ')
+            }))
+          );
+        });
 
-      // Ejecutar todas las peticiones en paralelo y retornar el resultado aplanado
-      return forkJoin(emprendimientosConCategorias);
+        // Ejecutar todas las peticiones en paralelo y retornar el resultado aplanado
+        return forkJoin(emprendimientosConCategorias);
+      })
+      // No se necesita un segundo map para aplanar, switchMap ya se encarga de ello.
+    );
+  }
+
+  getUbicacionDeEmprendimiento(idEmprendimiento: number): Observable<any> {
+  return this.http.get<any>(`${this.url}/EmprendimientoUbicacion`).pipe(
+    map((ubicacionRelaciones: any[]) => {
+      // Buscar la relación entre el emprendimiento y su ubicación
+      const ubicacionRelacion = ubicacionRelaciones.find(rel => rel.idEmprendimiento === idEmprendimiento);
+      if (!ubicacionRelacion) {
+        throw new Error('No se encontró la relación entre emprendimiento y ubicación');
+      }
+      
+      const idComuna = ubicacionRelacion.idUbicacion;
+      return idComuna; // Devolver solo el id de la comuna para seguir el flujo
+    }),
+    switchMap((idComuna: number) => {
+      // Obtener la comuna y luego la región usando `switchMap`
+      return this.getComunaById(idComuna).pipe(
+        switchMap((comuna: any) => {
+          const idRegion = comuna.id_Region;
+          return this.getRegionById(idRegion).pipe(
+            map((region: any) => ({
+              comuna: comuna.nombre,
+              region: region.nombre
+            }))
+          );
+        })
+      );
     })
-    // No se necesita un segundo map para aplanar, switchMap ya se encarga de ello.
   );
 }
 
-  crearEmprendimiento(data: any, imagen: File | null): Observable<any> {
-    const formData = new FormData();
-    formData.append('RUT', data.rut);
-    formData.append('Nombre', data.nombre);
-    formData.append('Descripcion', data.descripcion || '');
-    formData.append('Modalidad', data.modalidad);
-    formData.append('Horario_Atencion', data.horario_Atencion);
-    formData.append('Vigencia', 'true');
-    if (imagen) {
-      formData.append('Imagen', imagen);
-    }
+  getComunaById(idComuna: number): Observable<any> {
+    return this.http.get<any>(`${this.url}/Comunas/${idComuna}`);
+  }
 
-    return this.http.post<any>(this.url, formData);
+  getRegionById(idRegion: number): Observable<any> {
+    return this.http.get<any>(`${this.url}/Regiones/${idRegion}`);
   }
 }

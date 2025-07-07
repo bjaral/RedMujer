@@ -6,6 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { UbicacionService } from '../../services/ubicacion.service';
 import { Router } from '@angular/router';
+import { forkJoin, Observable } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 export interface Emprendimiento {
   id: string;
@@ -35,6 +37,7 @@ export class EmprendimientosComponent implements OnInit {
   emprendimientosPaginados: Emprendimiento[] = [];
   modos: any[] = [];
   comunas: any[] = [];
+  comunasFiltradas: any[] = [];
   regiones: any[] = [];
   categorias: any[] = [];
 
@@ -69,17 +72,37 @@ export class EmprendimientosComponent implements OnInit {
     if (useCategories) {
       this.emprendimientoService.getAllWithCategories().subscribe({
         next: (data: Emprendimiento[]) => {
-          this.emprendimientos = data.map((emp: Emprendimiento) => {
-            if (emp.imagen) {
-              emp.imagen = encodeURI(`http://localhost:5145/media/${emp.imagen}`);
-            }
-            return emp;
+          // Obtener la ubicación de cada emprendimiento
+          const emprendimientosConUbicacion$ = data.map((emp: Emprendimiento) => {
+            return this.emprendimientoService.getUbicacionDeEmprendimiento(Number(emp.id)).pipe(
+              map((ubicacion: any) => {
+                // Asignar la región y comuna al emprendimiento
+                emp.region = ubicacion.region;
+                emp.comuna = ubicacion.comuna;
+                return emp;
+              }),
+              catchError(err => {
+                console.error('Error al obtener ubicación de emprendimiento', err);
+                return [];
+              })
+            );
           });
-          this.emprendimientosFiltrados = [...this.emprendimientos];
-          this.totalItems = this.emprendimientos.length;
-          this.extractCategorias();
-          this.aplicarOrden();
-          this.loading = false;
+
+          // Hacer todas las peticiones en paralelo usando forkJoin
+          forkJoin(emprendimientosConUbicacion$).subscribe({
+            next: (emprendimientosConUbicacion: Emprendimiento[]) => {
+              this.emprendimientos = emprendimientosConUbicacion;
+              this.emprendimientosFiltrados = [...this.emprendimientos];
+              this.totalItems = this.emprendimientos.length;
+              this.extractCategorias();
+              this.aplicarOrden();
+              this.loading = false;
+            },
+            error: (err: any) => {
+              console.error('Error al cargar las ubicaciones de los emprendimientos', err);
+              this.loading = false;
+            }
+          });
         },
         error: (err) => {
           console.error('Error al cargar emprendimientos con categorías:', err);
@@ -96,7 +119,7 @@ export class EmprendimientosComponent implements OnInit {
       next: (data: Emprendimiento[]) => {
         this.emprendimientos = data.map((emp: Emprendimiento) => {
           if (emp.imagen) {
-            emp.imagen = encodeURI(`http://localhost:5145/media/${emp.imagen}`);
+            emp.imagen = `http://localhost:5145/media/${emp.imagen}`;
           }
           return emp;
         });
@@ -140,14 +163,46 @@ export class EmprendimientosComponent implements OnInit {
       { id: 'PresencialYOnline', nombre: 'Híbrida' }
     ];
 
+    // Cargar todas las comunas pero no mostrarlas inicialmente
     this.ubicacionService.comunas().subscribe({
       next: (comunas) => {
         this.comunas = comunas;
+        // Inicializar comunasFiltradas vacío para mostrar solo "Todas"
+        this.comunasFiltradas = [];
       },
       error: (err) => {
         console.error('Error al cargar comunas', err);
       }
     });
+  }
+
+  onRegionChange(): void {
+    if (this.selectedRegion && this.selectedRegion !== 'todas') {
+      // Encontrar la región seleccionada para obtener su ID
+      const regionSeleccionada = this.regiones.find(r => r.id_Region.toString() === this.selectedRegion);
+
+      if (regionSeleccionada) {
+        // Cargar comunas de la región seleccionada
+        this.ubicacionService.comunasPorRegion(regionSeleccionada.id_Region).subscribe({
+          next: (comunas) => {
+            this.comunasFiltradas = comunas;
+            // Resetear comuna seleccionada
+            this.selectedComuna = 'todas';
+            // Aplicar filtros después de cargar comunas
+            this.filtrarEmprendimientos();
+          },
+          error: (err) => {
+            console.error('Error al cargar comunas por región', err);
+            this.comunasFiltradas = [];
+          }
+        });
+      }
+    } else {
+      // Si no hay región seleccionada, limpiar comunas filtradas
+      this.comunasFiltradas = [];
+      this.selectedComuna = 'todas';
+      this.filtrarEmprendimientos();
+    }
   }
 
   filtrarEmprendimientos(): void {
@@ -162,29 +217,31 @@ export class EmprendimientosComponent implements OnInit {
       );
     }
 
-    if (this.selectedRegion) {
+    if (this.selectedRegion && this.selectedRegion !== 'todas') {
+      resultados = resultados.filter((emp: Emprendimiento) => {
+        // Buscar la región por nombre en el array de regiones
+        const regionSeleccionada = this.regiones.find(r => r.id_Region.toString() === this.selectedRegion);
+        return regionSeleccionada && emp.region === regionSeleccionada.nombre;
+      });
+    }
+
+    if (this.selectedComuna && this.selectedComuna !== 'todas') {
+      resultados = resultados.filter((emp: Emprendimiento) => {
+        // Buscar la comuna por nombre en el array de comunas filtradas
+        const comunaSeleccionada = this.comunasFiltradas.find(c => c.id_Comuna.toString() === this.selectedComuna);
+        return comunaSeleccionada && emp.comuna === comunaSeleccionada.nombre;
+      });
+    }
+
+    if (this.selectedModo && this.selectedModo !== 'todas') {
       resultados = resultados.filter((emp: Emprendimiento) =>
-        emp.region_id === this.selectedRegion ||
-        emp.region === this.selectedRegion
+        emp.modalidad === this.selectedModo
       );
     }
 
-    if (this.selectedComuna) {
+    if (this.selectedCategoria && this.selectedCategoria !== 'todas') {
       resultados = resultados.filter((emp: Emprendimiento) =>
-        emp.comuna_id === this.selectedComuna ||
-        emp.comuna === this.selectedComuna
-      );
-    }
-
-    if (this.selectedModo) {
-      resultados = resultados.filter((emp: Emprendimiento) =>
-        emp.modalidad == this.selectedModo
-      );
-    }
-
-    if (this.selectedCategoria) {
-      resultados = resultados.filter((emp: Emprendimiento) =>
-        emp.categorias && emp.categorias.some((cat: any) => cat.id === this.selectedCategoria)
+        emp.categorias && emp.categorias.some((cat: any) => cat.id.toString() === this.selectedCategoria)
       );
     }
 
@@ -247,12 +304,13 @@ export class EmprendimientosComponent implements OnInit {
 
   limpiarFiltros(): void {
     this.searchTerm = '';
-    this.selectedRegion = '';
-    this.selectedComuna = '';
-    this.selectedModo = '';
-    this.selectedCategoria = '';
+    this.selectedRegion = 'todas';
+    this.selectedComuna = 'todas';
+    this.selectedModo = 'todas';
+    this.selectedCategoria = 'todas';
     this.sortOrder = 'default';
     this.paginaActual = 0;
+    this.comunasFiltradas = [];
     this.emprendimientosFiltrados = [...this.emprendimientos];
     this.totalItems = this.emprendimientos.length;
     this.aplicarOrden();
