@@ -14,32 +14,16 @@ export class EmprendimientoFormService {
 
   //Nuevo emprendimiento
 
-  crearEmprendimiento(data: any, imagen: File | null): Observable<any> {
-    const formData = new FormData();
-    formData.append('RUT', data.rut);
-    formData.append('Nombre', data.nombre);
-    formData.append('Descripcion', data.descripcion || null);
-    formData.append('Modalidad', data.modalidad);
-    formData.append('Horario_Atencion', data.horario_Atencion);
-    formData.append('Vigencia', 'true');
-    if (imagen) {
-      formData.append('Imagen', imagen);
-    }
-
+  crearEmprendimiento(formData: FormData): Observable<any> {
     return this.http.post<any>(this.apiUrl, formData);
   }
 
-  subirMultimedia(idEmprendimiento: number, archivos: File[], descripcion = '', tipo = 'imagen'): Observable<any[]> {
-    const requests = archivos.map((archivo) => {
-      const formData = new FormData();
-      formData.append('Archivo', archivo);
-      formData.append('Tipo_Multimedia', tipo);
-      formData.append('Descripcion', descripcion);
-
-      return this.http.post(`${this.apiUrl}/${idEmprendimiento}/multimedia`, formData);
+  subirMultimedia(idEmprendimiento: number, archivos: File[]): Observable<any> {
+    const formData = new FormData();
+    archivos.forEach((archivo) => {
+      formData.append('Imagenes', archivo);
     });
-
-    return forkJoin(requests);
+    return this.http.post<any>(`${this.apiUrl}/${idEmprendimiento}/imagenes-emprendimiento`, formData);
   }
 
   //Editar emprendimiento
