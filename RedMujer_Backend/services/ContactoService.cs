@@ -21,6 +21,7 @@ namespace RedMujer_Backend.services
             var contactos = await _repo.GetAllAsync();
             return contactos.Select(c => new ContactoDto
             {
+                Id_Contacto = c.Id_Contacto,
                 Id_Emprendimiento = c.Id_Emprendimiento,
                 Valor = c.Valor,
                 Vigencia = c.Vigencia,
@@ -42,7 +43,7 @@ namespace RedMujer_Backend.services
             };
         }
 
-        public async Task CrearAsync(ContactoCreateDto dto)
+        public async Task<int> CrearAsync(ContactoCreateDto dto)
         {
             var contacto = new Contacto
             {
@@ -51,7 +52,8 @@ namespace RedMujer_Backend.services
                 Vigencia = dto.Vigencia,
                 Tipo_Contacto = dto.Tipo_Contacto
             };
-            await _repo.InsertAsync(contacto);
+            var id =await _repo.InsertAsync(contacto);
+            return id;
         }
 
         public async Task ActualizarAsync(int id, ContactoCreateDto dto)

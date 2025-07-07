@@ -12,5 +12,7 @@ namespace RedMujer_Backend.services
         Task<int> CrearAsync(UbicacionCreateDto dto);
         Task ActualizarAsync(int id, UbicacionCreateDto dto);
         Task EliminarAsync(int id);
+        Task<IEnumerable<UbicacionDto>> ObtenerUbicacionesPorEmprendimientoAsync(int idEmprendimiento);
+
     }
 }

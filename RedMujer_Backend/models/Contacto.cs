@@ -5,9 +5,9 @@ namespace RedMujer_Backend.models
         public enum TipoContacto
         {
 
-            tipo1,
-            tipo2,
-            tipo3,
+            telefono,
+            correo,
+            // red_social,
         }
 
         public int Id_Contacto { get; set; }

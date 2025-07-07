@@ -60,5 +60,23 @@ namespace RedMujer_Backend.services
         {
             await _repo.DeleteAsync(id);
         }
+
+
+        // Obtener ubicaciones por emprendimiento
+        public async Task<IEnumerable<UbicacionDto>> ObtenerUbicacionesPorEmprendimientoAsync(int idEmprendimiento)
+        {
+            var ubicaciones = await _repo.GetUbicacionesPorEmprendimientoAsync(idEmprendimiento);
+            return ubicaciones.Select(c => new UbicacionDto
+            {
+                Id_Ubicacion = c.Id_Ubicacion,
+                Id_Comuna = c.Id_Comuna,
+                Calle = c.Calle,
+                Numero = c.Numero,
+                Referencia = c.Referencia,
+                Vigencia = c.Vigencia
+            });
+        }
+
+
     }
 }

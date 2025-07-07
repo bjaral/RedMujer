@@ -38,7 +38,7 @@ export class LoginComponent {
 
           }
           console.log('Inicio de sesión exitoso');
-          this.toInicio();
+          this.toPerfil();
         },
         error: (err) => {
           alert('Error en el inicio de sesión');
@@ -49,7 +49,7 @@ export class LoginComponent {
     }
   }
 
-  toInicio() {
-    this.router.navigate(['']);
+  toPerfil() {
+    this.router.navigate(['/perfil']);
   }
 }

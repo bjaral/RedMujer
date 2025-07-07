@@ -8,7 +8,7 @@ namespace RedMujer_Backend.repositories
     {
         Task<IEnumerable<Contacto>> GetAllAsync();
         Task<Contacto?> GetByIdAsync(int id);
-        Task InsertAsync(Contacto contacto);
+        Task<int> InsertAsync(Contacto contacto);
         Task UpdateAsync(Contacto contacto);
         Task DeleteAsync(int id);
     }
