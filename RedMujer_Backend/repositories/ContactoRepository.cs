@@ -9,11 +9,13 @@ namespace RedMujer_Backend.repositories
 {
     public class ContactoRepository : IContactoRepository
     {
-        private readonly string _connectionString;
+        private readonly IConfiguration _config;
+        private readonly string? _connectionString;
 
         public ContactoRepository(IConfiguration config)
         {
-            _connectionString = config.GetConnectionString("DefaultConnection") ?? string.Empty;
+            _config = config;
+            _connectionString = _config.GetConnectionString("DefaultConnection");
         }
 
         public async Task<IEnumerable<Contacto>> GetAllAsync()
@@ -31,21 +33,27 @@ namespace RedMujer_Backend.repositories
                 new { Id = id });
         }
 
-        public async Task InsertAsync(Contacto contacto)
+        public async Task<int> InsertAsync(Contacto contacto)
         {
             using var connection = new NpgsqlConnection(_connectionString);
-            await connection.ExecuteAsync(
-                @"INSERT INTO ""Contactos"" 
+
+            var query = @"
+                INSERT INTO ""Contactos"" 
                     (""id_emprendimiento"", ""valor"", ""vigencia"", ""tipo_contacto"") 
                 VALUES 
-                    (@Id_Emprendimiento, @Valor, @Vigencia, @Tipo_Contacto::tipo_contacto)",
-                new
-                {
-                    contacto.Id_Emprendimiento,
-                    contacto.Valor,
-                    contacto.Vigencia,
-                    Tipo_Contacto = contacto.Tipo_Contacto.ToString() 
-                });
+                    (@Id_Emprendimiento, @Valor, @Vigencia, @Tipo_Contacto::tipo_contacto)
+                RETURNING id_contacto;
+            ";
+
+            var id = await connection.ExecuteScalarAsync<int>(query, new
+            {
+                contacto.Id_Emprendimiento,
+                contacto.Valor,
+                contacto.Vigencia,
+                Tipo_Contacto = contacto.Tipo_Contacto.ToString()
+            });
+
+            return id;
         }
 
 

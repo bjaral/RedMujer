@@ -18,7 +18,11 @@ namespace RedMujer_Backend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get() => Ok(await _service.GetAllAsync());
+        public async Task<IActionResult> Get()
+        {
+            var contactos = await _service.GetAllAsync();
+            return Ok(contactos);
+        }
 
         [HttpGet("tipos_contacto")]
         public ActionResult<IEnumerable<string>> GetTiposContacto()
@@ -39,8 +43,8 @@ namespace RedMujer_Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ContactoCreateDto dto)
         {
-            await _service.CrearAsync(dto);
-            return Ok();
+            var id = await _service.CrearAsync(dto);
+            return CreatedAtAction(nameof(Get), new { id }, new { id });
         }
 
         [HttpPut("{id}")]
