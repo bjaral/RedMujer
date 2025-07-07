@@ -63,16 +63,16 @@ namespace RedMujer_Backend.repositories
         }
 
         // MÉTODO NUEVO: CATEGORÍAS POR EMPRENDIMIENTO
-        public async Task<IEnumerable<Categoria>> GetCategoriasPorEmprendimientoAsync(int idEmprendimiento)
+        public async Task<IEnumerable<Categoria>> GetCategoriasPorEmprendimientoAsync(int id_Emprendimiento)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             var query = @"
                 SELECT c.* 
                 FROM ""Emprendimiento_categoria"" ec
                 JOIN ""Categorias"" c ON ec.id_categoria = c.id_categoria
-                WHERE ec.id_emprendimiento = @IdEmprendimiento AND c.vigencia = true
+                WHERE ec.id_emprendimiento = @Id_Emprendimiento AND c.vigencia = true
             ";
-            return await connection.QueryAsync<Categoria>(query, new { IdEmprendimiento = idEmprendimiento });
+            return await connection.QueryAsync<Categoria>(query, new { Id_Emprendimiento = id_Emprendimiento });
         }
     }
 }

@@ -11,5 +11,7 @@ namespace RedMujer_Backend.repositories
         Task<int> InsertAsync(Ubicacion ubicacion);
         Task UpdateAsync(Ubicacion ubicacion);
         Task DeleteAsync(int id); // Soft-delete (vigencia)
+
+        Task<IEnumerable<Ubicacion>> GetUbicacionesPorEmprendimientoAsync(int idEmprendimiento);
     }
 }

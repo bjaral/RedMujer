@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
+using RedMujer_Backend.repositories;
 
 namespace RedMujer_Backend.controllers
 {
@@ -27,15 +28,18 @@ namespace RedMujer_Backend.controllers
         private readonly IEmprendimientoService _service;
         private readonly IWebHostEnvironment _env;
         private readonly ICategoriaService _categoriaService;
+        private readonly IUbicacionService _ubicacionService;
 
         public EmprendimientosController(
             IEmprendimientoService service,
             IWebHostEnvironment env,
-            ICategoriaService categoriaService)
+            ICategoriaService categoriaService,
+            IUbicacionService ubicacionService)
         {
             _service = service;
             _env = env;
             _categoriaService = categoriaService;
+            _ubicacionService = ubicacionService;
         }
 
         // =========== GETS ===========
@@ -308,6 +312,25 @@ namespace RedMujer_Backend.controllers
                 return NotFound("No se encontraron categorías para el emprendimiento.");
             return Ok(categorias);
         }
+
+        // =========== ENDPOINT DE UBICACIONES DE EMPRENDIMIENTO ===========
+        [HttpGet("/emprendimientos/{idEmprendimiento}/ubicaciones")]
+        public async Task<ActionResult<IEnumerable<UbicacionDto>>> GetUbicacionesPorEmprendimiento(int idEmprendimiento)
+        {
+            var ubicaciones = await _ubicacionService.ObtenerUbicacionesPorEmprendimientoAsync (idEmprendimiento);
+            if (ubicaciones == null || !ubicaciones.Any())
+                return NotFound("No se encontraron ubicaciones para el emprendimiento.");
+            return Ok(ubicaciones);
+        }
+
+        // =========== ENDPOINT DE PERSONAS DE EMPRENDIMIENTO ===========
+
+
+
+
+
+
+        
 
         // =========== MÉTODOS DE GUARDADO DE IMÁGENES ===========
         private async Task<string?> GuardarImagenPrincipal(int idEmprendimiento, IFormFile? imagen)
