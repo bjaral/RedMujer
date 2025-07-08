@@ -10,6 +10,8 @@ namespace RedMujer_Backend.repositories
         Task<Plataforma?> GetByIdAsync(int id);
         Task<int> InsertAsync(Plataforma plataforma);
         Task<int> UpdateAsync(Plataforma plataforma);
-        Task DeleteAsync(int id); // Soft-delete (vigencia)
+        Task DeleteAsync(int id); 
+        Task<IEnumerable<Plataforma>> GetByEmprendimientoIdAsync(int idEmprendimiento);
+
     }
 }

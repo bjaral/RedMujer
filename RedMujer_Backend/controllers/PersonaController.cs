@@ -57,6 +57,13 @@ namespace RedMujer_Backend.Controllers
             var emprendimientos = await _emprendimientoService.ObtenerPorPersonaAsync(idPersona);
             return Ok(emprendimientos);
         }
+        [HttpGet("usuario/{idUsuario:int}")]
+        public async Task<IActionResult> GetByUsuarioId(int idUsuario)
+        {
+            var persona = await _service.GetByUsuarioIdAsync(idUsuario);
+            if (persona == null) return NotFound();
+            return Ok(persona);
+        }
 
     }
 }
