@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { MATERIAL_IMPORTS } from '../../shared/material/material';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { TokenService } from '../../core/services/token.service';
 
 @Component({
   selector: 'app-sidebar-emp',
@@ -12,11 +13,15 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrl: './sidebar-emp.component.scss'
 })
 
-export class SidebarEmpComponent {
+export class SidebarEmpComponent implements OnInit {
 
   isMobileMenuOpen: boolean = false;
 
-  constructor(private router: Router, private authService: AuthService) { }
+  constructor(private router: Router, private authService: AuthService, private tokenService: TokenService) { }
+
+  ngOnInit(): void {
+      const id = this.tokenService.getNameIdentifier();
+  }
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
