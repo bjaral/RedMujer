@@ -90,5 +90,22 @@ namespace RedMujer_Backend.services
         {
             await _repo.DeleteAsync(id);
         }
+        public async Task<PersonaDto?> GetByUsuarioIdAsync(int idUsuario)
+        {
+            var persona = await _repo.GetByUsuarioIdAsync(idUsuario);
+            if (persona == null) return null;
+            return new PersonaDto
+            {
+                Id_Persona = persona.Id_Persona,
+                Id_Ubicacion = persona.Id_Ubicacion,
+                Id_Usuario = persona.Id_Usuario,
+                RUN = persona.RUN,
+                Nombre = persona.Nombre,
+                PrimerApellido = persona.PrimerApellido,
+                SegundoApellido = persona.SegundoApellido,
+                Vigencia = persona.Vigencia
+            };
+        }
+
     }
 }
