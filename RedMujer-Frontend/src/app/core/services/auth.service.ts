@@ -21,22 +21,20 @@ export class AuthService {
   }
 
   register(data: { usuario: any; persona: any; ubicacion: any }): Observable<any> {
-  return this.createUsuario(data.usuario).pipe(
-    switchMap(usuarioRes =>
-
-      this.createUbicacion(data.ubicacion).pipe(
-
-        switchMap(ubicacionRes =>
-          this.createPersona({
-            ...data.persona,
-            usuarioId: usuarioRes.id,
-            idUbicacion: ubicacionRes.id
-          })
+    return this.createUsuario(data.usuario).pipe(
+      switchMap(usuarioRes =>
+        this.createUbicacion(data.ubicacion).pipe(
+          switchMap(ubicacionRes =>
+            this.createPersona({
+              ...data.persona,
+              Id_Usuario: usuarioRes.id,
+              Id_Ubicacion: ubicacionRes.id
+            })
+          )
         )
       )
-    )
-  );
-}
+    );
+  }
 
   private createUsuario(usuario: any): Observable<any> {
     return this.http.post(this.usuarioUrl, usuario);
