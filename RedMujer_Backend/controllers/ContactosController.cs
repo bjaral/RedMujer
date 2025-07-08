@@ -53,12 +53,23 @@ namespace RedMujer_Backend.Controllers
             await _service.ActualizarAsync(id, dto);
             return Ok();
         }
-
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _service.EliminarAsync(id);
             return NoContent();
         }
+        [HttpGet("emprendimiento/{idEmprendimiento}")]
+    public async Task<ActionResult<IEnumerable<ContactoDto>>> GetContactosPorEmprendimiento(int idEmprendimiento)
+    {
+        var contactos = await _service.GetContactosPorEmprendimientoAsync(idEmprendimiento);
+        if (contactos == null || !contactos.Any())
+        {
+            return NotFound();
+        }
+        return Ok(contactos);
+    }
+
     }
 }

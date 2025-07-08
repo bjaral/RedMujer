@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './core/guards/auth.guard';
 import { LoginComponent } from './features/auth/components/login/login.component';
 import { HomeComponent } from './features/home/components/home/home.component';
 import { LayoutComponent } from './layout/layout/layout.component';
@@ -28,7 +29,7 @@ export const routes: Routes = [
     ]},
 
     //Vistas con sidebar de emprendimiento
-    { 'path': '', 'component': SidebarEmpComponent, 'children': [
+    { 'path': '', 'component': SidebarEmpComponent, canActivateChild: [AuthGuard], 'children': [
         { 'path': 'nuevo-emprendimiento', 'component': NuevoEmprendimientoComponent },
         { 'path': 'editar-emprendimiento/:id', 'component': EditarEmprendimientoComponent },
         { 'path': 'perfil', 'component': PerfilComponent},
