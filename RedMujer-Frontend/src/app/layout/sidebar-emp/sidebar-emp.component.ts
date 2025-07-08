@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { MATERIAL_IMPORTS } from '../../shared/material/material';
-import { CommonModule
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
 
- } from '@angular/common';
 @Component({
   selector: 'app-sidebar-emp',
   imports: [RouterModule, MATERIAL_IMPORTS, CommonModule],
@@ -16,7 +16,7 @@ export class SidebarEmpComponent {
 
   isMobileMenuOpen: boolean = false;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private authService: AuthService) { }
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
@@ -25,6 +25,7 @@ export class SidebarEmpComponent {
   confirmarLogout() {
     const confirmacion = confirm('¿Estás segura de que deseas cerrar sesión?');
     if (confirmacion) {
+      this.authService.logout();
       this.router.navigate(['/']);
     }
   }
