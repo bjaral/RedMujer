@@ -1,5 +1,15 @@
+# generated files
+*out
+out/
+
 #vscode
 *.vscode
 
 # direcorio personal para scripts locales 
 *local-scripts/
+
+
+# Errores por parte de colaboradores
+*.log
+node_modules/
+*node_modules/

@@ -1,16 +1,30 @@
 <mat-toolbar role="heading">
-    <img mat-card-image src="assets/images/logo-png-color.png">
+  <button mat-icon-button class="menu-icon" (click)="toggleMobileMenu()" aria-label="Toggle navigation menu">
+    <mat-icon>{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+  </button>
 
-    <nav>
-        <a>Quiénes somos</a>
-        <a>Qué hacemos</a>
-        <a>Volver al inicio</a>
-        <a>Contacto</a>
-    </nav>
+  <img mat-card-image src="assets/images/logo-png-color.png" routerLink="/" alt="Logo">
 
-    <span class="spacer"></span>
+  <nav class="desktop-nav">
+    <a routerLink="/">Inicio</a>
+    <a routerLink="/quienes-somos">Quiénes somos</a>
+    <a routerLink="/que-hacemos">Qué hacemos</a>
+    <a routerLink="/contacto">Contacto</a>
+  </nav>
 
+  <span class="spacer"></span>
+
+  <div class="desktop-buttons">
     <button mat-button class="signin-btn" routerLink="/registro">Únete</button>
     <button mat-flat-button class="login-btn" routerLink="/login">Iniciar sesión</button>
-    
+  </div>
 </mat-toolbar>
+
+<div class="mobile-menu-dropdown" *ngIf="isMobileMenuOpen">
+  <a mat-button (click)="toggleMobileMenu()" routerLink="/">Inicio</a>
+  <a mat-button (click)="toggleMobileMenu()" routerLink="/quienes-somos">Quiénes somos</a>
+  <a mat-button (click)="toggleMobileMenu()" routerLink="/que-hacemos">Qué hacemos</a>
+  <a mat-button (click)="toggleMobileMenu()" routerLink="/contacto">Contacto</a>
+  <button mat-button class="mobile-signin-btn" routerLink="/registro" (click)="toggleMobileMenu()">Únete</button>
+  <button mat-flat-button class="mobile-login-btn" routerLink="/login" (click)="toggleMobileMenu()">Iniciar sesión</button>
+</div>

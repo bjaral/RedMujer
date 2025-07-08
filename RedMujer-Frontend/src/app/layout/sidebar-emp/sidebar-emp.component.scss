@@ -1,0 +1,218 @@
+@use '../../../styles.scss' as *;
+
+.layout {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  height: 100vh;
+}
+
+.sidebar {
+  background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #673ab7 100%);
+  color: white;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  img {
+    height: 60px;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
+    margin-bottom: 2rem;
+    cursor: pointer;
+  }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    flex-grow: 1;
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      color: white;
+      font-size: 1rem;
+      transition: background-color 0.2s ease;
+
+      mat-icon {
+        font-size: 20px;
+      }
+
+      &:hover {
+        background-color: #34495e;
+      }
+    }
+
+    .logout-spacer {
+      flex-grow: 1;
+    }
+
+    .logout {
+      background: white !important;
+      color: #e91e63 !important;
+      padding: 1rem 2.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+      margin-top: auto;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    .navigation-item {
+      color: white !important;
+      border-color: rgba(255, 255, 255, 0.5) !important;
+      padding: 1rem 1rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+
+      &:hover,
+      &.active {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: white !important;
+      }
+    }
+  }
+}
+
+.mobile-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #673ab7 100%);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+  z-index: 10000;
+
+  .menu-icon {
+    color: white;
+    margin-right: 16px;
+    display: block;
+  }
+
+  .mobile-logo {
+    height: 40px;
+    width: auto;
+    max-width: 160px;
+    cursor: pointer;
+    object-fit: contain;
+    margin-right: auto;
+  }
+}
+
+.mobile-sidebar {
+  display: none;
+
+  &.open {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #673ab7 100%);
+    color: #fff;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px 20px;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    z-index: 9999;
+    gap: 10px;
+  }
+
+  a.navigation-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 10px 0;
+    text-decoration: none;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 30px;
+    transition: none;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+
+    mat-icon {
+      font-size: 20px;
+      color: white;
+    }
+
+    &.active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  button.logout {
+    background: white;
+    color: #e91e63;
+    font-weight: 600;
+    padding: 8px 20px;
+    margin: 0 auto 10px auto;
+    border-radius: 30px;
+    border: none;
+    width: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+}
+
+.main-content {
+  padding: 2rem;
+  background-color: #f4f4f4;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .desktop-sidebar {
+    display: none;
+  }
+
+  .main-content {
+    padding: 1rem;
+    margin-top: 64px;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-sidebar,
+  .mobile-header {
+    display: none !important;
+  }
+}

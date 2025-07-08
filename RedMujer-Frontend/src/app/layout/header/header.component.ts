@@ -10,5 +10,9 @@ import { MATERIAL_IMPORTS } from '../../shared/material/material';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  
+  isMobileMenuOpen: boolean = false;
+
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
 }

@@ -1,1 +1,46 @@
-<p>detalle-emprendimiento works!</p>
+<div class="contenedor-principal">
+    <div class="informacion-principal">
+        <h3 class="nombre-emprendimiento">{{ emprendimiento.nombre }}</h3>
+        <p>{{ emprendimiento.descripcion }}</p>
+
+        <h4>CATEGORÍA</h4>
+        <p class="categoria">{{ emprendimiento.categoriasTexto }}</p>
+
+        <h4>PLATAFORMAS</h4>
+        <div class="iconos">
+            <a *ngFor="let plataforma of emprendimiento.plataformas" [href]="plataforma.ruta" target="_blank"
+                rel="noreferrer" class="plataforma-link" [title]="plataforma.descripcion">
+                <mat-icon>{{ plataforma.icon }}</mat-icon>
+            </a>
+        </div>
+
+        <h4>UBICACIÓN</h4>
+        <a href="https://www.google.com/maps/search/?api=1&query={{emprendimiento.calle}}+{{emprendimiento.numero}},+{{emprendimiento.comuna}},+{{emprendimiento.region}}"
+            target="_blank" rel="noreferrer">{{emprendimiento.calle}} {{emprendimiento.numero}}
+            {{emprendimiento.comuna}} {{emprendimiento.region}}</a>
+    </div>
+
+    <!-- FLASHCARD SOLO IMAGEN PRINCIPAL -->
+    <div class="imagen-principal">
+        <img [src]="emprendimiento.imagen" alt="" (error)="onImageError($event)" loading="lazy">
+    </div>
+</div>
+
+<!-- GALERÍA FUERA DEL FLASHCARD -->
+<div class="contenedor">
+    <h2>GALERÍA</h2>
+    <div class="galeria">
+        <img *ngFor="let imagen of imagenesExtras" [src]="imagen" alt="Imagen de {{ emprendimiento.nombre }}"
+            (error)="onImageError($event)" loading="lazy">
+    </div>
+
+    <br>
+    <h2>VIDEO</h2>
+    <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/glHfVFk8CwQ?si=aKf4WjRIgXMGG3Rf" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+        </iframe>
+    </div>
+</div>

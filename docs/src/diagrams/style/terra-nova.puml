@@ -1,0 +1,334 @@
+' ===== TEMA: NoirVoyant =====
+' Un estilo oscuro moderno con acentos púrpura-ámbar y máxima legibilidad
+
+' ===== PALETA DE COLORES =====
+' Dominante principal (púrpura profundo)
+!$primary = "#7E57C2"  
+!$primary_light = "#B39DDB"
+!$primary_lighter = "#D1C4E9"
+!$primary_dark = "#5E35B1"
+!$primary_darker = "#4527A0"
+
+' Dominante secundario (ámbar)
+!$secondary = "#FFA000"  
+!$secondary_light = "#FFC107"
+!$secondary_lighter = "#FFECB3"
+!$secondary_dark = "#FF8F00"
+!$secondary_darker = "#FF6F00"
+
+' Colores complementarios
+!$accent_teal = "#26A69A"
+!$accent_pink = "#EC407A"
+!$accent_blue = "#42A5F5"
+
+' Escala de grises mejorada
+!$bg_dark = "#121418"  
+!$bg_medium = "#1E2025"  
+!$bg_light = "#2B2E33"  
+!$bg_lighter = "#383C44"  
+
+' Texto optimizado para contraste
+!$text_primary = "#F5F7FA"  
+!$text_secondary = "#CFD8DC"  
+!$text_highlight = "#FFE082"  
+
+' Estados del sistema
+!$accent_success = "#66BB6A"
+!$accent_warning = "#FFEE58"
+!$accent_error = "#EF5350"
+!$accent_info = "#29B6F6"
+
+' ===== TIPOGRAFÍA MEJORADA =====
+!$font_main = "'Fira Sans', 'Segoe UI', sans-serif"
+!$font_mono = "'Fira Code', monospace"
+!$font_title_size = 26
+!$font_large = 18
+!$font_medium = 15
+!$font_small = 12
+
+' ===== GEOMETRÍA AJUSTADA =====
+!$border_radius = 10
+!$border_thickness = 2.5
+!$arrow_thickness = 2
+!$arrow_head_size = 7
+!$shadow_intensity = 25
+
+skinparam Shadowing true
+skinparam Handwritten false
+skinparam actorStyle awesome
+skinparam monochrome false
+
+<style>
+
+' ================================================
+' ================ GLOBAL CONFIG ================
+' ================================================
+root {
+  BackgroundColor $bg_dark
+  LineColor $primary_lighter
+  FontName $font_main
+  FontSize $font_medium
+  FontColor $text_primary
+
+}
+
+' ================================================
+' ============== SHARED ELEMENTS ================
+' ================================================
+rectangle, activity, object, component, node, cloud, package, file, usecase {
+  BackgroundColor $bg_medium
+  LineColor $primary
+  FontColor $text_primary
+  RoundCorner $border_radius
+  BorderThickness $border_thickness
+  Shadowing true
+}
+
+actor {
+  Style awesome
+  BackgroundColor $bg_medium
+  LineColor $secondary
+  FontColor $text_highlight
+  RoundCorner 25
+  FontStyle bold
+}
+
+database {
+  BackgroundColor $bg_medium
+  LineColor $accent_teal
+  FontColor $text_primary
+  RoundCorner $border_radius
+  StereotypeFontColor $accent_teal
+}
+
+participant {
+  BackgroundColor $bg_light
+  LineColor $primary_light
+  FontColor $text_highlight
+  RoundCorner 20
+  FontStyle bold
+}
+
+diamond, activityDiamond {
+  BackgroundColor $primary_darker
+  LineColor $secondary
+  FontColor $text_highlight
+  RoundCorner $border_radius
+  FontStyle bold
+}
+
+partition, swimlane {
+  BackgroundColor $bg_light
+  LineColor $primary_dark
+  FontColor $text_highlight
+  LineThickness $border_thickness + 1
+  RoundCorner $border_radius
+}
+
+arrow {
+  LineColor $primary_light
+  LineThickness $arrow_thickness
+  FontColor $text_secondary
+  FontStyle normal
+  FontName $font_main
+}
+
+note {
+  BackgroundColor $primary_darker
+  LineColor $primary
+  FontColor $text_highlight
+  RoundCorner $border_radius
+  Shadowing true
+}
+
+' ================================================
+' ============= DIAGRAMAS ENTIDAD-RELACIÓN ======
+' ================================================
+entity {
+  BackgroundColor $bg_medium
+  LineColor $accent_teal
+  FontColor $text_primary
+  RoundCorner $border_radius
+  BorderThickness $border_thickness
+}
+
+entity_header {
+  BackgroundColor $primary_darker
+  FontColor $text_highlight
+  FontStyle bold
+}
+
+entity_attribute {
+  BackgroundColor $bg_light
+  FontColor $text_secondary
+  FontSize $font_small
+  RoundCorner $border_radius - 2
+}
+
+primary_key {
+  BackgroundColor $primary_darker
+  FontColor $text_highlight
+  FontStyle bold
+  LineColor $primary
+}
+
+foreign_key {
+  BackgroundColor $secondary_darker
+  FontColor $text_highlight
+  FontStyle italic
+}
+
+relationship {
+  LineColor $secondary
+  LineThickness $arrow_thickness
+  FontColor $text_secondary
+  FontStyle italic
+}
+
+inheritance {
+  LineColor $accent_blue
+  LineThickness $arrow_thickness + 1
+  TriangleSize $arrow_head_size + 2
+}
+
+cardinality {
+  FontColor $secondary_light
+  FontSize $font_small
+  FontStyle italic
+}
+
+' ================================================
+' ============= USE CASE DIAGRAM STYLES ==========
+' ================================================
+usecase {
+  BackgroundColor $bg_light
+  LineColor $secondary
+  FontColor $text_highlight
+  RoundCorner 20
+}
+
+.arrowInclude {
+  LineColor $accent_teal
+  LineThickness $arrow_thickness
+  LineStyle dashed
+}
+
+.arrowExtend {
+  LineColor $accent_pink
+  LineThickness $arrow_thickness
+  LineStyle dotted
+}
+
+' ================================================
+' =========== ACTIVITY DIAGRAM STYLES ============
+' ================================================
+activityStart, activityEnd {
+  BackgroundColor $secondary_darker
+  LineColor $secondary_light
+  FontColor $text_highlight
+  FontStyle bold
+  RoundCorner 50
+}
+
+activityDecision {
+  BackgroundColor $primary_darker
+  LineColor $secondary
+  FontColor $text_highlight
+  RoundCorner $border_radius
+}
+
+' ================================================
+' ============== TÍTULOS Y LEYENDAS =============
+' ================================================
+title {
+  LineColor $secondary
+  FontColor $text_highlight
+  FontSize $font_title_size
+  FontStyle bold
+  Margin 20
+  Padding 10
+  BackgroundColor $bg_light
+  RoundCorner $border_radius
+}
+
+legend {
+  BackgroundColor $bg_light
+  LineColor $primary
+  RoundCorner $border_radius
+  FontColor $text_secondary
+}
+
+legendTitle {
+  FontColor $secondary
+  FontSize $font_large
+  FontStyle bold
+}
+
+legendText {
+  FontColor $text_secondary
+  FontSize $font_small
+  LineColor transparent
+}
+' ================================================
+' ============== TÍTULOS Y LEYENDAS ============= MONOCROMATIC
+' ================================================
+' coment out the this section and uncomment previous one to use complementary style
+title {
+  LineColor $primary
+  FontColor $text_primary
+  FontSize $font_title_size
+  FontStyle bold
+  Margin 20
+  Padding 10
+  BackgroundColor $bg_light
+  RoundCorner $border_radius
+}
+
+legend {
+  BackgroundColor $bg_light
+  LineColor $primary
+  RoundCorner $border_radius
+  FontColor $text_primary
+}
+
+legendTitle {
+  FontColor $primary
+  FontSize $font_large
+  FontStyle bold
+}
+
+legendText {
+  FontColor $text_primary
+  FontSize $font_small
+  LineColor transparent
+}
+
+
+
+
+' ================================================
+' ============= COMPONENT DIAGRAM STYLES =========
+' ================================================
+component {
+  BackgroundColor $bg_medium
+  LineColor $accent_blue
+  FontColor $text_primary
+  RoundCorner $border_radius
+  BorderThickness $border_thickness
+}
+
+interface {
+  BackgroundColor $bg_light
+  LineColor $accent_teal
+  FontColor $text_highlight
+  LineStyle dashed
+}
+</style>
+
+skinparam stereotype<<E>> {
+  BackgroundColor $primary_darker
+  FontColor $text_highlight
+  FontSize $font_small
+  RoundCorner 5
+  LineStyle plain
+}

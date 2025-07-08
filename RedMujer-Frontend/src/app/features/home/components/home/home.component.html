@@ -1,63 +1,151 @@
-<section class="presentacion">
-  <mat-card class="presentacion-card">
-    <div class="presentacion-content">
-
-      <div class="left">
-        <img src="assets/images/logo-png-color.png" alt="Logo" class="logo" />
-        <div class="presentacion-texto">
-          <h1 class="lema">Conecta<br>Apoya<br>Crece</h1>
-          <p class="descripcion">
-            Bienvenida a Red Mujer, tu espacio para conectar y crecer junto a otras emprendedoras.
+<section class="hero-section">
+  <div class="hero-container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <span class="title-line">Conecta.</span>
+          <span class="title-line">Apoya.</span>
+          <span class="title-line">Crece.</span>
+        </h1>
+        <h2 class="hero-subtitle">Red Mujer USS</h2>
+        <div class="hero-description">
+          <p class="main-description">
+            Somos una comunidad que conecta, apoya y potencia a mujeres emprendedoras. 
+            Aquí encontrarás redes, recursos y oportunidades para crecer junto a otras mujeres que impulsan el cambio.
           </p>
-          <button mat-flat-button color="primary" routerLink="/login">Comenzar</button>
+          <p class="secondary-description">
+            Únete para descubrir historias inspiradoras, compartir experiencias y acceder a herramientas 
+            que te ayudarán a llevar tu emprendimiento al siguiente nivel.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button mat-flat-button class="cta-button" (click)="toRegistro()">
+            <span>Comenzar ahora</span>
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+          <button mat-stroked-button class="secondary-button">
+            Conocer más
+          </button>
         </div>
       </div>
-
-      <div class="right">
-        <img src="assets/images/redmujer.png" alt="Ilustración RedMujer" class="presentacion-imagen" />
+      <div class="hero-visual">
+        <div class="image-container">
+          <img src="assets/images/mujeres.jpg" alt="Ilustración RedMujer Principal" class="hero-image" />
+          <div class="floating-elements">
+            <div class="floating-card card-1">
+              <mat-icon>groups</mat-icon>
+              <span>Networking</span>
+            </div>
+            <div class="floating-card card-2">
+              <mat-icon>trending_up</mat-icon>
+              <span>Crecimiento</span>
+            </div>
+            <div class="floating-card card-3">
+              <mat-icon>lightbulb</mat-icon>
+              <span>Innovación</span>
+            </div>
+          </div>
+        </div>
       </div>
-
     </div>
-  </mat-card>
+  </div>
+  <div class="hero-bg-elements">
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+    <div class="bg-circle circle-3"></div>
+  </div>
 </section>
-
 
 <!-- Sección de emprendimientos -->
-<section class="carrusel-emprendimientos">
-  <mat-card class="carrusel-card">
-  <div class="carrusel-header">
-    <h2>Conecta con la red</h2>
-    <button mat-flat-button>Ver más</button>
-  </div>
+<section class="emprendimientos-section">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="header-content">
+        <h2 class="section-title">Conecta con la red</h2>
+        <p class="section-subtitle">Descubre historias inspiradoras de mujeres que están transformando sus ideas en realidad</p>
+      </div>
+      <button mat-flat-button class="view-all-button" (click)="toEmprendimientos()" color="primary">
+        Ver todas
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
 
-  <ng-container *ngIf="random; else cargando">
-    <div class="carrusel-scroll">
-      <mat-card *ngFor="let emp of random" class="emprendimiento-card">
-        <img mat-card-image [src]="emp.imagen || 'assets/images/emprendimiento-placeholder.png'" alt="Imagen del emprendimiento">
-        <mat-card-content>
-          <h3>{{ emp.nombre }}</h3>
-          <p>{{ emp.descripcion }}</p>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-button>Ver más</button>
-        </mat-card-actions>
-      </mat-card>
-      <mat-card class="ver-mas-card">
-        <mat-card-content>
-          <mat-card-title>¡Conoce a nuestras emprendedoras!</mat-card-title>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-flat-button (click)="toEmprendimientos()">
+    <div class="carousel-scroll">
+    <ng-container *ngIf="random; else cargando">
+      <ng-container *ngFor="let emp of random; let i = index">
+        <div class="emprendimiento-card" [style.animation-delay]="i * 100 + 'ms'">
+          <div class="card-image">
+            <img [src]="emp.imagen" [alt]="'Imagen de ' + emp.nombre" (error)="onImageError($event)" loading="lazy">
+            <div class="card-overlay">
+              <button mat-fab class="quick-view-btn" color="primary" (click)="verDetalles(emp)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">{{ emp.nombre }}</h3>
+            <p class="card-description">{{ emp.descripcion }}</p>
+            <div class="card-tags">
+              <span class="tag">Emprendimiento</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button mat-button class="learn-more-btn" (click)="verDetalles(emp)">
+              Conocer más
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+      <!-- Tarjeta especial de call-to-action -->
+      <div class="cta-card">
+        <div class="cta-content">
+          <div class="cta-icon">
+            <mat-icon>add_circle</mat-icon>
+          </div>
+          <h3 class="cta-title">¡Únete a nuestra red!</h3>
+          <p class="cta-description">Conoce a todas nuestras increíbles emprendedoras y sus historias de éxito</p>
+          <button mat-flat-button class="cta-button-secondary" (click)="toEmprendimientos()">
             Ver todos los emprendimientos
           </button>
-        </mat-card-actions>
-      </mat-card>
+        </div>
+        <div class="cta-decoration">
+          <div class="decoration-circle"></div>
+          <div class="decoration-dots"></div>
+        </div>
+      </div>
+    </ng-container>
     </div>
-  </ng-container>
 
-  <ng-template #cargando>
-    <p>Cargando datos...</p>
-  </ng-template>
-</mat-card>
+    <ng-template #cargando>
+      <div class="loading-container">
+        <mat-spinner diameter="60"></mat-spinner>
+        <p class="loading-text">Cargando emprendimientos...</p>
+      </div>
+    </ng-template>
+  </div>
 </section>
 
+<!-- Sección de estadísticas -->
+<section class="stats-section">
+  <div class="section-container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number">500+</div>
+        <div class="stat-label">Mujeres emprendedoras</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">200+</div>
+        <div class="stat-label">Emprendimientos activos</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">50+</div>
+        <div class="stat-label">Eventos realizados</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">95%</div>
+        <div class="stat-label">Satisfacción de usuarias</div>
+      </div>
+    </div>
+  </div>
+</section>

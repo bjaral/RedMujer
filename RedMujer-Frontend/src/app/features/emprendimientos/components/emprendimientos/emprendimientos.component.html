@@ -1,1 +1,131 @@
-<p>emprendimientos works!</p>
+<div class="search-container">
+    <div class="search-bar">
+        <div class="search-input-wrapper">
+            <mat-icon class="search-icon">search</mat-icon>
+            <input class="search-input" [(ngModel)]="searchTerm" (ngModelChange)="filtrarEmprendimientos()"
+                placeholder="¿Qué emprendimiento te gustaría encontrar?" [value]="searchTerm">
+        </div>
+
+        <div class="select-wrapper">
+            <mat-select [(ngModel)]="selectedRegion" (ngModelChange)="onRegionChange()" placeholder="Selec. Región"
+                class="custom-select">
+                <mat-option value="todas">Todas</mat-option>
+                <mat-option *ngFor="let region of regiones" [value]="region.id_Region">
+                    {{region.nombre}}
+                </mat-option>
+            </mat-select>
+        </div>
+
+        <div class="select-wrapper">
+            <mat-select [(ngModel)]="selectedComuna" (ngModelChange)="filtrarEmprendimientos()"
+                placeholder="Selec. Comuna" class="custom-select">
+                <mat-option value="todas">Todas</mat-option>
+                <mat-option *ngFor="let comuna of comunasFiltradas" [value]="comuna.id_Comuna">
+                    {{comuna.nombre}}
+                </mat-option>
+            </mat-select>
+        </div>
+
+        <div class="select-wrapper">
+            <mat-select [(ngModel)]="selectedModo" (ngModelChange)="filtrarEmprendimientos()" placeholder="Selec. Modo"
+                class="custom-select">
+                <mat-option value="todas">Todas</mat-option>
+                <mat-option *ngFor="let modo of modos" [value]="modo.id">
+                    {{modo.nombre}}
+                </mat-option>
+            </mat-select>
+        </div>
+
+        <div class="select-wrapper">
+            <mat-select [(ngModel)]="selectedCategoria" (ngModelChange)="filtrarEmprendimientos()"
+                placeholder="Selec. Categoría" class="custom-select">
+                <mat-option value="todas">Todas</mat-option>
+                <mat-option *ngFor="let categoria of categorias" [value]="categoria.nombre">
+                    {{categoria.nombre}}
+                </mat-option>
+            </mat-select>
+        </div>
+
+        <button class="search-button" (click)="buscarEmprendimientos()">
+            <mat-icon>search</mat-icon>
+        </button>
+    </div>
+</div>
+
+<section class="emprendimientos-section">
+    <div class="section-container">
+        <div class="results-info">
+            <p class="results-count">{{ contadorTexto }}</p>
+
+            <div class="sort-wrapper">
+                <span class="sort-label">Mostrar emprendimientos:</span>
+                <div class="select-container">
+                    <mat-select [(value)]="sortOrder" (selectionChange)="aplicarOrden()" class="custom-sort-select">
+                        <mat-option value="default">Por defecto</mat-option>
+                        <mat-option value="nombre-asc">Nombre A-Z</mat-option>
+                        <mat-option value="nombre-desc">Nombre Z-A</mat-option>
+                        <mat-option value="fecha-reciente">Más recientes</mat-option>
+                        <mat-option value="fecha-antigua">Más antiguos</mat-option>
+                        <mat-option value="10">10 por página</mat-option>
+                        <mat-option value="20">20 por página</mat-option>
+                        <mat-option value="30">30 por página</mat-option>
+                    </mat-select>
+                </div>
+            </div>
+        </div>
+
+        <ng-container *ngIf="!loading; else cargando">
+            <div class="emprendimientos-grid">
+                <div class="emprendimiento-card" *ngFor="let emp of emprendimientosPaginados; let i = index"
+                    [style.animation-delay]="i * 0.1 + 's'">
+                    <div class="card-image">
+                        <img [src]="emp.imagen" [alt]="'Imagen de ' + emp.nombre" (error)="onImageError($event)"
+                            loading="lazy">
+                        <div class="card-overlay">
+                            <button mat-fab class="quick-view-btn" (click)="verDetalles(emp)">
+                                <mat-icon>visibility</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">{{ emp.nombre }}</h3>
+                        <p class="card-description">{{ emp.descripcion }}</p>
+                        <div class="card-tags">
+                            <span class="tag" *ngFor="let categoria of emp.categorias">
+                                {{ categoria.nombre }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button mat-button class="learn-more-btn" (click)="verDetalles(emp)">
+                            Conocer más
+                            <mat-icon>arrow_forward</mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <mat-paginator *ngIf="totalItems > itemsPorPagina" [length]="totalItems" [pageSize]="itemsPorPagina"
+                [pageIndex]="paginaActual" [pageSizeOptions]="[10, 20, 30]" (page)="onPageChange($event)"
+                showFirstLastButtons aria-label="Seleccionar página de emprendimientos">
+            </mat-paginator>
+        </ng-container>
+
+        <ng-template #cargando>
+            <div class="loading-container">
+                <mat-spinner diameter="60"></mat-spinner>
+                <p class="loading-text">Cargando emprendimientos...</p>
+            </div>
+        </ng-template>
+
+        <div *ngIf="!loading && emprendimientosFiltrados.length === 0" class="no-results">
+            <mat-icon class="no-results-icon">search_off</mat-icon>
+            <h3>No se encontraron emprendimientos</h3>
+            <p>Intenta ajustar los filtros de búsqueda</p>
+            <button mat-raised-button color="primary" (click)="limpiarFiltros()">
+                <mat-icon>refresh</mat-icon>
+                Limpiar filtros
+            </button>
+        </div>
+    </div>
+</section>
