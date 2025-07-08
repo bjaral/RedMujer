@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { EmprendimientoFormService } from '../../services/emprendimiento-form.service';
+import { TokenService } from '../../../../core/services/token.service';
+import { PersonaService } from '../../../profile/services/persona.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -21,8 +23,17 @@ export class NuevoEmprendimientoComponent {
   imagenesExtras: string[] = [];
   imagenPrincipalFile: File | null = null;
   imagenesExtrasFile: File[] = [];
+  idUsuario: number = 0;
+  idPersona: number = 0;
+  idEmprendimiento: number = 0;
 
-  constructor(private fb: FormBuilder, private emprendimientoFormService: EmprendimientoFormService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private emprendimientoFormService: EmprendimientoFormService,
+    private personaService: PersonaService,
+    private tokenService: TokenService,
+    private router: Router
+  ) {
     this.formulario = this.fb.group({
       rut: ['', Validators.required],
       nombre: ['', Validators.required],
@@ -81,7 +92,7 @@ export class NuevoEmprendimientoComponent {
     this.imagenesExtrasFile.splice(index, 1);
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.formulario.invalid) {
       alert('Por favor completa todos los campos obligatorios.');
       return;
@@ -107,7 +118,29 @@ export class NuevoEmprendimientoComponent {
           alert('Error: no se recibió el ID del emprendimiento creado.');
           return;
         }
-        
+
+        this.idEmprendimiento = idEmprendimiento;
+
+        this.idUsuario = this.tokenService.getNameIdentifier() || 0;
+        this.personaService.getIdPersona(this.idUsuario).subscribe({
+          next: (idPersona) => {
+            this.idPersona = idPersona;
+            console.log('ID de la persona:', this.idPersona);
+
+            this.personaService.postEmprendimientoToPersona(this.idPersona, this.idEmprendimiento).subscribe({
+              next: () => {
+                console.log('Emprendimiento asociado a la persona correctamente.');
+              },
+              error: (err) => {
+                console.error('Error al asociar el emprendimiento a la persona:', err);
+              }
+            });
+          },
+          error: (err) => {
+            console.error('Error al obtener el ID de la persona:', err);
+          }
+        });
+
         if (this.imagenesExtrasFile.length > 0) {
           this.emprendimientoFormService.subirMultimedia(idEmprendimiento, this.imagenesExtrasFile).subscribe({
             next: () => {
@@ -117,7 +150,7 @@ export class NuevoEmprendimientoComponent {
             },
             error: (err) => {
               console.error('Error al subir multimedia', err);
-              alert('Emprendimiento creado, pero hubo un error al subir las imágenes adicionales,');
+              alert('Emprendimiento creado, pero hubo un error al subir las imágenes adicionales.');
               this.router.navigate(['/mis-emprendimientos']);
             }
           });
@@ -149,5 +182,5 @@ export class NuevoEmprendimientoComponent {
   get imagenPrincipalDeshabilitada(): boolean {
     return this.imagenPrincipalFile !== null;
   }
-
+  
 }

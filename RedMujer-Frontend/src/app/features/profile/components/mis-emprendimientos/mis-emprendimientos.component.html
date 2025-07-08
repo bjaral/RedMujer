@@ -1,1 +1,30 @@
 <h2>Mis emprendimientos</h2>
+
+<div class="emprendimientos-grid">
+  <div class="emprendimiento-card" *ngFor="let e of emprendimientos">
+    <div class="card-image">
+      <img [src]="e.imagen" [alt]="'Imagen de ' + e.nombre" (error)="onImageError($event)" loading="lazy">
+      <div class="card-overlay">
+        <button class="quick-view-btn" color="primary" aria-label="Ver rápido">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </div>
+    </div>
+    <div class="card-content">
+      <h3 class="card-title">{{ e.nombre }}</h3>
+      <p class="card-description">{{ e.descripcion }}</p>
+      <div class="card-tags">
+        <span class="tag">Emprendimiento</span>
+      </div>
+    </div>
+    <div class="card-actions">
+      <button class="edit-btn" (click)="toEditar(e.id_Emprendimiento)">
+        <span class="material-icons">edit</span> Editar
+      </button>
+      <button class="delete-btn" (click)="eliminarEmprendimiento(e.id_Emprendimiento)">
+        <span class="material-icons">delete</span> Eliminar
+      </button>
+    </div>
+  </div>
+  
+</div>

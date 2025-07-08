@@ -30,7 +30,7 @@ export const routes: Routes = [
 
     //Vistas con sidebar de emprendimiento
     { 'path': '', 'component': SidebarEmpComponent, canActivateChild: [AuthGuard], 'children': [
-        { 'path': 'nuevo-emprendimiento', 'component': NuevoEmprendimientoComponent },
+        { 'path': 'crear-emprendimiento', 'component': NuevoEmprendimientoComponent },
         { 'path': 'editar-emprendimiento/:id', 'component': EditarEmprendimientoComponent },
         { 'path': 'perfil', 'component': PerfilComponent},
         { 'path': 'mis-emprendimientos', 'component': MisEmprendimientosComponent}
