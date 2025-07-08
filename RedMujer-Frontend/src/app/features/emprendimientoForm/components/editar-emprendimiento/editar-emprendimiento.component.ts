@@ -90,6 +90,12 @@ export class EditarEmprendimientoComponent implements OnInit {
     const confirmar = confirm('¿Estás segura de querer eliminar la imagen principal?');
     if (!confirmar) return;
 
+    if (this.imagenSeleccionada && typeof this.imagenSeleccionada === 'string' && this.imagenSeleccionada.startsWith('data:')) {
+      this.imagenPrincipalFile = null;
+      this.imagenSeleccionada = null;
+      return;
+    }
+
     this.emprendimientoFormService.borrarImagenPrincipal(this.idEmprendimiento).subscribe({
       next: () => {
         this.imagenPrincipalFile = null;
