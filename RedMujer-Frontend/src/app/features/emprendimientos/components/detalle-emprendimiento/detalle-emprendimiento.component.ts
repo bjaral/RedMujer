@@ -92,12 +92,12 @@ export class DetalleEmprendimientoComponent implements OnInit {
       catchError(err => {
         console.error(`Error al obtener ubicación del emprendimiento con id ${this.idEmprendimiento}:`, err);
         return of({
-          region: 'No especificada',
-          comuna: 'No especificada',
+          region: '',
+          comuna: '',
           id_Comuna: null,
           id_Region: null,
-          calle: 'No especificada',
-          numero: 'No especificada',
+          calle: '',
+          numero: '',
         });
       })
     );

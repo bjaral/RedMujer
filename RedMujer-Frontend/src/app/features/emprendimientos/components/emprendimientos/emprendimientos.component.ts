@@ -7,7 +7,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { UbicacionService } from '../../services/ubicacion.service';
 import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 export interface Emprendimiento {
   id_Emprendimiento: number;
@@ -67,70 +67,76 @@ export class EmprendimientosComponent implements OnInit {
   getEmprendimientos(): void {
     this.loading = true;
 
-    this.emprendimientoService.getAll().subscribe({
-      next: (data: Emprendimiento[]) => {
-        this.asignarUbicacionesAEmprendimientos(data);
-      },
-      error: (err) => {
-        console.error('Error al cargar emprendimientos:', err);
-        this.loading = false;
-      }
-    });
-  }
+    this.emprendimientoService.getAll().pipe(
+      switchMap((data: Emprendimiento[]) => {
+        const emprendimientosConDatos$ = data.map((emp: Emprendimiento) => {
+          const ubicacion$ = this.emprendimientoService.getUbicacionDeEmprendimiento(Number(emp.id_Emprendimiento)).pipe(
+            catchError(err => {
+              return of({
+                comuna: 'No especificada',
+                region: 'No especificada',
+                id_Comuna: null,
+                id_Region: null
+              });
+            })
+          );
 
-  private asignarUbicacionesAEmprendimientos(emprendimientos: Emprendimiento[]): void {
-    const emprendimientosConUbicacion$ = emprendimientos.map((emp: Emprendimiento) => {
-      return this.emprendimientoService.getUbicacionDeEmprendimiento(Number(emp.id_Emprendimiento)).pipe(
-        map((ubicacion: any) => {
-          emp.region = ubicacion.region;
-          emp.comuna = ubicacion.comuna;
-          emp.id_Comuna = ubicacion.id_Comuna;
-          emp.id_Region = ubicacion.id_Region;
+          const categorias$ = this.emprendimientoService.getCategoriasByEmprendimiento(Number(emp.id_Emprendimiento)).pipe(
+            catchError(err => {
+              return of([]);
+            })
+          );
 
-          if (emp.imagen) {
-            emp.imagen = `http://localhost:5145/media/${emp.imagen}`;
-          }
+          return forkJoin({ ubicacion: ubicacion$, categorias: categorias$ }).pipe(
+            map(({ ubicacion, categorias }) => {
+              emp.region = ubicacion.region;
+              emp.comuna = ubicacion.comuna;
+              emp.id_Comuna = ubicacion.id_Comuna;
+              emp.id_Region = ubicacion.id_Region;
+              emp.categorias = categorias;
+              emp.categoriasTexto = categorias.map((cat: any) => cat.nombre).join(', ');
 
-          return emp;
-        }),
-        catchError(err => {
-          console.error(`Error al obtener ubicación del emprendimiento con id ${emp.id_Emprendimiento}:`, err);
-
-          if (emp.imagen) {
-            emp.imagen = `http://localhost:5145/media/${emp.imagen}`;
-          }
-
-          return of(emp);
-        })
-      );
-    });
-
-    forkJoin(emprendimientosConUbicacion$).subscribe({
-      next: (emprendimientosConUbicacion: Emprendimiento[]) => {
-        this.emprendimientos = emprendimientosConUbicacion;
+              if (emp.imagen) {
+                emp.imagen = `http://localhost:5145/media/${emp.imagen}`;
+              }
+              return emp;
+            })
+          );
+        });
+        return forkJoin(emprendimientosConDatos$);
+      })
+    ).subscribe({
+      next: (emprendimientosCompletos: Emprendimiento[]) => {
+        this.emprendimientos = emprendimientosCompletos;
         this.emprendimientosFiltrados = [...this.emprendimientos];
         this.totalItems = this.emprendimientos.length;
         this.extractCategorias();
         this.aplicarOrden();
         this.loading = false;
       },
-      error: (err: any) => {
-        console.error('Error al cargar ubicaciones de los emprendimientos:', err);
+      error: (err) => {
+        console.error('Error al cargar emprendimientos y sus datos adicionales:', err);
         this.loading = false;
       }
     });
   }
 
   private extractCategorias(): void {
-    const categoriasSet = new Set();
+    const uniqueCategorias: { id: any, nombre: string }[] = [];
+    const seenNames = new Set<string>();
+
     this.emprendimientos.forEach((emp: Emprendimiento) => {
       if (emp.categorias && emp.categorias.length > 0) {
         emp.categorias.forEach((cat: any) => {
-          categoriasSet.add(JSON.stringify({ id: cat.id, nombre: cat.nombre }));
+          const categoriaNombreNormalizado = cat.nombre.toLowerCase().trim();
+          if (!seenNames.has(categoriaNombreNormalizado)) {
+            seenNames.add(categoriaNombreNormalizado);
+            uniqueCategorias.push({ id: cat.id_Categoria, nombre: cat.nombre });
+          }
         });
       }
     });
-    this.categorias = Array.from(categoriasSet).map(cat => JSON.parse(cat as string));
+    this.categorias = uniqueCategorias;
   }
 
   loadFilters(): void {
@@ -198,14 +204,14 @@ export class EmprendimientosComponent implements OnInit {
 
     if (this.selectedRegion && this.selectedRegion !== 'todas') {
       const regionId = Number(this.selectedRegion);
-      resultados = resultados.filter((emp: Emprendimiento) => 
+      resultados = resultados.filter((emp: Emprendimiento) =>
         emp.id_Region === regionId
       );
     }
 
     if (this.selectedComuna && this.selectedComuna !== 'todas') {
       const comunaId = Number(this.selectedComuna);
-      resultados = resultados.filter((emp: Emprendimiento) => 
+      resultados = resultados.filter((emp: Emprendimiento) =>
         emp.id_Comuna === comunaId
       );
     }
@@ -217,8 +223,11 @@ export class EmprendimientosComponent implements OnInit {
     }
 
     if (this.selectedCategoria && this.selectedCategoria !== 'todas') {
+      const selectedCatNameLower = this.selectedCategoria.toLowerCase().trim();
       resultados = resultados.filter((emp: Emprendimiento) =>
-        emp.categorias && emp.categorias.some((cat: any) => cat.id.toString() === this.selectedCategoria)
+        emp.categorias && emp.categorias.some((cat: any) =>
+          cat.nombre?.toLowerCase().trim() === selectedCatNameLower
+        )
       );
     }
 

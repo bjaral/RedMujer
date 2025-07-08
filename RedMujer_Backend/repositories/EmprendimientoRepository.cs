@@ -68,6 +68,7 @@ namespace RedMujer_Backend.repositories
                 SELECT id_emprendimiento, ""RUT"", nombre, descripcion, horario_atencion, vigencia, imagen, modalidad
                 FROM public.""Emprendimientos""
                 WHERE id_emprendimiento = @Id
+		AND vigencia = true
                 LIMIT 1;";
 
             using var connection = CreateConnection();
@@ -92,7 +93,7 @@ namespace RedMujer_Backend.repositories
         public async Task<IEnumerable<Emprendimiento>> GetAllAsync()
         {
             const string query = @"SELECT id_emprendimiento, ""RUT"", nombre, descripcion, horario_atencion, vigencia, imagen, modalidad
-                                   FROM public.""Emprendimientos"";";
+                                   FROM public.""Emprendimientos"" WHERE vigencia = true;";
 
             using var connection = CreateConnection();
             var result = await connection.QueryAsync<dynamic>(query);

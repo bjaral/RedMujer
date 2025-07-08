@@ -77,7 +77,7 @@
           <div class="card-image">
             <img [src]="emp.imagen" [alt]="'Imagen de ' + emp.nombre" (error)="onImageError($event)" loading="lazy">
             <div class="card-overlay">
-              <button mat-fab class="quick-view-btn" color="primary">
+              <button mat-fab class="quick-view-btn" color="primary" (click)="verDetalles(emp)">
                 <mat-icon>visibility</mat-icon>
               </button>
             </div>
@@ -90,7 +90,7 @@
             </div>
           </div>
           <div class="card-actions">
-            <button mat-button class="learn-more-btn">
+            <button mat-button class="learn-more-btn" (click)="verDetalles(emp)">
               Conocer más
               <mat-icon>arrow_forward</mat-icon>
             </button>

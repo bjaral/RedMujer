@@ -93,8 +93,8 @@ export class EmprendimientoService {
         console.error(`Error al obtener ubicaciones para emprendimiento ${idEmprendimiento}:`, error);
 
         return of({
-          comuna: 'No especificada',
-          region: 'No especificada',
+          comuna: '',
+          region: '',
           id_Comuna: null,
           id_Region: null
         });
@@ -127,11 +127,10 @@ export class EmprendimientoService {
           }]);
         }
 
-        // Mapear todas las plataformas vigentes, no solo la primera
         const plataformasFormateadas = plataformasVigentes.map(plataforma => ({
           ruta: plataforma.ruta,
           descripcion: plataforma.descripcion,
-          tipo_plataforma: plataforma.tipo_Plataforma // Nota: mantengo la consistencia con el naming
+          tipo_plataforma: plataforma.tipo_Plataforma
         }));
 
         return of(plataformasFormateadas);
