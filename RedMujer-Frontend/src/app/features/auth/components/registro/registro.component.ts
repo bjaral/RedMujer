@@ -1,17 +1,16 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, FormsModule, ReactiveFormsModule, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { StepperOrientation } from '@angular/material/stepper';
-import { AuthService } from '../../../../core/services/auth.service';
-import { UbicacionService } from '../../services/ubicacion.service';
 import { Router } from '@angular/router';
 
-import { ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
+import { AuthService } from '../../../../core/services/auth.service';
+import { UbicacionService } from '../../services/ubicacion.service';
 
 @Component({
   selector: 'app-registro',
@@ -30,7 +29,6 @@ import { ElementRef, ViewChild, AfterViewInit } from '@angular/core';
   ]
 })
 export class RegistroComponent implements OnInit, AfterViewInit {
-  // Reintroducimos las referencias a los elementos
   @ViewChild('tituloRef') tituloRef!: ElementRef<HTMLHeadingElement>;
   @ViewChild('contenedorRef') contenedorRef!: ElementRef<HTMLElement>;
   @ViewChild('parrafoRef') parrafoRef!: ElementRef<HTMLElement>;
@@ -43,7 +41,12 @@ export class RegistroComponent implements OnInit, AfterViewInit {
   personalesForm: any;
   ubicacionForm: any;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private ubicacionService: UbicacionService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private ubicacionService: UbicacionService,
+    private router: Router
+  ) {
     const breakpointObserver = inject(BreakpointObserver);
     this.stepperOrientation = breakpointObserver
       .observe('(min-width: 800px)')
@@ -57,7 +60,7 @@ export class RegistroComponent implements OnInit, AfterViewInit {
     }, { validators: this.passwordMatchValidator });
 
     this.personalesForm = this.fb.group({
-      run: ['', Validators.required],
+      run: ['', [Validators.required, this.rutValidator()]],
       nombre: ['', Validators.required],
       apellido1: ['', Validators.required],
       apellido2: ['', Validators.required],
@@ -96,6 +99,84 @@ export class RegistroComponent implements OnInit, AfterViewInit {
     }
   }
 
+  formatRut(event: any): void {
+    let value = event.target.value;
+
+    value = value.replace(/[^0-9kK]/g, '');
+
+    let formattedRut = '';
+    if (value.length > 1) {
+      let rutBody = value.substring(0, value.length - 1);
+      const dv = value.substring(value.length - 1).toUpperCase();
+
+      rutBody = rutBody.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+      formattedRut = `${rutBody}-${dv}`;
+    } else {
+      formattedRut = value;
+    }
+
+    event.target.value = formattedRut;
+
+    this.personalesForm.get('run')?.setValue(formattedRut, { emitEvent: false });
+  }
+
+  rutValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const rut: string = control.value;
+
+      if (!rut) {
+        return null;
+      }
+
+      const cleanRut: string = rut.replace(/\.|-/g, "");
+
+      if (cleanRut.length < 8) {
+        return null;
+      }
+
+      const rutRegex: RegExp = /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/;
+
+      if (!rutRegex.test(rut.trim())) {
+        return { invalidRutFormat: true };
+      }
+
+      const checkDigit: string = cleanRut.slice(-1).toLowerCase();
+      const rutNumber: string = cleanRut.slice(0, -1);
+
+      let sum: number = 0;
+      let multiplier: number = 2;
+
+      const reversedRut: string[] = rutNumber.split("").reverse();
+      for (let i: number = 0; i < reversedRut.length; i++) {
+        sum += parseInt(reversedRut[i]) * multiplier;
+        multiplier = multiplier >= 7 ? 2 : multiplier + 1;
+      }
+
+      const remainder: number = sum % 11;
+      let expectedDigit: string;
+
+      if (remainder === 0) {
+        expectedDigit = "0";
+      } else if (remainder === 1) {
+        expectedDigit = "k";
+      } else {
+        expectedDigit = (11 - remainder).toString();
+      }
+
+      if (expectedDigit !== checkDigit) {
+        return { invalidRutChecksum: true };
+      }
+
+      return null;
+    };
+  }
+
+  passwordMatchValidator(form: any) {
+    return form.get('password')?.value === form.get('confirmPassword')?.value
+      ? null : { mismatch: true };
+  }
+
   onRegionChange() {
     const regionObj = this.ubicacionForm.get('region')?.value;
     if (regionObj && regionObj.id_Region) {
@@ -113,11 +194,6 @@ export class RegistroComponent implements OnInit, AfterViewInit {
       this.comunas = [];
       this.ubicacionForm.get('comuna')?.setValue(null);
     }
-  }
-
-  passwordMatchValidator(form: any) {
-    return form.get('password')?.value === form.get('confirmPassword')?.value
-      ? null : { mismatch: true };
   }
 
   onStepHeaderClick(event: Event) {
@@ -146,11 +222,13 @@ export class RegistroComponent implements OnInit, AfterViewInit {
           correo: this.usuarioForm.value.email,
         },
         persona: {
-          run: this.personalesForm.value.run,
-          nombre: this.personalesForm.value.nombre,
-          primerApellido: this.personalesForm.value.apellido1,
-          segundoApellido: this.personalesForm.value.apellido2,
-          vigencia: true,
+          RUN: this.personalesForm.value.run,
+          Nombre: this.personalesForm.value.nombre,
+          PrimerApellido: this.personalesForm.value.apellido1,
+          SegundoApellido: this.personalesForm.value.apellido2,
+          Vigencia: true,
+          Id_Usuario: 0,
+          Id_Ubicacion: 0
         },
         ubicacion: {
           id_Region: Number(regionObj.id_Region),
@@ -160,18 +238,23 @@ export class RegistroComponent implements OnInit, AfterViewInit {
           referencia: this.ubicacionForm.value.referencia,
           vigencia: true,
         }
-
       };
 
       this.authService.register(data).subscribe({
         next: (res) => {
-          console.log('Registro exitoso');
+          console.log('Registro exitoso', res);
           this.toInicio();
         },
         error: (err) => {
-          alert('Ocurrió un error en registro.')
+          console.error('Error en registro:', err);
+          alert('Ocurrió un error en registro.');
         }
       });
+    } else {
+      this.usuarioForm.markAllAsTouched();
+      this.personalesForm.markAllAsTouched();
+      this.ubicacionForm.markAllAsTouched();
+      console.log('Formulario inválido', this.usuarioForm.errors, this.personalesForm.errors, this.ubicacionForm.errors);
     }
   }
 

@@ -29,19 +29,39 @@
           <mat-form-field appearance="outline">
             <mat-label>Nombre de usuario</mat-label>
             <input matInput formControlName="username" required>
+            <mat-error *ngIf="usuarioForm.get('username')?.hasError('required') && usuarioForm.get('username')?.touched">
+              El nombre de usuario es requerido.
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Correo</mat-label>
             <input matInput formControlName="email" required type="email">
+            <mat-error *ngIf="usuarioForm.get('email')?.hasError('required') && usuarioForm.get('email')?.touched">
+              El correo es requerido.
+            </mat-error>
+            <mat-error *ngIf="usuarioForm.get('email')?.hasError('email') && usuarioForm.get('email')?.touched">
+              El formato del correo no es válido.
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Contraseña</mat-label>
             <input matInput formControlName="password" required type="password">
+            <mat-error *ngIf="usuarioForm.get('password')?.hasError('required') && usuarioForm.get('password')?.touched">
+              La contraseña es requerida.
+            </mat-error>
+            <mat-error *ngIf="usuarioForm.get('password')?.hasError('minlength') && usuarioForm.get('password')?.touched">
+              La contraseña debe tener al menos 6 caracteres.
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Confirmar contraseña</mat-label>
             <input matInput formControlName="confirmPassword" required type="password">
-            <mat-error *ngIf="usuarioForm.hasError('mismatch')">Las contraseñas no coinciden</mat-error>
+            <mat-error *ngIf="usuarioForm.get('confirmPassword')?.hasError('required') && usuarioForm.get('confirmPassword')?.touched">
+              Debe confirmar la contraseña.
+            </mat-error>
+            <mat-error *ngIf="usuarioForm.hasError('mismatch') && usuarioForm.get('confirmPassword')?.touched">
+              Las contraseñas no coinciden.
+            </mat-error>
           </mat-form-field>
           <div>
             <button mat-raised-button color="primary" matStepperNext [disabled]="!usuarioForm.valid">Siguiente</button>
@@ -57,19 +77,39 @@
         <form [formGroup]="personalesForm">
           <mat-form-field appearance="outline">
             <mat-label>RUN</mat-label>
-            <input matInput formControlName="run" required>
+            <!-- Add the (input) event to trigger the formatting -->
+            <input matInput formControlName="run" required (input)="formatRut($event)">
+            <mat-error *ngIf="personalesForm.get('run')?.hasError('required') && personalesForm.get('run')?.touched">
+              El RUN es requerido.
+            </mat-error>
+            <!-- Display custom validation errors for RUT -->
+            <mat-error *ngIf="personalesForm.get('run')?.hasError('invalidRutFormat') && personalesForm.get('run')?.touched">
+              El formato del RUN no es válido (ej: XX.XXX.XXX-X).
+            </mat-error>
+            <mat-error *ngIf="personalesForm.get('run')?.hasError('invalidRutChecksum') && personalesForm.get('run')?.touched">
+              El RUN no es válido.
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Nombre</mat-label>
             <input matInput formControlName="nombre" required>
+            <mat-error *ngIf="personalesForm.get('nombre')?.hasError('required') && personalesForm.get('nombre')?.touched">
+              El nombre es requerido.
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Primer apellido</mat-label>
             <input matInput formControlName="apellido1" required>
+            <mat-error *ngIf="personalesForm.get('apellido1')?.hasError('required') && personalesForm.get('apellido1')?.touched">
+              El primer apellido es requerido.
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Segundo apellido</mat-label>
             <input matInput formControlName="apellido2" required>
+            <mat-error *ngIf="personalesForm.get('apellido2')?.hasError('required') && personalesForm.get('apellido2')?.touched">
+              El segundo apellido es requerido.
+            </mat-error>
           </mat-form-field>
           <div>
             <button mat-button matStepperPrevious>Retroceder</button>
@@ -90,6 +130,9 @@
             <mat-select formControlName="region" (selectionChange)="onRegionChange()" required>
               <mat-option *ngFor="let region of regiones" [value]="region">{{ region.nombre }}</mat-option>
             </mat-select>
+            <mat-error *ngIf="ubicacionForm.get('region')?.hasError('required') && ubicacionForm.get('region')?.touched">
+              La región es requerida.
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Comuna</mat-label>
@@ -97,14 +140,23 @@
               <mat-option [value]="null" disabled>Seleccione una región primero</mat-option>
               <mat-option *ngFor="let comuna of comunas" [value]="comuna.nombre">{{ comuna.nombre }}</mat-option>
             </mat-select>
+            <mat-error *ngIf="ubicacionForm.get('comuna')?.hasError('required') && ubicacionForm.get('comuna')?.touched">
+              La comuna es requerida.
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Calle</mat-label>
             <input matInput formControlName="calle" required>
+            <mat-error *ngIf="ubicacionForm.get('calle')?.hasError('required') && ubicacionForm.get('calle')?.touched">
+              La calle es requerida.
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Número</mat-label>
-            <input matInput formControlName="numero" required type="number">
+            <input matInput formControlName="numero" required>
+            <mat-error *ngIf="ubicacionForm.get('numero')?.hasError('required') && ubicacionForm.get('numero')?.touched">
+              El número es requerido.
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Referencia adicional</mat-label>
