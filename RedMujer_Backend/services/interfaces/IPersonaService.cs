@@ -11,5 +11,7 @@ namespace RedMujer_Backend.services
         Task<int> CrearAsync(PersonaCreateDto dto);
         Task ActualizarAsync(int id, PersonaCreateDto dto);
         Task EliminarAsync(int id);
+        Task<PersonaDto?> GetByUsuarioIdAsync(int idUsuario);
+
     }
 }

@@ -92,5 +92,24 @@ namespace RedMujer_Backend.repositories
                 "UPDATE \"Personas\" SET vigencia = false WHERE \"id_persona\" = @Id",
                 new { Id = id });
         }
+        public async Task<Persona?> GetByUsuarioIdAsync(int idUsuario)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            return await connection.QueryFirstOrDefaultAsync<Persona>(
+                @"SELECT 
+                    ""id_persona"" as Id_Persona,
+                    ""id_ubicacion"" as Id_Ubicacion,
+                    ""id_usuario"" as Id_Usuario,
+                    ""RUN"",
+                    ""nombre"" as Nombre,
+                    ""primer_apellido"" as PrimerApellido,
+                    ""segundo_apellido"" as SegundoApellido,
+                    ""vigencia""
+                FROM ""Persona""
+                WHERE ""id_usuario"" = @idUsuario AND ""vigencia"" = true",
+                new { idUsuario }
+            );
+        }
+
     }
 }
