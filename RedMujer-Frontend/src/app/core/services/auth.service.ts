@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class AuthService {
   private personaUrl = 'http://localhost:5145/api/Personas';
   private ubicacionUrl = 'http://localhost:5145/api/Ubicaciones';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private tokenService: TokenService) { }
 
   login(credentials: { correo: string; password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, credentials);
@@ -50,6 +51,6 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('tokenRedMujer');
+    this.tokenService.clearToken();
   }
 }
