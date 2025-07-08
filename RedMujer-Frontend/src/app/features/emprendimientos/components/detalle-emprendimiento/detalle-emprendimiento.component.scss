@@ -1,22 +1,19 @@
 @use '../../../../../styles.scss' as *;
-@use "sass:color";
 
-// ==========================
-// CONTENEDOR PRINCIPAL
-// ==========================
 .contenedor-principal {
-  max-width: 1300px;
+  max-width: 1200px;
   margin: 2.5rem auto 2rem auto;
   display: flex;
   gap: 2.2rem;
   background: #fff;
   border-radius: 2.2rem;
-  box-shadow: 0 6px 28px rgba(60,80,130,0.10);
-  padding: 2.2rem 1.8rem;
+  box-shadow: 0 6px 28px rgba(60, 80, 130, 0.10);
+  padding: 2.5rem 3rem;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
 
-  @media (max-width: 1020px) {
+  @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
     padding: 1.1rem 0.4rem;
@@ -24,23 +21,36 @@
   }
 
   .informacion-principal {
-    flex: 1.7;
-    min-width: 300px;
-    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1 1 60%;
+    max-width: 60%;
 
     .nombre-emprendimiento {
       font-size: 2.15rem;
       font-weight: 900;
       color: $secondary-color;
-      margin-bottom: 1rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0rem;
       line-height: 1.11;
       letter-spacing: -0.015em;
     }
 
     p {
-      font-size: 1.14rem;
+      font-size: 1.1rem;
       color: #364152;
-      margin-bottom: 1.15rem;
+      margin-bottom: 1rem;
+      font-family: $font-family-main, sans-serif;
+      line-height: 1.63;
+      letter-spacing: 0.01em;
+    }
+
+    .categoria {
+      font-size: 1.1rem;
+      color: #364152;
+      margin-bottom: 0.7rem;
+      margin-top: 0rem;
       font-family: $font-family-main, sans-serif;
       line-height: 1.63;
       letter-spacing: 0.01em;
@@ -49,41 +59,38 @@
     h4 {
       color: $primary-color;
       font-size: 1.13rem;
-      margin-top: 2.2rem;
+      margin-top: 1rem;
       margin-bottom: 0.4rem;
       font-weight: 700;
       letter-spacing: 0.01em;
     }
 
-  .iconos {
-  display: flex;
-  gap: 1.05rem;
-  font-size: 2rem;
-  margin-bottom: 1.3rem;
-  margin-top: 0.4rem;
+    .iconos {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 0.7rem;
 
-  a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    background: $gradient;
-    color: #fff;
-    font-size: 1.42rem;
-    transition: background 0.19s, color 0.15s, transform 0.13s, filter 0.12s;
+      a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        background: $gradient;
+        color: #fff;
+        font-size: 1.42rem;
+        transition: background 0.19s, color 0.15s, transform 0.13s, filter 0.12s;
 
-    &:hover {
-      background: $primary-color; // SOLO color primario en hover
-      filter: brightness(1.13) drop-shadow(0 0 7px $primary-color);
-      color: #fff;
-      transform: scale(1.13);
+        &:hover {
+          background: $primary-color;
+          box-shadow: 0 4px 15px #81002b;
+          color: #fff;
+          transform: scale(1.13);
+        }
+      }
     }
-  }
-}
-
 
     h2 {
       font-size: 1.35rem;
@@ -97,40 +104,34 @@
     }
 
     a {
-      color: $primary-color;
-      font-weight: 500;
+      font-size: 1.1rem;
+      font-weight: 300;
+      transition: color 0.3s, transform 0.2s ease;
+      color: $secondary-color;
       text-decoration: underline;
-      transition: color 0.2s;
       cursor: pointer;
 
       &:hover {
-        color: $secondary-color;
+        color: darken($secondary-color, 10%);
+        transition: all 0.3s
       }
-    }
 
-    .galeria-links {
-      margin: 1rem 0 0.5rem 0;
-      font-size: 1.07rem;
-      color: #585858;
-      word-break: break-word;
+      &:active {
+        color: navy
+      }
     }
   }
 
-  // ========== IMAGEN PRINCIPAL SIN BORDES ==========
   .imagen-principal {
-    flex: 1;
-    min-width: 180px;
-    max-width: 340px;
-    width: 240px;
-    height: 240px;
+    width: auto;
+    height: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
-    margin: 0 auto;
+    align-self: center;
     border-radius: 1.25rem;
     overflow: hidden;
-    background: none;
-    box-shadow: none;
+    flex: 1 1 35%;
+    max-width: 35%;
 
     img {
       width: 100%;
@@ -139,20 +140,12 @@
       border-radius: 1.25rem;
       transition: transform 0.20s, box-shadow 0.19s;
       box-shadow: 0 2px 16px rgba(54, 65, 82, 0.11);
-
-      &:hover {
-        transform: scale(1.045);
-        box-shadow: 0 8px 24px $primary-color;
-      }
     }
   }
 }
 
-// ==========================
-// GALERÍA Y VIDEO
-// ==========================
 .contenedor {
-  max-width: 1300px;
+  max-width: 1100px;
   margin: 0 auto 2.5rem auto;
 
   h2 {
@@ -169,15 +162,15 @@
 
   .galeria {
     display: flex;
-    justify-content: center;
     align-items: center;
     gap: 2.5rem;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     background: #fff;
-    padding: 1.08rem 0.7rem 1.18rem 0.7rem;
+    padding: 2.5rem 3rem;
     border-radius: 1.15rem;
-    box-shadow: 0 4px 20px rgba(60,80,130,0.10);
+    box-shadow: 0 4px 20px rgba(60, 80, 130, 0.10);
+    justify-content: space-between;
 
     img {
       flex: 0 0 auto;
@@ -207,25 +200,23 @@
     margin: 1.3rem auto 2.2rem auto;
     width: 100%;
 
-    video {
-      max-width: 98vw;
-      border-radius: 1.06rem;
-      box-shadow: 0 2px 12px rgba(60,80,130,0.13);
-      outline: none;
+    iframe {
+      height: 455px;
+      width: 700px;
     }
   }
 }
 
-// ==========================
-// RESPONSIVE
-// ==========================
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .contenedor-principal {
     flex-direction: column;
     gap: 1.2rem;
-    .imagen-principal, .informacion-principal {
+
+    .imagen-principal,
+    .informacion-principal {
       max-width: 100%;
     }
+
     .imagen-principal {
       width: 86vw;
       height: 53vw;
@@ -233,9 +224,11 @@
       max-height: 170px;
     }
   }
+
   .contenedor .galeria {
     gap: 1.1rem;
     padding: 0.7rem 0.1rem 1rem 0.1rem;
+
     img {
       width: 31vw;
       max-width: 100px;
@@ -246,12 +239,14 @@
 }
 
 @media (max-width: 480px) {
+
   .contenedor-principal,
   .contenedor {
     padding: 0.2rem 0;
     border-radius: 0;
     box-shadow: none;
   }
+
   .contenedor .galeria img {
     width: 43vw;
     height: 22vw;

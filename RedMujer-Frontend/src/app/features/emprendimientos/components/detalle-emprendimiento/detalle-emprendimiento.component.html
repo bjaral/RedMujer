@@ -1,12 +1,18 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=distance" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=captive_portal" /> 
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=distance" />
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=captive_portal" />
 
 <div class="contenedor-principal">
     <div class="informacion-principal">
         <h3 class="nombre-emprendimiento">{{ nombre }}</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis illum accusamus nemo a illo voluptates fugit maiores nulla! Iure aut aspernatur harum nulla quaerat hic vero iste quo, nam accusamus.  </p>
-    
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis illum accusamus nemo a illo voluptates
+            fugit maiores nulla! Iure aut aspernatur harum nulla quaerat hic vero iste quo, nam accusamus. </p>
+
+        <h4>CATEGORÍA</h4>
+        <p class="categoria">Joyería</p>
+
         <h4>REDES SOCIALES</h4>
         <div class="iconos">
             <a href="#" class="fa fa-instagram"></a>
@@ -18,16 +24,13 @@
         </div>
 
         <h4>UBICACIÓN</h4>
-        <a>algo</a>
+        <a>Barros Arana 601-603, 4030575 Concepción, Bío Bío</a>
 
-        <div *ngFor="let link of links">
-            {{ link }}
-        </div>
     </div>
 
     <!-- FLASHCARD SOLO IMAGEN PRINCIPAL -->
     <div class="imagen-principal">
-        <img [src]="urlImagen" alt="Imagen Principal de {{ nombre }}">
+        <img src="assets/images/emprendimiento-placeholder.png" alt="Imagen Principal de {{ nombre }}">
     </div>
 </div>
 
@@ -35,18 +38,20 @@
 <div class="contenedor">
     <h2>GALERÍA</h2>
     <div class="galeria">
-        <img [src]="urlImagen" alt="Imagen galería de {{ nombre }}">
-        <img [src]="urlImagen" alt="Imagen galería de {{ nombre }}">
-        <img [src]="urlImagen" alt="Imagen galería de {{ nombre }}">
-        <img [src]="urlImagen" alt="Imagen galería de {{ nombre }}">
-        <img [src]="urlImagen" alt="Imagen galería de {{ nombre }}">
+        <img src="assets/images/emprendimiento-placeholder.png" alt="Imagen galería de {{ nombre }}">
+        <img src="assets/images/emprendimiento-placeholder.png" alt="Imagen galería de {{ nombre }}">
+        <img src="assets/images/emprendimiento-placeholder.png" alt="Imagen galería de {{ nombre }}">
+        <img src="assets/images/emprendimiento-placeholder.png" alt="Imagen galería de {{ nombre }}">
+        <img src="assets/images/emprendimiento-placeholder.png" alt="Imagen galería de {{ nombre }}">
     </div>
+
     <br>
     <h2>VIDEO</h2>
     <div class="video-container">
-        <video controls width="1200">
-            <source src="../../../../../assets/Video_place_holder.mp4" type="video/mp4">
-            Tu navegador no soporta el elemento <code>video</code>.
-        </video>
+        <iframe src="https://www.youtube.com/embed/glHfVFk8CwQ?si=aKf4WjRIgXMGG3Rf" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+        </iframe>
     </div>
 </div>

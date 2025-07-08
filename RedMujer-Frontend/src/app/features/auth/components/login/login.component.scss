@@ -143,6 +143,7 @@
         font-weight: 300;
         transition: color 0.3s, transform 0.2s ease;
         color: blue;
+        cursor: pointer;
 
         &:hover {
             color: darkblue;
