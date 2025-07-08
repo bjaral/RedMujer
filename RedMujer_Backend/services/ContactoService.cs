@@ -74,5 +74,18 @@ namespace RedMujer_Backend.services
         {
             await _repo.DeleteAsync(id);
         }
+        public async Task<IEnumerable<ContactoDto>> GetContactosPorEmprendimientoAsync(int idEmprendimiento)
+{
+        var contactos = await _repo.GetContactosPorEmprendimientoAsync(idEmprendimiento);
+        return contactos.Select(c => new ContactoDto
+        {
+            Id_Contacto = c.Id_Contacto,
+            Id_Emprendimiento = c.Id_Emprendimiento,
+            Valor = c.Valor,
+            Vigencia = c.Vigencia,
+            Tipo_Contacto = c.Tipo_Contacto
+        });
+    }
+
     }
 }
