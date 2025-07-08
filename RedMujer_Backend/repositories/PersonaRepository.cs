@@ -105,7 +105,7 @@ namespace RedMujer_Backend.repositories
                     ""primer_apellido"" as PrimerApellido,
                     ""segundo_apellido"" as SegundoApellido,
                     ""vigencia""
-                FROM ""Persona""
+                FROM ""Personas""
                 WHERE ""id_usuario"" = @idUsuario AND ""vigencia"" = true",
                 new { idUsuario }
             );
