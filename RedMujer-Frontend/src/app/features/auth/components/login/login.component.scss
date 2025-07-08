@@ -10,25 +10,32 @@
 }
 
 .login-info {
-    max-width: 45vw;
-    gap: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0rem;
 
     .login-ilustracion {
-        width: max-content;
-        justify-self: center;
+        width: 100%;
+        text-align: center;
     }
 
     img {
         height: 300px;
         border-radius: 2rem;
+        max-width: 100%;
+        object-fit: cover;
+        display: block;
+        margin: 0 auto;
     }
 
     h2 {
         font-size: 2.8rem;
         font-weight: 700;
         color: $primary-color;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0;
         line-height: 1.1;
+        width: fit-content;
+        white-space: nowrap;
     }
 
     h2:last-of-type {
@@ -40,7 +47,8 @@
         color: $secondary-color;
         font-size: 1.15rem;
         margin-bottom: 2rem;
-        max-width: 600px;
+        text-align: left;
+        overflow-wrap: break-word;
     }
 }
 
