@@ -10,6 +10,9 @@ import { StepperOrientation } from '@angular/material/stepper';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UbicacionService } from '../../services/ubicacion.service';
 import { Router } from '@angular/router';
+
+import { ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+
 @Component({
   selector: 'app-registro',
   standalone: true,
@@ -26,7 +29,12 @@ import { Router } from '@angular/router';
     }
   ]
 })
-export class RegistroComponent implements OnInit {
+export class RegistroComponent implements OnInit, AfterViewInit {
+  // Reintroducimos las referencias a los elementos
+  @ViewChild('tituloRef') tituloRef!: ElementRef<HTMLHeadingElement>;
+  @ViewChild('contenedorRef') contenedorRef!: ElementRef<HTMLElement>;
+  @ViewChild('parrafoRef') parrafoRef!: ElementRef<HTMLElement>;
+
   stepperOrientation: Observable<StepperOrientation>;
   regiones: any[] = [];
   comunas: any[] = [];
@@ -41,7 +49,6 @@ export class RegistroComponent implements OnInit {
       .observe('(min-width: 800px)')
       .pipe(map(({ matches }) => (matches ? 'horizontal' : 'vertical')));
 
-    // Inicializa los formularios aquí
     this.usuarioForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -63,8 +70,6 @@ export class RegistroComponent implements OnInit {
       numero: ['', Validators.required],
       referencia: [''],
     });
-
-    this.regiones
   }
 
   ngOnInit() {
@@ -76,6 +81,19 @@ export class RegistroComponent implements OnInit {
         console.error('Error al cargar regiones', err);
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    if (this.tituloRef && this.contenedorRef && this.parrafoRef) {
+      const h2Width = this.tituloRef.nativeElement.offsetWidth;
+      this.contenedorRef.nativeElement.style.width = `${h2Width}px`;
+      this.parrafoRef.nativeElement.style.width = `${h2Width}px`;
+
+      const ilustracionDiv = this.contenedorRef.nativeElement.querySelector('.registro-ilustracion');
+      if (ilustracionDiv) {
+        (ilustracionDiv as HTMLElement).style.width = `${h2Width}px`;
+      }
+    }
   }
 
   onRegionChange() {
@@ -102,7 +120,6 @@ export class RegistroComponent implements OnInit {
       ? null : { mismatch: true };
   }
 
-  // Método para prevenir clics en el header del stepper
   onStepHeaderClick(event: Event) {
     event.preventDefault();
     event.stopPropagation();

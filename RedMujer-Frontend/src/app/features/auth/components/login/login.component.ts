@@ -1,17 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
+import { CommonModule } from '@angular/common'; // Importar CommonModule si no está
 
 @Component({
   selector: 'app-login',
-  imports: [...MATERIAL_IMPORTS, RouterModule, FormsModule, ReactiveFormsModule],
+  standalone: true, // Asegúrate de que sea standalone si no lo es
+  imports: [CommonModule, ...MATERIAL_IMPORTS, RouterModule, FormsModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements AfterViewInit { // Implementar AfterViewInit
+  @ViewChild('tituloRef') tituloRef!: ElementRef<HTMLHeadingElement>;
+  @ViewChild('contenedorRef') contenedorRef!: ElementRef<HTMLElement>;
+  @ViewChild('parrafoRef') parrafoRef!: ElementRef<HTMLElement>;
+
   hidePassword = true;
   loginForm: any;
 
@@ -19,13 +25,27 @@ export class LoginComponent {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(5)]],
-    })
+    });
+  }
+
+  ngAfterViewInit(): void {
+    if (this.tituloRef && this.contenedorRef && this.parrafoRef) {
+      const h2Width = this.tituloRef.nativeElement.offsetWidth;
+
+      this.contenedorRef.nativeElement.style.width = `${h2Width}px`;
+      this.parrafoRef.nativeElement.style.width = `${h2Width}px`;
+
+      const ilustracionDiv = this.contenedorRef.nativeElement.querySelector('.login-ilustracion');
+      if (ilustracionDiv) {
+        (ilustracionDiv as HTMLElement).style.width = `${h2Width}px`;
+      }
+    }
   }
 
   onSubmit() {
     if (this.loginForm.valid) {
       const credentials = {
-        correo: this.loginForm.value.email,    
+        correo: this.loginForm.value.email,
         password: this.loginForm.value.password
       };
       console.log('Se envía al backend:', credentials);
@@ -35,7 +55,7 @@ export class LoginComponent {
           if (res && res.token) {
             localStorage.setItem('tokenRedMujer', res.token);
           } else {
-
+            // Manejar caso donde no hay token en la respuesta
           }
           console.log('Inicio de sesión exitoso');
           this.toPerfil();
