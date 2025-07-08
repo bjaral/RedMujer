@@ -1,36 +1,28 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=distance" />
-<link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=captive_portal" />
-
 <div class="contenedor-principal">
     <div class="informacion-principal">
-        <h3 class="nombre-emprendimiento">{{ nombre }}</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis illum accusamus nemo a illo voluptates
-            fugit maiores nulla! Iure aut aspernatur harum nulla quaerat hic vero iste quo, nam accusamus. </p>
+        <h3 class="nombre-emprendimiento">{{ emprendimiento.nombre }}</h3>
+        <p>{{ emprendimiento.descripcion }}</p>
 
         <h4>CATEGORÍA</h4>
-        <p class="categoria">Joyería</p>
+        <p class="categoria">{{ emprendimiento.categoriasTexto }}</p>
 
-        <h4>REDES SOCIALES</h4>
+        <h4>PLATAFORMAS</h4>
         <div class="iconos">
-            <a href="#" class="fa fa-instagram"></a>
-            <a href="#" class="fa fa-facebook"></a>
-            <a href="#" class="fa fa-android"></a>
-            <a href="#" class="material-symbols-outlined">
-                captive_portal
+            <a *ngFor="let plataforma of emprendimiento.plataformas" [href]="plataforma.ruta" target="_blank"
+                rel="noreferrer" class="plataforma-link" [title]="plataforma.descripcion">
+                <mat-icon>{{ plataforma.icon }}</mat-icon>
             </a>
         </div>
 
         <h4>UBICACIÓN</h4>
-        <a>Barros Arana 601-603, 4030575 Concepción, Bío Bío</a>
-
+        <a href="https://www.google.com/maps/search/?api=1&query={{emprendimiento.calle}}+{{emprendimiento.numero}},+{{emprendimiento.comuna}},+{{emprendimiento.region}}"
+            target="_blank" rel="noreferrer">{{emprendimiento.calle}} {{emprendimiento.numero}},
+            {{emprendimiento.comuna}}, {{emprendimiento.region}}</a>
     </div>
 
     <!-- FLASHCARD SOLO IMAGEN PRINCIPAL -->
     <div class="imagen-principal">
-        <img src="assets/images/emprendimiento-placeholder.png" alt="Imagen Principal de {{ nombre }}">
+        <img [src]="emprendimiento.imagen" alt="" (error)="onImageError($event)" loading="lazy">
     </div>
 </div>
 
@@ -38,11 +30,8 @@
 <div class="contenedor">
     <h2>GALERÍA</h2>
     <div class="galeria">
-        <img src="assets/images/emprendimiento-placeholder.png" alt="Imagen galería de {{ nombre }}">
-        <img src="assets/images/emprendimiento-placeholder.png" alt="Imagen galería de {{ nombre }}">
-        <img src="assets/images/emprendimiento-placeholder.png" alt="Imagen galería de {{ nombre }}">
-        <img src="assets/images/emprendimiento-placeholder.png" alt="Imagen galería de {{ nombre }}">
-        <img src="assets/images/emprendimiento-placeholder.png" alt="Imagen galería de {{ nombre }}">
+        <img *ngFor="let imagen of imagenesExtras" [src]="imagen" alt="Imagen de {{ emprendimiento.nombre }}"
+            (error)="onImageError($event)" loading="lazy">
     </div>
 
     <br>

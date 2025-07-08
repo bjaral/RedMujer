@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, map, switchMap, of, catchError  } from 'rxjs';
+import { Observable, forkJoin, map, switchMap, of, catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -61,7 +61,7 @@ export class EmprendimientoService {
     return this.http.get<any>(`http://localhost:5145/emprendimientos/${idEmprendimiento}/ubicaciones`).pipe(
       switchMap((ubicaciones: any[]) => {
         const ubicacionesVigentes = ubicaciones.filter(ubicacion => ubicacion.vigencia === true);
-        
+
         if (ubicacionesVigentes.length === 0) {
           return of({
             comuna: 'No especificada',
@@ -82,14 +82,16 @@ export class EmprendimientoService {
               comuna: comuna.nombre,
               region: region.nombre,
               id_Comuna: ubicacion.id_Comuna,
-              id_Region: ubicacion.id_Region
+              id_Region: ubicacion.id_Region,
+              calle: ubicacion.calle,
+              numero: ubicacion.numero
             };
           })
         );
       }),
       catchError(error => {
         console.error(`Error al obtener ubicaciones para emprendimiento ${idEmprendimiento}:`, error);
-        
+
         return of({
           comuna: 'No especificada',
           region: 'No especificada',
@@ -107,4 +109,48 @@ export class EmprendimientoService {
   getRegionById(idRegion: number): Observable<any> {
     return this.http.get<any>(`${this.url}/Regiones/${idRegion}`);
   }
+
+  getCategoriasByEmprendimiento(idEmprendimiento: number): Observable<any> {
+    return this.http.get<any>(`http://localhost:5145/emprendimientos/${idEmprendimiento}/categorias`);
+  }
+
+  getPlataformasByEmprendimiento(idEmprendimiento: number): Observable<any[]> {
+    return this.http.get<any[]>(`http://localhost:5145/emprendimientos/${idEmprendimiento}/plataformas`).pipe(
+      switchMap((plataformas: any[]) => {
+        const plataformasVigentes = plataformas.filter(plataforma => plataforma.vigencia === true);
+
+        if (plataformasVigentes.length === 0) {
+          return of([{
+            ruta: 'No especificada',
+            descripcion: 'No especificada',
+            tipo_plataforma: 'No especificada',
+          }]);
+        }
+
+        // Mapear todas las plataformas vigentes, no solo la primera
+        const plataformasFormateadas = plataformasVigentes.map(plataforma => ({
+          ruta: plataforma.ruta,
+          descripcion: plataforma.descripcion,
+          tipo_plataforma: plataforma.tipo_Plataforma // Nota: mantengo la consistencia con el naming
+        }));
+
+        return of(plataformasFormateadas);
+      }),
+      catchError(error => {
+        console.error(`Error al obtener plataformas para emprendimiento ${idEmprendimiento}:`, error);
+
+        return of([{
+          ruta: 'No especificada',
+          descripcion: 'No especificada',
+          tipo_plataforma: 'No especificada',
+        }]);
+      })
+    );
+  }
+
+  obtenerMultimediaPorId(id: number): Observable<string[]> {
+    return this.http.get<{ imagenes: string[] }>(`${this.url}/Emprendimientos/${id}/imagenes-emprendimiento`)
+      .pipe(map(response => response.imagenes));
+  }
+
 }
