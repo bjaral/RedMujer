@@ -9,5 +9,8 @@ namespace RedMujer_Backend.services
         Task<int> CrearAsync(PlataformaCreateDto dto);
         Task<int> ActualizarAsync(int id, PlataformaCreateDto dto);
         Task DeleteAsync(int id);
+        Task<IEnumerable<PlataformaDto>> GetByEmprendimientoIdAsync(int idEmprendimiento);
+
+
     }
 }

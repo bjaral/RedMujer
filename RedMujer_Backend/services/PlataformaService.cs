@@ -71,7 +71,19 @@ namespace RedMujer_Backend.services
 
             return id;
         }
-
+      public async Task<IEnumerable<PlataformaDto>> GetByEmprendimientoIdAsync(int idEmprendimiento)
+        {
+            var plataformas = await _repository.GetByEmprendimientoIdAsync(idEmprendimiento);
+            return plataformas.Select(p => new PlataformaDto
+            {
+                Id_Plataforma = p.Id_Plataforma,
+                Id_Emprendimiento = p.Id_Emprendimiento,
+                Ruta = p.Ruta,
+                Descripcion = p.Descripcion,
+                Vigencia = p.Vigencia,
+                Tipo_Plataforma = p.Tipo_Plataforma.ToString()
+            });
+        }
         public async Task DeleteAsync(int id)
         {
             await _repository.DeleteAsync(id);
