@@ -264,7 +264,7 @@
                     left: 0;
                     right: 0;
                     bottom: 0;
-                    background: rgba(231, 0, 76, 0.85);
+                    background: rgba(233, 30, 99, 0.8);
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -272,14 +272,23 @@
                     transition: all 0.3s ease;
 
                     .quick-view-btn {
-                        background: white;
-                        color: $primary-color;
+                        background: #ffdbda;
+                        color: #91002c;
+                        font-size: 24px;
+                        border: none !important;
+                        border-radius: 17px;
+                        width: 56px;
+                        height: 56px;
+                        padding: 1rem;
                         transform: translateY(20px);
                         transition: transform 0.3s ease;
-                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+                        cursor: pointer;
 
                         &:hover {
                             transform: translateY(0) scale(1.1);
+                            background: #f6c8ce;
+                            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
                         }
                     }
                 }
@@ -388,22 +397,22 @@
         color: #ccc;
         margin-bottom: 1rem;
     }
-    
+
     h3 {
         color: $secondary-color;
         margin-bottom: 0.5rem;
         font-size: 1.5rem;
     }
-    
+
     p {
         color: #666;
         margin-bottom: 1.5rem;
     }
-    
+
     button {
         background: $gradient;
         color: white;
-        
+
         mat-icon {
             margin-right: 0.5rem;
         }
@@ -415,6 +424,7 @@
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -424,16 +434,16 @@
 @media (max-width: 480px) {
     .search-container {
         padding: 1.5rem 0.5rem;
-        
+
         .search-bar {
             gap: 0.5rem;
         }
     }
-    
+
     .emprendimientos-section {
         padding: 1rem 0.5rem;
     }
-    
+
     .results-info {
         padding: 0 0.5rem;
     }

@@ -26,9 +26,10 @@ export class TokenService {
     }
   }
 
-  getNameIdentifier(): string | null {
+  getNameIdentifier(): number | null {
     const decoded = this.decodeToken();
-    return decoded?.['nameidentifier'] || null;
+    const nameIdentifier = decoded?.['nameidentifier'];
+    return nameIdentifier ? Number(nameIdentifier) : null;
   }
 
   getRole(): string | null {
