@@ -11,5 +11,7 @@ namespace RedMujer_Backend.repositories
         Task<int> InsertAsync(Persona persona);
         Task UpdateAsync(Persona persona);
         Task DeleteAsync(int id);
+        Task<Persona?> GetByUsuarioIdAsync(int idUsuario);
+
     }
 }

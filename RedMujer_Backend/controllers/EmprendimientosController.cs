@@ -25,6 +25,7 @@ namespace RedMujer_Backend.controllers
     [Route("api/[controller]")]
     public class EmprendimientosController : ControllerBase
     {
+        private readonly IPlataformaService _plataformaService;
         private readonly IEmprendimientoService _service;
         private readonly IWebHostEnvironment _env;
         private readonly ICategoriaService _categoriaService;
@@ -34,12 +35,14 @@ namespace RedMujer_Backend.controllers
             IEmprendimientoService service,
             IWebHostEnvironment env,
             ICategoriaService categoriaService,
-            IUbicacionService ubicacionService)
+            IUbicacionService ubicacionService,
+            IPlataformaService plataformaService)
         {
             _service = service;
             _env = env;
             _categoriaService = categoriaService;
             _ubicacionService = ubicacionService;
+            _plataformaService = plataformaService;
         }
 
         // =========== GETS ===========
@@ -357,5 +360,16 @@ namespace RedMujer_Backend.controllers
 
             return Path.Combine("emprendimientos", idEmprendimiento.ToString(), "imagen_principal", nombreArchivo).Replace("\\", "/");
         }
+        [HttpGet("/emprendimientos/{idEmprendimiento}/plataformas")]
+        public async Task<IActionResult> GetPlataformasPorEmprendimiento(int idEmprendimiento)
+        {
+            var plataformas = await _plataformaService.GetByEmprendimientoIdAsync(idEmprendimiento);
+
+            if (plataformas == null || !plataformas.Any())
+                return NotFound("No se encontraron plataformas para el emprendimiento.");
+
+            return Ok(plataformas);
+        }
+
     }
 }

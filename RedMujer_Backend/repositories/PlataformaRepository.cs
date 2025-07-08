@@ -94,5 +94,13 @@ namespace RedMujer_Backend.repositories
             await connection.ExecuteAsync(
                 "UPDATE \"Plataforma\" SET \"vigencia\" = false WHERE \"id_plataforma\" = @Id", new { Id = id });
         }
+        public async Task<IEnumerable<Plataforma>> GetByEmprendimientoIdAsync(int idEmprendimiento)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            var query = @"SELECT * FROM ""Plataforma"" 
+                        WHERE ""id_emprendimiento"" = @IdEmprendimiento AND ""vigencia"" = true";
+            return await connection.QueryAsync<Plataforma>(query, new { IdEmprendimiento = idEmprendimiento });
+        }
+
     }
 }
