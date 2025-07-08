@@ -92,8 +92,6 @@
                         <p class="card-description">{{ emp.descripcion }}</p>
                         <div class="card-tags">
                             <span class="tag">{{ emp.modalidad || 'Sin modalidad' }}</span>
-                            <span class="tag">{{ emp.region || 'Sin región' }}</span>
-                            <span class="tag">{{ emp.id_Emprendimiento || 'Sin id' }}</span>
                             <span class="tag" *ngFor="let categoria of emp.categorias">
                                 {{ categoria.nombre }}
                             </span>

@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { StepperOrientation } from '@angular/material/stepper';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { UbicacionService } from '../../services/ubicacion.service';
 import { Router } from '@angular/router';
 @Component({
