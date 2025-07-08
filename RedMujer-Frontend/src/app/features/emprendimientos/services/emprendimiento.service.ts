@@ -127,11 +127,10 @@ export class EmprendimientoService {
           }]);
         }
 
-        // Mapear todas las plataformas vigentes, no solo la primera
         const plataformasFormateadas = plataformasVigentes.map(plataforma => ({
           ruta: plataforma.ruta,
           descripcion: plataforma.descripcion,
-          tipo_plataforma: plataforma.tipo_Plataforma // Nota: mantengo la consistencia con el naming
+          tipo_plataforma: plataforma.tipo_Plataforma
         }));
 
         return of(plataformasFormateadas);
