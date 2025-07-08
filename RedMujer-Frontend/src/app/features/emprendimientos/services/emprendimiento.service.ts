@@ -93,8 +93,8 @@ export class EmprendimientoService {
         console.error(`Error al obtener ubicaciones para emprendimiento ${idEmprendimiento}:`, error);
 
         return of({
-          comuna: 'No especificada',
-          region: 'No especificada',
+          comuna: '',
+          region: '',
           id_Comuna: null,
           id_Region: null
         });

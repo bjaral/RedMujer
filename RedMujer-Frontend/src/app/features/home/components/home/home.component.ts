@@ -8,14 +8,12 @@ import { forkJoin, Observable } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
 export interface Emprendimiento {
-  id: string;
+  id_Emprendimiento: number;
   nombre: string;
   descripcion: string;
   imagen?: string;
   categorias?: any[];
   categoriasTexto?: string;
-  modalidad?: string;
-  fecha_inicio?: Date;
 }
 
 @Component({
@@ -56,6 +54,10 @@ export class HomeComponent implements OnInit {
 
   toEmprendimientos() {
     this.router.navigate(['/emprendimientos']);
+  }
+
+  verDetalles(emp: Emprendimiento): void {
+    this.router.navigate(['/emprendimientos', emp.id_Emprendimiento]);
   }
 
   onImageError(event: any): void {
