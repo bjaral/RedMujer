@@ -55,7 +55,6 @@ namespace RedMujer_Backend.controllers
             await _service.ActualizarAsync(id, dto);
             return NoContent();
         }
-        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
