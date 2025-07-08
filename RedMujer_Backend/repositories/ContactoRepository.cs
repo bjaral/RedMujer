@@ -86,5 +86,15 @@ namespace RedMujer_Backend.repositories
                 "UPDATE \"Contactos\" SET vigencia = false WHERE \"id_contacto\" = @Id",
                 new { Id = id });
         }
+        public async Task<IEnumerable<Contacto>> GetContactosPorEmprendimientoAsync(int idEmprendimiento)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            var query = @"
+                SELECT * FROM ""Contactos""
+                WHERE ""id_emprendimiento"" = @IdEmprendimiento
+                AND vigencia = true
+            ";
+            return await connection.QueryAsync<Contacto>(query, new { IdEmprendimiento = idEmprendimiento });
+        }
     }
 }
