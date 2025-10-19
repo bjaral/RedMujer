@@ -47,7 +47,7 @@ namespace RedMujer_Backend.repositories
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.ExecuteAsync(
                 @"DELETE FROM ""Emprendimiento_categoria""
-                  WHERE ""id_emprendimiento"" = @Id_Emprendimiento AND ""id_categoria"" = @Id_Categoria",
+                  WHERE ""id_emprendimiento"" = @IdEmprendimiento AND ""id_categoria"" = @IdCategoria",
                 new { IdEmprendimiento = idEmprendimiento, IdCategoria = idCategoria });
         }
     }
