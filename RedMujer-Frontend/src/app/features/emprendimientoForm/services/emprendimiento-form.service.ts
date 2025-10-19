@@ -9,6 +9,7 @@ import { map } from 'rxjs/operators';
 export class EmprendimientoFormService {
 
   private apiUrl = 'http://localhost:5145/api/Emprendimientos';
+  private api = 'http://localhost:5145/api/';
 
   constructor(private http: HttpClient) {}
 
@@ -55,6 +56,57 @@ export class EmprendimientoFormService {
 
   borrarImagenAdicional(id: number, nombreArchivo: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}/imagenes-emprendimiento/${nombreArchivo}`);
+  }
+
+  // Contactos
+  crearContacto(contacto: any): Observable<any> {
+    return this.http.post<any>(`${this.api}Contactos`, contacto);
+  }
+
+  obtenerContactosPorEmprendimiento(idEmprendimiento: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}Contactos/emprendimiento/${idEmprendimiento}`);
+  }
+
+  actualizarContacto(id: number, contacto: any): Observable<any> {
+    return this.http.put<any>(`${this.api}Contactos/${id}`, contacto);
+  }
+
+  eliminarContacto(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.api}Contactos/${id}`);
+  }
+
+  // Categorías
+  obtenerCategorias(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/categorias`);
+  }
+
+  crearEmprendimientoCategoria(empCat: any): Observable<any> {
+    return this.http.post<any>(`${this.api}EmprendimientoCategoria`, empCat);
+  }
+
+  obtenerCategoriasPorEmprendimiento(idEmprendimiento: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}EmprendimientoCategoria/emprendimiento/${idEmprendimiento}`);
+  }
+
+  eliminarEmprendimientoCategoria(idCategoria: number, idEmprendimiento: number): Observable<any> {
+    return this.http.delete<any>(`${this.api}EmprendimientoCategoria/${idCategoria}/${idEmprendimiento}`);
+  }
+
+  // Plataformas
+  crearPlataforma(plataforma: any): Observable<any> {
+    return this.http.post<any>(`${this.api}Plataforma`, plataforma);
+  }
+
+  obtenerPlataformasPorEmprendimiento(idEmprendimiento: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}Plataforma/emprendimiento/${idEmprendimiento}`);
+  }
+
+  actualizarPlataforma(id: number, plataforma: any): Observable<any> {
+    return this.http.put<any>(`${this.api}Plataforma/${id}`, plataforma);
+  }
+
+  eliminarPlataforma(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.api}Plataforma/${id}`);
   }
 
 }

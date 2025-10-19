@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { EmprendimientoFormService } from '../../services/emprendimiento-form.service';
 import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-nuevo-emprendimiento',
+  selector: 'app-editar-emprendimiento',
   standalone: true,
   imports: [MATERIAL_IMPORTS, ReactiveFormsModule, CommonModule],
   templateUrl: './editar-emprendimiento.component.html',
@@ -21,24 +21,137 @@ export class EditarEmprendimientoComponent implements OnInit {
   imagenesExtrasData: { preview: string; file: File }[] = [];
   imagenPrincipalFile: File | null = null;
   idEmprendimiento!: number;
+  categorias: any[] = [];
+  contactosOriginales: any[] = [];
+  plataformasOriginales: any[] = [];
+  categoriasOriginales: number[] = [];
 
-  constructor(private fb: FormBuilder, private emprendimientoFormService: EmprendimientoFormService, private router: Router,private route: ActivatedRoute) {
+  tiposContacto = ['telefono', 'email'];
+  tiposPlataforma = [
+    { value: 'red_social', label: 'Red Social' },
+    { value: 'sitio_web', label: 'Sitio Web' },
+    { value: 'mercado_online', label: 'Mercado Online' },
+    { value: 'aplicacion_movil', label: 'Aplicación Móvil' },
+    { value: 'otro', label: 'Otro' }
+  ];
+
+  redesSociales = ['Instagram', 'Facebook', 'LinkedIn', 'Twitter/X', 'TikTok', 'YouTube', 'Pinterest', 'Otra'];
+
+  constructor(
+    private fb: FormBuilder, 
+    private emprendimientoFormService: EmprendimientoFormService, 
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     this.formulario = this.fb.group({
       rut: ['', Validators.required],
       nombre: ['', Validators.required],
       descripcion: [''],
       modalidad: ['', Validators.required],
       horario_Atencion: ['', Validators.required],
+      categorias: [[], Validators.required],
+      contactos: this.fb.array([]),
+      plataformas: this.fb.array([])
     });
   }
 
   ngOnInit(): void {
+    this.cargarCategorias();
     this.route.params.subscribe(params => {
       this.idEmprendimiento = +params['id'];
       if (this.idEmprendimiento) {
         this.cargarEmprendimiento(this.idEmprendimiento);
       }
     });
+  }
+
+  cargarCategorias(): void {
+    this.emprendimientoFormService.obtenerCategorias().subscribe({
+      next: (categorias) => {
+        this.categorias = categorias;
+      },
+      error: (err) => {
+        console.error('Error al cargar categorías', err);
+      }
+    });
+  }
+
+  get contactos(): FormArray {
+    return this.formulario.get('contactos') as FormArray;
+  }
+
+  get plataformas(): FormArray {
+    return this.formulario.get('plataformas') as FormArray;
+  }
+
+  agregarContacto(): void {
+    const contactoGroup = this.fb.group({
+      id_Contacto: [null],
+      valor: [''],
+      tipo_Contacto: ['telefono']
+    });
+    this.contactos.push(contactoGroup);
+  }
+
+  eliminarContacto(index: number): void {
+    const confirmar = confirm('¿Estás segura de querer eliminar este contacto?');
+    if (!confirmar) return;
+
+    const contacto = this.contactos.at(index).value;
+    if (contacto.id_Contacto) {
+      this.emprendimientoFormService.eliminarContacto(contacto.id_Contacto).subscribe({
+        next: () => {
+          this.contactos.removeAt(index);
+          alert('Contacto eliminado correctamente.');
+        },
+        error: (err) => {
+          console.error('Error al eliminar contacto', err);
+          alert('Error al eliminar el contacto.');
+        }
+      });
+    } else {
+      if (this.contactos.length > 1) {
+        this.contactos.removeAt(index);
+      }
+    }
+  }
+
+  agregarPlataforma(): void {
+    const plataformaGroup = this.fb.group({
+      id_Plataforma: [null],
+      ruta: [''],
+      tipo_Plataforma: ['sitio_web'],
+      descripcion: ['']
+    });
+    this.plataformas.push(plataformaGroup);
+  }
+
+  eliminarPlataforma(index: number): void {
+    const confirmar = confirm('¿Estás segura de querer eliminar esta plataforma?');
+    if (!confirmar) return;
+
+    const plataforma = this.plataformas.at(index).value;
+    if (plataforma.id_Plataforma) {
+      this.emprendimientoFormService.eliminarPlataforma(plataforma.id_Plataforma).subscribe({
+        next: () => {
+          this.plataformas.removeAt(index);
+          alert('Plataforma eliminada correctamente.');
+        },
+        error: (err) => {
+          console.error('Error al eliminar plataforma', err);
+          alert('Error al eliminar la plataforma.');
+        }
+      });
+    } else {
+      if (this.plataformas.length > 1) {
+        this.plataformas.removeAt(index);
+      }
+    }
+  }
+
+  esTipoRedSocial(index: number): boolean {
+    const tipo = this.plataformas.at(index).get('tipo_Plataforma')?.value;
+    return tipo === 'red_social';
   }
 
   cargarEmprendimiento(id: number): void {
@@ -65,11 +178,79 @@ export class EditarEmprendimientoComponent implements OnInit {
             console.error('Error al cargar las imágenes secundarias', err);
           }
         });
+
+        this.cargarContactos();
+        this.cargarCategoriasSeleccionadas();
+        this.cargarPlataformas();
       },
       error: (error) => {
         console.error('Error al cargar el emprendimiento', error);
-        alert('Ocurrió un error al cargar el emprendimiento. Por favor, intenténtelo de nuevo');
+        alert('Ocurrió un error al cargar el emprendimiento. Por favor, inténtelo de nuevo');
         this.router.navigate(['/mis-emprendimientos']);
+      }
+    });
+  }
+
+  cargarContactos(): void {
+    this.emprendimientoFormService.obtenerContactosPorEmprendimiento(this.idEmprendimiento).subscribe({
+      next: (contactos) => {
+        this.contactosOriginales = contactos;
+        this.contactos.clear();
+        if (contactos && contactos.length > 0) {
+          contactos.forEach(contacto => {
+            const contactoGroup = this.fb.group({
+              id_Contacto: [contacto.id_Contacto],
+              valor: [contacto.valor],
+              tipo_Contacto: [contacto.tipo_Contacto]
+            });
+            this.contactos.push(contactoGroup);
+          });
+        } else {
+          this.agregarContacto();
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar contactos', err);
+        this.agregarContacto();
+      }
+    });
+  }
+
+  cargarCategoriasSeleccionadas(): void {
+    this.emprendimientoFormService.obtenerCategoriasPorEmprendimiento(this.idEmprendimiento).subscribe({
+      next: (categorias) => {
+        const categoriasIds = categorias.map(cat => cat.id_Categoria);
+        this.categoriasOriginales = categoriasIds;
+        this.formulario.patchValue({ categorias: categoriasIds });
+      },
+      error: (err) => {
+        console.error('Error al cargar categorías del emprendimiento', err);
+      }
+    });
+  }
+
+  cargarPlataformas(): void {
+    this.emprendimientoFormService.obtenerPlataformasPorEmprendimiento(this.idEmprendimiento).subscribe({
+      next: (plataformas) => {
+        this.plataformasOriginales = plataformas;
+        this.plataformas.clear();
+        if (plataformas && plataformas.length > 0) {
+          plataformas.forEach(plataforma => {
+            const plataformaGroup = this.fb.group({
+              id_Plataforma: [plataforma.id_Plataforma],
+              ruta: [plataforma.ruta],
+              tipo_Plataforma: [plataforma.tipo_Plataforma],
+              descripcion: [plataforma.descripcion || '']
+            });
+            this.plataformas.push(plataformaGroup);
+          });
+        } else {
+          this.agregarPlataforma();
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar plataformas', err);
+        this.agregarPlataforma();
       }
     });
   }
@@ -104,7 +285,7 @@ export class EditarEmprendimientoComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al eliminar la imagen principal', err);
-        alert('Ocurrió un error al eliminar la imagen principal. Por favor, intenténtelo de nuevo.');
+        alert('Ocurrió un error al eliminar la imagen principal. Por favor, inténtelo de nuevo.');
       }
     });
   }
@@ -149,7 +330,7 @@ export class EditarEmprendimientoComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al eliminar la imagen adicional', err);
-          alert('Ocurrió un error al eliminar la imagen adicional. Por favor, intenténtelo de nuevo.');
+          alert('Ocurrió un error al eliminar la imagen adicional. Por favor, inténtelo de nuevo.');
         }
       });
     } else {
@@ -185,24 +366,111 @@ export class EditarEmprendimientoComponent implements OnInit {
         if (filesToUpload.length > 0) {
           this.emprendimientoFormService.actualizarMultimedia(this.idEmprendimiento, filesToUpload).subscribe({
             next: () => {
-              alert('Emprendimiento e imágenes actualizados correctamente.');
-              this.router.navigate(['/mis-emprendimientos']);
+              console.log('Multimedia actualizada');
             },
             error: (err) => {
               console.error('Error al actualizar las imágenes adicionales', err);
-              alert('El emprendimiento y la imagen principal se actualizaron correctamente, pero ocurrió un error al actualizar las imágenes adicionales.');
             }
           });
-        } else {
-          alert('Emprendimiento actualizado correctamente, pero no se añadieron imágenes adicionales.');
-          this.router.navigate(['/mis-emprendimientos']);
         }
+        
+        this.actualizarContactos();
+        this.actualizarCategorias();
+        this.actualizarPlataformas();
+        
+        alert('Emprendimiento actualizado exitosamente.');
+        this.router.navigate(['/mis-emprendimientos']);
       },
       error: (error) => {
         console.error('Error al actualizar el emprendimiento', error);
         alert('Ocurrió un error al actualizar el emprendimiento.');
       }
     });
+  }
+
+  actualizarContactos(): void {
+    const contactos = this.formulario.get('contactos')?.value;
+    contactos.forEach((contacto: any) => {
+      if (contacto.valor) {
+        const contactoData = {
+          id_Emprendimiento: this.idEmprendimiento,
+          valor: contacto.valor,
+          tipo_Contacto: contacto.tipo_Contacto,
+          vigencia: true
+        };
+
+        if (contacto.id_Contacto) {
+          this.emprendimientoFormService.actualizarContacto(contacto.id_Contacto, contactoData).subscribe({
+            next: () => console.log('Contacto actualizado'),
+            error: (err) => console.error('Error al actualizar contacto', err)
+          });
+        } else {
+          this.emprendimientoFormService.crearContacto(contactoData).subscribe({
+            next: () => console.log('Contacto creado'),
+            error: (err) => console.error('Error al crear contacto', err)
+          });
+        }
+      }
+    });
+  }
+
+  actualizarCategorias(): void {
+    const categoriasSeleccionadas = this.formulario.get('categorias')?.value || [];
+    
+    // Eliminar categorías que ya no están seleccionadas
+    this.categoriasOriginales.forEach(idCategoria => {
+      if (!categoriasSeleccionadas.includes(idCategoria)) {
+        this.emprendimientoFormService.eliminarEmprendimientoCategoria(this.idEmprendimiento, idCategoria).subscribe({
+          next: () => console.log('Categoría eliminada'),
+          error: (err) => console.error('Error al eliminar categoría', err)
+        });
+      }
+    });
+
+    // Agregar nuevas categorías
+    categoriasSeleccionadas.forEach((idCategoria: number) => {
+      if (!this.categoriasOriginales.includes(idCategoria)) {
+        const empCat = {
+          id_Categoria: idCategoria,
+          id_Emprendimiento: this.idEmprendimiento
+        };
+        this.emprendimientoFormService.crearEmprendimientoCategoria(empCat).subscribe({
+          next: () => console.log('Categoría asociada'),
+          error: (err) => console.error('Error al asociar categoría', err)
+        });
+      }
+    });
+  }
+
+  actualizarPlataformas(): void {
+    const plataformas = this.formulario.get('plataformas')?.value;
+    plataformas.forEach((plataforma: any) => {
+      if (plataforma.ruta) {
+        const plataformaData = {
+          id_Emprendimiento: this.idEmprendimiento,
+          ruta: plataforma.ruta,
+          tipo_Plataforma: plataforma.tipo_Plataforma,
+          descripcion: plataforma.descripcion || '',
+          vigencia: true
+        };
+
+        if (plataforma.id_Plataforma) {
+          this.emprendimientoFormService.actualizarPlataforma(plataforma.id_Plataforma, plataformaData).subscribe({
+            next: () => console.log('Plataforma actualizada'),
+            error: (err) => console.error('Error al actualizar plataforma', err)
+          });
+        } else {
+          this.emprendimientoFormService.crearPlataforma(plataformaData).subscribe({
+            next: () => console.log('Plataforma creada'),
+            error: (err) => console.error('Error al crear plataforma', err)
+          });
+        }
+      }
+    });
+  }
+
+  get maximoImagenesExtrasAlcanzado(): boolean {
+    return this.imagenesExtras.length >= 5;
   }
   
 }
