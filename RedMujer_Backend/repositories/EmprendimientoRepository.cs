@@ -165,7 +165,7 @@ namespace RedMujer_Backend.repositories
 
         public async Task EliminarEmprendimientoAsync(int id)
         {
-            const string query = @"DELETE FROM public.""Emprendimientos"" WHERE id_emprendimiento = @Id;";
+            const string query = @"UPDATE public.""Emprendimientos"" SET vigencia = false WHERE id_emprendimiento = @Id;";
 
             using var connection = CreateConnection();
             await connection.ExecuteAsync(query, new { Id = id });
@@ -220,7 +220,7 @@ namespace RedMujer_Backend.repositories
                 SELECT e.*
                 FROM ""Emprendimientos"" e
                 INNER JOIN ""Persona_emprendimiento"" pe ON e.""id_emprendimiento"" = pe.""id_emprendimiento""
-                WHERE pe.""id_persona"" = @Id_Persona
+                WHERE pe.""id_persona"" = @Id_Persona AND vigencia = true
             ";
 
             return await connection.QueryAsync<Emprendimiento>(query, new { Id_Persona = id_Persona });

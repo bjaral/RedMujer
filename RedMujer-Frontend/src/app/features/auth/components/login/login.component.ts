@@ -4,16 +4,16 @@ import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angu
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
-import { CommonModule } from '@angular/common'; // Importar CommonModule si no está
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
-  standalone: true, // Asegúrate de que sea standalone si no lo es
+  standalone: true,
   imports: [CommonModule, ...MATERIAL_IMPORTS, RouterModule, FormsModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent implements AfterViewInit { // Implementar AfterViewInit
+export class LoginComponent implements AfterViewInit {
   @ViewChild('tituloRef') tituloRef!: ElementRef<HTMLHeadingElement>;
   @ViewChild('contenedorRef') contenedorRef!: ElementRef<HTMLElement>;
   @ViewChild('parrafoRef') parrafoRef!: ElementRef<HTMLElement>;
@@ -48,14 +48,13 @@ export class LoginComponent implements AfterViewInit { // Implementar AfterViewI
         correo: this.loginForm.value.email,
         password: this.loginForm.value.password
       };
-      console.log('Se envía al backend:', credentials);
 
       this.authService.login(credentials).subscribe({
         next: (res) => {
           if (res && res.token) {
             localStorage.setItem('tokenRedMujer', res.token);
           } else {
-            // Manejar caso donde no hay token en la respuesta
+            
           }
           console.log('Inicio de sesión exitoso');
           this.toPerfil();

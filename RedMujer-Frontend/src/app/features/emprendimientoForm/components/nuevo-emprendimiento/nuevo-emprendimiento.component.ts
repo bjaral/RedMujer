@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { EmprendimientoFormService } from '../../services/emprendimiento-form.service';
@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
   styleUrl: './nuevo-emprendimiento.component.scss'
 })
 
-export class NuevoEmprendimientoComponent {
+export class NuevoEmprendimientoComponent implements OnInit {
 
   formulario: FormGroup;
   imagenSeleccionada: string | ArrayBuffer | null = null;
@@ -26,6 +26,18 @@ export class NuevoEmprendimientoComponent {
   idUsuario: number = 0;
   idPersona: number = 0;
   idEmprendimiento: number = 0;
+  categorias: any[] = [];
+
+  tiposContacto = ['telefono', 'email'];
+  tiposPlataforma = [
+    { value: 'red_social', label: 'Red Social' },
+    { value: 'sitio_web', label: 'Sitio Web' },
+    { value: 'mercado_online', label: 'Mercado Online' },
+    { value: 'aplicacion_movil', label: 'Aplicación Móvil' },
+    { value: 'otro', label: 'Otro' }
+  ];
+
+  redesSociales = ['Instagram', 'Facebook', 'LinkedIn', 'Twitter/X', 'TikTok', 'YouTube', 'Pinterest', 'Otra'];
 
   constructor(
     private fb: FormBuilder,
@@ -39,8 +51,92 @@ export class NuevoEmprendimientoComponent {
       nombre: ['', Validators.required],
       descripcion: [''],
       modalidad: ['', Validators.required],
-      horario_Atencion: ['', Validators.required]
+      horario_Atencion: ['', Validators.required],
+      categorias: [[], Validators.required],
+      contactos: this.fb.array([]),
+      plataformas: this.fb.array([])
     });
+  }
+
+  ngOnInit(): void {
+    this.cargarCategorias();
+    this.agregarContacto();
+    this.agregarPlataforma();
+  }
+
+  cargarCategorias(): void {
+    this.emprendimientoFormService.obtenerCategorias().subscribe({
+      next: (categorias) => {
+        this.categorias = categorias;
+      },
+      error: (err) => {
+        console.error('Error al cargar categorías', err);
+      }
+    });
+  }
+
+  get contactos(): FormArray {
+    return this.formulario.get('contactos') as FormArray;
+  }
+
+  get plataformas(): FormArray {
+    return this.formulario.get('plataformas') as FormArray;
+  }
+
+  agregarContacto(): void {
+    const contactoGroup = this.fb.group({
+      valor: [''],
+      tipo_Contacto: ['telefono']
+    });
+    this.contactos.push(contactoGroup);
+  }
+
+  eliminarContacto(index: number): void {
+    if (this.contactos.length > 1) {
+      this.contactos.removeAt(index);
+    }
+  }
+
+  agregarPlataforma(): void {
+    const plataformaGroup = this.fb.group({
+      ruta: [''],
+      tipo_Plataforma: ['sitio_web'],
+      descripcion: ['']
+    });
+    this.plataformas.push(plataformaGroup);
+  }
+
+  eliminarPlataforma(index: number): void {
+    if (this.plataformas.length > 1) {
+      this.plataformas.removeAt(index);
+    }
+  }
+
+  esTipoRedSocial(index: number): boolean {
+    const tipo = this.plataformas.at(index).get('tipo_Plataforma')?.value;
+    return tipo === 'red_social';
+  }
+
+  formatRut(event: any): void {
+    let value = event.target.value;
+
+    value = value.replace(/[^0-9kK]/g, '');
+
+    let formattedRut = '';
+    if (value.length > 1) {
+      let rutBody = value.substring(0, value.length - 1);
+      const dv = value.substring(value.length - 1).toUpperCase();
+
+      rutBody = rutBody.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+      formattedRut = `${rutBody}-${dv}`;
+    } else {
+      formattedRut = value;
+    }
+
+    event.target.value = formattedRut;
+
+    this.formulario.get('rut')?.setValue(formattedRut, { emitEvent: false });
   }
 
   onFileSelected(event: Event): void {
@@ -130,6 +226,9 @@ export class NuevoEmprendimientoComponent {
             this.personaService.postEmprendimientoToPersona(this.idPersona, this.idEmprendimiento).subscribe({
               next: () => {
                 console.log('Emprendimiento asociado a la persona correctamente.');
+                this.guardarContactos();
+                this.guardarCategorias();
+                this.guardarPlataformas();
               },
               error: (err) => {
                 console.error('Error al asociar el emprendimiento a la persona:', err);
@@ -144,25 +243,73 @@ export class NuevoEmprendimientoComponent {
         if (this.imagenesExtrasFile.length > 0) {
           this.emprendimientoFormService.subirMultimedia(idEmprendimiento, this.imagenesExtrasFile).subscribe({
             next: () => {
-              alert('Emprendimiento creado y multimedia subida exitosamente.');
-              this.limpiarFormulario();
-              this.router.navigate(['/mis-emprendimientos']);
+              console.log('Multimedia subida exitosamente.');
             },
             error: (err) => {
               console.error('Error al subir multimedia', err);
-              alert('Emprendimiento creado, pero hubo un error al subir las imágenes adicionales.');
-              this.router.navigate(['/mis-emprendimientos']);
             }
           });
-        } else {
-          alert('Emprendimiento creado exitosamente.');
-          this.limpiarFormulario();
-          this.router.navigate(['/mis-emprendimientos']);
         }
       },
       error: (err) => {
         console.error('Error al crear el emprendimiento', err);
         alert('Ocurrió un error al crear el emprendimiento.');
+      }
+    });
+  }
+
+  guardarContactos(): void {
+    const contactos = this.formulario.get('contactos')?.value;
+    contactos.forEach((contacto: any) => {
+      if (contacto.valor) {
+        const contactoData = {
+          id_Emprendimiento: this.idEmprendimiento,
+          valor: contacto.valor,
+          tipo_Contacto: contacto.tipo_Contacto,
+          vigencia: true
+        };
+        this.emprendimientoFormService.crearContacto(contactoData).subscribe({
+          next: () => console.log('Contacto guardado'),
+          error: (err) => console.error('Error al guardar contacto', err)
+        });
+      }
+    });
+  }
+
+  guardarCategorias(): void {
+    const categorias = this.formulario.get('categorias')?.value;
+    categorias.forEach((idCategoria: number) => {
+      const empCat = {
+        id_Categoria: idCategoria,
+        id_Emprendimiento: this.idEmprendimiento
+      };
+      this.emprendimientoFormService.crearEmprendimientoCategoria(empCat).subscribe({
+        next: () => console.log('Categoría asociada'),
+        error: (err) => console.error('Error al asociar categoría', err)
+      });
+    });
+  }
+
+  guardarPlataformas(): void {
+    const plataformas = this.formulario.get('plataformas')?.value;
+    plataformas.forEach((plataforma: any) => {
+      if (plataforma.ruta) {
+        const plataformaData = {
+          id_Emprendimiento: this.idEmprendimiento,
+          ruta: plataforma.ruta,
+          tipo_Plataforma: plataforma.tipo_Plataforma,
+          descripcion: plataforma.descripcion || '',
+          vigencia: true
+        };
+        this.emprendimientoFormService.crearPlataforma(plataformaData).subscribe({
+          next: () => {
+            console.log('Plataforma guardada');
+            alert('Emprendimiento creado exitosamente.');
+            this.limpiarFormulario();
+            this.router.navigate(['/mis-emprendimientos']);
+          },
+          error: (err) => console.error('Error al guardar plataforma', err)
+        });
       }
     });
   }
@@ -173,6 +320,10 @@ export class NuevoEmprendimientoComponent {
     this.imagenPrincipalFile = null;
     this.imagenesExtras = [];
     this.imagenesExtrasFile = [];
+    this.contactos.clear();
+    this.plataformas.clear();
+    this.agregarContacto();
+    this.agregarPlataforma();
   }
 
   get maximoImagenesExtrasAlcanzado(): boolean {

@@ -6,7 +6,7 @@
     <div class="form-col-left">
       <mat-form-field appearance="outline" class="form-field">
         <mat-label>RUT</mat-label>
-        <input matInput formControlName="rut" required>
+        <input matInput formControlName="rut" required (input)="formatRut($event)">
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
@@ -32,6 +32,86 @@
         <mat-label>Horario de Atención</mat-label>
         <textarea matInput formControlName="horario_Atencion"></textarea>
       </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Categorías</mat-label>
+        <mat-select formControlName="categorias" multiple>
+          <mat-option *ngFor="let categoria of categorias" [value]="categoria.id_Categoria">
+            {{ categoria.nombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="contactos-section">
+        <h3>Contactos</h3>
+        <div formArrayName="contactos">
+          <div *ngFor="let contacto of contactos.controls; let i = index" [formGroupName]="i" class="contacto-group">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Tipo de Contacto</mat-label>
+              <mat-select formControlName="tipo_Contacto">
+                <mat-option *ngFor="let tipo of tiposContacto" [value]="tipo">
+                  {{ tipo }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Valor</mat-label>
+              <input matInput formControlName="valor" placeholder="Ej: +56912345678">
+            </mat-form-field>
+
+            <button type="button" mat-icon-button color="warn" (click)="eliminarContacto(i)" *ngIf="contactos.length > 1">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        <button type="button" mat-stroked-button color="primary" (click)="agregarContacto()">
+          <mat-icon>add</mat-icon> Agregar Contacto
+        </button>
+      </div>
+
+      <div class="plataformas-section">
+        <h3>Plataformas</h3>
+        <div formArrayName="plataformas">
+          <div *ngFor="let plataforma of plataformas.controls; let i = index" [formGroupName]="i" class="plataforma-group">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Tipo de Plataforma</mat-label>
+              <mat-select formControlName="tipo_Plataforma">
+                <mat-option *ngFor="let tipo of tiposPlataforma" [value]="tipo.value">
+                  {{ tipo.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field" *ngIf="esTipoRedSocial(i)">
+              <mat-label>Red Social</mat-label>
+              <mat-select formControlName="descripcion">
+                <mat-option *ngFor="let red of redesSociales" [value]="red">
+                  {{ red }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field" *ngIf="!esTipoRedSocial(i)">
+              <mat-label>Descripción</mat-label>
+              <input matInput formControlName="descripcion" placeholder="Descripción de la plataforma">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>URL/Enlace</mat-label>
+              <input matInput formControlName="ruta" placeholder="https://...">
+            </mat-form-field>
+
+            <button type="button" mat-icon-button color="warn" (click)="eliminarPlataforma(i)" *ngIf="plataformas.length > 1">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        <button type="button" mat-stroked-button color="primary" (click)="agregarPlataforma()">
+          <mat-icon>add</mat-icon> Agregar Plataforma
+        </button>
+      </div>
+      
     </div>
 
     <div class="form-col-right">

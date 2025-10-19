@@ -48,6 +48,12 @@ export class AuthService {
     return this.http.post(this.ubicacionUrl, ubicacion);
   }
 
+  verificarCorreo(correo: string): Observable<{ existe: boolean; correo: string }> {
+    return this.http.get<{ existe: boolean; correo: string }>(
+      `${this.usuarioUrl}/verificar-correo?correo=${encodeURIComponent(correo)}`
+    );
+  }
+
   logout(): void {
     this.tokenService.clearToken();
   }

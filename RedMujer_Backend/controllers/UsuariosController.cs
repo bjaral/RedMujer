@@ -102,5 +102,20 @@ namespace RedMujer_Backend.controllers
             await _service.EliminarAsync(id);
             return Ok(new { mensaje = "Usuario eliminado correctamente" });
         }
+
+        [HttpGet("verificar-correo")]
+        public async Task<ActionResult> VerificarCorreo([FromQuery] string correo)
+        {
+            if (string.IsNullOrWhiteSpace(correo))
+                return BadRequest(new { mensaje = "El correo es requerido" });
+
+            var usuario = await _service.GetByCorreoAsync(correo);
+
+            return Ok(new
+            {
+                existe = usuario != null,
+                correo = correo.Trim()
+            });
+        }
     }
 }
