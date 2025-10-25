@@ -19,5 +19,6 @@ namespace RedMujer_Backend.models
         public string? Horario_Atencion { get; set; }
         public bool Vigencia { get; set; }
         public string? Imagen { get; set; }
+        public string? VideoUrl { get; set; }
     }
 }

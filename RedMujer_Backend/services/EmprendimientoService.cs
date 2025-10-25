@@ -143,5 +143,13 @@ namespace RedMujer_Backend.services
         {
             return await _repo.GetByPersonaIdAsync(id_Persona);
         }
+        public async Task<string?> ObtenerVideoPrincipalAsync(int id)
+        {
+            return await _repo.GetVideoPrincipalAsync(id);
+        }
+        public async Task ActualizarVideoPrincipalAsync(int id, string? videoUrl)
+        {
+            await _repo.UpdateVideoPrincipalAsync(id, videoUrl);
+        }
     }
 }
