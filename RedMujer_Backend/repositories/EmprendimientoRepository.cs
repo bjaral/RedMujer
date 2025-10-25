@@ -225,5 +225,22 @@ namespace RedMujer_Backend.repositories
 
             return await connection.QueryAsync<Emprendimiento>(query, new { Id_Persona = id_Persona });
         }
+        public async Task<string?> GetVideoPrincipalAsync(int id)
+        {
+            const string sql = @"SELECT video_url FROM public.""Emprendimientos"" WHERE id_emprendimiento = @Id";
+            using (var connection = CreateConnection())
+            {
+                return await connection.QueryFirstOrDefaultAsync<string>(sql, new { Id = id });
+            }
+        }
+
+        public async Task UpdateVideoPrincipalAsync(int id, string? videoUrl)
+        {
+            const string sql = @"UPDATE public.""Emprendimientos"" SET video_url = @VideoUrl WHERE id_emprendimiento = @Id";
+            using (var connection = CreateConnection())
+            {
+                await connection.ExecuteAsync(sql, new { VideoUrl = videoUrl, Id = id });
+            }
+        }
     }
 }

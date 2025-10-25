@@ -11,7 +11,7 @@ public class EmprendimientoCreateDto
     public string? Horario_Atencion { get; set; }
     public bool? Vigencia { get; set; } // <-- ahora es anulable
     public IFormFile? Imagen { get; set; }
-
+    public string? VideoUrl { get; set; }
     public bool EsVacio()
     {
         return string.IsNullOrWhiteSpace(RUT)

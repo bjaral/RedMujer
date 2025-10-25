@@ -369,7 +369,33 @@ namespace RedMujer_Backend.controllers
                 return NotFound("No se encontraron plataformas para el emprendimiento.");
 
             return Ok(plataformas);
+        }   
+        // =========== ENDPOINT DE VIDEOS DE EMPRENDIMIENTO ===========
+        [HttpGet("/emprendimientos/{idEmprendimiento}/video")]
+        public async Task<ActionResult<string>> GetVideoPrincipal(int idEmprendimiento)
+        {
+            var videoUrl = await _service.ObtenerVideoPrincipalAsync(idEmprendimiento);
+            if (string.IsNullOrEmpty(videoUrl))
+                return NotFound("No se encontró un video principal para este emprendimiento.");
+            return Ok(videoUrl);
+        }
+        [HttpPost("/emprendimientos/{idEmprendimiento}/video")]
+        public async Task<ActionResult> PostVideoPrincipal(int idEmprendimiento, [FromForm] string? videoUrl)
+        {
+            await _service.ActualizarVideoPrincipalAsync(idEmprendimiento, videoUrl);
+            return Ok();
         }
 
+        [HttpPut("/emprendimientos/{idEmprendimiento}/video")]
+        public async Task<ActionResult> PutVideoPrincipal(int idEmprendimiento, [FromForm] string? videoUrl)
+        {
+            var existe = await _service.ExisteAsync(idEmprendimiento);
+            if (!existe)
+                return NotFound($"No se encontró el emprendimiento con ID {idEmprendimiento}");
+                
+            await _service.ActualizarVideoPrincipalAsync(idEmprendimiento, videoUrl);
+            return Ok(new { mensaje = "Video actualizado correctamente" });
+        }
+        
     }
 }
