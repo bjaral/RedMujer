@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } fr
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { EmprendimientoFormService } from '../../services/emprendimiento-form.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-editar-emprendimiento',
@@ -25,6 +26,7 @@ export class EditarEmprendimientoComponent implements OnInit {
   contactosOriginales: any[] = [];
   plataformasOriginales: any[] = [];
   categoriasOriginales: number[] = [];
+  videoEmbedUrl: SafeResourceUrl | null = null;
 
   tiposContacto = ['telefono', 'email'];
   tiposPlataforma = [
@@ -41,7 +43,8 @@ export class EditarEmprendimientoComponent implements OnInit {
     private fb: FormBuilder, 
     private emprendimientoFormService: EmprendimientoFormService, 
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private sanitizer: DomSanitizer
   ) {
     this.formulario = this.fb.group({
       rut: ['', Validators.required],
@@ -50,6 +53,7 @@ export class EditarEmprendimientoComponent implements OnInit {
       modalidad: ['', Validators.required],
       horario_Atencion: ['', Validators.required],
       categorias: [[], Validators.required],
+      videoUrl: [''],
       contactos: this.fb.array([]),
       plataformas: this.fb.array([])
     });
@@ -154,6 +158,48 @@ export class EditarEmprendimientoComponent implements OnInit {
     return tipo === 'red_social';
   }
 
+  onVideoUrlChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const url = input.value.trim();
+    
+    if (!url) {
+      this.videoEmbedUrl = null;
+      return;
+    }
+
+    const videoId = this.extractYoutubeVideoId(url);
+    if (videoId) {
+      const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+      this.videoEmbedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+    } else {
+      this.videoEmbedUrl = null;
+      alert('Por favor ingresa una URL válida de YouTube.');
+    }
+  }
+
+  extractYoutubeVideoId(url: string): string | null {
+    const patterns = [
+      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/,
+      /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^?]+)/,
+      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^?]+)/
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    return null;
+  }
+
+  removeVideo(): void {
+    const confirmar = confirm('¿Estás segura de querer eliminar el video?');
+    if (!confirmar) return;
+    this.formulario.get('videoUrl')?.setValue('');
+    this.videoEmbedUrl = null;
+  }
+
   cargarEmprendimiento(id: number): void {
     this.emprendimientoFormService.obtenerEmprendimientoPorId(id).subscribe({
       next: (emprendimiento) => {
@@ -163,7 +209,17 @@ export class EditarEmprendimientoComponent implements OnInit {
           descripcion: (emprendimiento.descripcion && emprendimiento.descripcion !== 'null') ? emprendimiento.descripcion : '',
           modalidad: emprendimiento.modalidad,
           horario_Atencion: emprendimiento.horario_Atencion,
+          videoUrl: emprendimiento.videoUrl || ''
         });
+
+        // Cargar video si existe
+        if (emprendimiento.videoUrl) {
+          const videoId = this.extractYoutubeVideoId(emprendimiento.videoUrl);
+          if (videoId) {
+            const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+            this.videoEmbedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+          }
+        }
 
         if (emprendimiento.imagen) {
           this.imagenSeleccionada = `http://localhost:5145/media/${emprendimiento.imagen}`;
@@ -355,6 +411,7 @@ export class EditarEmprendimientoComponent implements OnInit {
     formData.append('Modalidad', data.modalidad);
     formData.append('Horario_Atencion', data.horario_Atencion);
     formData.append('Vigencia', 'true');
+    formData.append('VideoUrl', data.videoUrl);
 
     if (this.imagenPrincipalFile) {
       formData.append('Imagen', this.imagenPrincipalFile);

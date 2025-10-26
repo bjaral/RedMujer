@@ -144,6 +144,19 @@
           </button>
         </div>
       </div>
+
+      <mat-form-field appearance="outline" class="form-field video-field">
+        <mat-label>Video de YouTube (opcional)</mat-label>
+        <input matInput formControlName="videoUrl" (change)="onVideoUrlChange($event)" placeholder="https://youtube.com/watch?v=...">
+        <mat-icon matSuffix>videocam</mat-icon>
+      </mat-form-field>
+
+      <div class="video-preview" *ngIf="videoEmbedUrl">
+        <iframe [src]="videoEmbedUrl" frameborder="0" allowfullscreen></iframe>
+        <button type="button" class="remove-btn" (click)="removeVideo()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
     </div>
 
     <button mat-raised-button color="primary" type="submit" [disabled]="formulario.invalid">Guardar</button>

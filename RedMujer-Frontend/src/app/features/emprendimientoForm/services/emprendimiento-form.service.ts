@@ -77,7 +77,7 @@ export class EmprendimientoFormService {
 
   // Categorías
   obtenerCategorias(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.api}/categorias`);
+    return this.http.get<any[]>(`http://localhost:5145/categorias`);
   }
 
   crearEmprendimientoCategoria(empCat: any): Observable<any> {
@@ -85,7 +85,7 @@ export class EmprendimientoFormService {
   }
 
   obtenerCategoriasPorEmprendimiento(idEmprendimiento: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.api}EmprendimientoCategoria/emprendimiento/${idEmprendimiento}`);
+    return this.http.get<any[]>(`http://localhost:5145/emprendimientos/${idEmprendimiento}/categorias`);
   }
 
   eliminarEmprendimientoCategoria(idCategoria: number, idEmprendimiento: number): Observable<any> {
@@ -98,7 +98,7 @@ export class EmprendimientoFormService {
   }
 
   obtenerPlataformasPorEmprendimiento(idEmprendimiento: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.api}Plataforma/emprendimiento/${idEmprendimiento}`);
+    return this.http.get<any[]>(`http://localhost:5145/emprendimientos/${idEmprendimiento}/plataformas`);
   }
 
   actualizarPlataforma(id: number, plataforma: any): Observable<any> {

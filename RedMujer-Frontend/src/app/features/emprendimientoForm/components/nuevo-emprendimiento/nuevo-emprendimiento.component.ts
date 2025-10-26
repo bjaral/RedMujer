@@ -7,6 +7,7 @@ import { EmprendimientoFormService } from '../../services/emprendimiento-form.se
 import { TokenService } from '../../../../core/services/token.service';
 import { PersonaService } from '../../../profile/services/persona.service';
 import { Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-nuevo-emprendimiento',
@@ -27,6 +28,7 @@ export class NuevoEmprendimientoComponent implements OnInit {
   idPersona: number = 0;
   idEmprendimiento: number = 0;
   categorias: any[] = [];
+  videoEmbedUrl: SafeResourceUrl | null = null;
 
   tiposContacto = ['telefono', 'email'];
   tiposPlataforma = [
@@ -44,7 +46,8 @@ export class NuevoEmprendimientoComponent implements OnInit {
     private emprendimientoFormService: EmprendimientoFormService,
     private personaService: PersonaService,
     private tokenService: TokenService,
-    private router: Router
+    private router: Router,
+    private sanitizer: DomSanitizer
   ) {
     this.formulario = this.fb.group({
       rut: ['', Validators.required],
@@ -53,6 +56,7 @@ export class NuevoEmprendimientoComponent implements OnInit {
       modalidad: ['', Validators.required],
       horario_Atencion: ['', Validators.required],
       categorias: [[], Validators.required],
+      videoUrl: [''],
       contactos: this.fb.array([]),
       plataformas: this.fb.array([])
     });
@@ -115,6 +119,48 @@ export class NuevoEmprendimientoComponent implements OnInit {
   esTipoRedSocial(index: number): boolean {
     const tipo = this.plataformas.at(index).get('tipo_Plataforma')?.value;
     return tipo === 'red_social';
+  }
+
+  onVideoUrlChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const url = input.value.trim();
+    
+    if (!url) {
+      this.videoEmbedUrl = null;
+      return;
+    }
+
+    const videoId = this.extractYoutubeVideoId(url);
+    if (videoId) {
+      const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+      this.videoEmbedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+    } else {
+      this.videoEmbedUrl = null;
+      alert('Por favor ingresa una URL válida de YouTube.');
+    }
+  }
+
+  extractYoutubeVideoId(url: string): string | null {
+    const patterns = [
+      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/,
+      /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^?]+)/,
+      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^?]+)/
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    return null;
+  }
+
+  removeVideo(): void {
+    const confirmar = confirm('¿Estás segura de querer eliminar el video?');
+    if (!confirmar) return;
+    this.formulario.get('videoUrl')?.setValue('');
+    this.videoEmbedUrl = null;
   }
 
   formatRut(event: any): void {
@@ -203,6 +249,8 @@ export class NuevoEmprendimientoComponent implements OnInit {
     formData.append('Modalidad', data.modalidad);
     formData.append('Horario_Atencion', data.horario_Atencion);
     formData.append('Vigencia', 'true');
+    formData.append('VideoUrl', data.videoUrl);
+    
     if (this.imagenPrincipalFile) {
       formData.append('Imagen', this.imagenPrincipalFile);
     }
@@ -320,6 +368,7 @@ export class NuevoEmprendimientoComponent implements OnInit {
     this.imagenPrincipalFile = null;
     this.imagenesExtras = [];
     this.imagenesExtrasFile = [];
+    this.videoEmbedUrl = null;
     this.contactos.clear();
     this.plataformas.clear();
     this.agregarContacto();
