@@ -16,7 +16,7 @@ namespace RedMujer_Backend.repositories
         Task UpdateImagenPrincipalAsync(int id, string? ruta);
         // obtener los emprendimientos de una persona
         Task<IEnumerable<Emprendimiento>> GetByPersonaIdAsync(int idPersona);   
-        Task<string?> GetVideoPrincipalAsync(int id);
-        Task UpdateVideoPrincipalAsync(int id, string? ruta);
+        // Task<string?> GetVideoPrincipalAsync(int id);
+        // Task UpdateVideoPrincipalAsync(int id, string? ruta);
     }   
 }

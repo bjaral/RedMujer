@@ -60,7 +60,8 @@ namespace RedMujer_Backend.services
                 Horario_Atencion = dto.Horario_Atencion,
                 Vigencia = dto.Vigencia ?? false,
                 Imagen = !string.IsNullOrEmpty(rutaImagen) ? rutaImagen.Replace("\\", "/") : null,
-                Modalidad = MapearModalidad(dto.Modalidad)
+                Modalidad = MapearModalidad(dto.Modalidad),
+                VideoUrl = dto.VideoUrl
             };
             var id = await _repo.InsertarEmprendimientoAsync(entidad);
             entidad.Id_Emprendimiento = id;
@@ -79,6 +80,7 @@ namespace RedMujer_Backend.services
             emprendimientoExistente.Horario_Atencion = dto.Horario_Atencion;
             emprendimientoExistente.Vigencia = dto.Vigencia ?? emprendimientoExistente.Vigencia;
             emprendimientoExistente.Modalidad = MapearModalidad(dto.Modalidad);
+            emprendimientoExistente.VideoUrl = dto.VideoUrl;
 
             if (!string.IsNullOrEmpty(rutaImagen))
                 emprendimientoExistente.Imagen = rutaImagen.Replace("\\", "/");
@@ -130,6 +132,7 @@ namespace RedMujer_Backend.services
                 Horario_Atencion = e.Horario_Atencion,
                 Vigencia = e.Vigencia,
                 Imagen = e.Imagen,
+                VideoUrl = e.VideoUrl,
                 Modalidad = e.Modalidad switch
                 {
                     TipoModalidad.PresencialYOnline => "PresencialYOnline",
@@ -143,13 +146,13 @@ namespace RedMujer_Backend.services
         {
             return await _repo.GetByPersonaIdAsync(id_Persona);
         }
-        public async Task<string?> ObtenerVideoPrincipalAsync(int id)
-        {
-            return await _repo.GetVideoPrincipalAsync(id);
-        }
-        public async Task ActualizarVideoPrincipalAsync(int id, string? videoUrl)
-        {
-            await _repo.UpdateVideoPrincipalAsync(id, videoUrl);
-        }
+        // public async Task<string?> ObtenerVideoPrincipalAsync(int id)
+        // {
+        //     return await _repo.GetVideoPrincipalAsync(id);
+        // }
+        // public async Task ActualizarVideoPrincipalAsync(int id, string? videoUrl)
+        // {
+        //     await _repo.UpdateVideoPrincipalAsync(id, videoUrl);
+        // }
     }
 }
