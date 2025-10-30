@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { EmprendimientoFormService } from '../../services/emprendimiento-form.service';
+import { UbicacionService } from '../../services/ubicacion.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
@@ -22,7 +23,10 @@ export class EditarEmprendimientoComponent implements OnInit {
   imagenesExtrasData: { preview: string; file: File }[] = [];
   imagenPrincipalFile: File | null = null;
   idEmprendimiento!: number;
+  idUbicacion: number = 0;
   categorias: any[] = [];
+  regiones: any[] = [];
+  comunas: any[] = [];
   contactosOriginales: any[] = [];
   plataformasOriginales: any[] = [];
   categoriasOriginales: number[] = [];
@@ -41,7 +45,8 @@ export class EditarEmprendimientoComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder, 
-    private emprendimientoFormService: EmprendimientoFormService, 
+    private emprendimientoFormService: EmprendimientoFormService,
+    private ubicacionService: UbicacionService,
     private router: Router,
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer
@@ -55,12 +60,20 @@ export class EditarEmprendimientoComponent implements OnInit {
       categorias: [[], Validators.required],
       videoUrl: [''],
       contactos: this.fb.array([]),
-      plataformas: this.fb.array([])
+      plataformas: this.fb.array([]),
+      ubicacion: this.fb.group({
+        region: [null, Validators.required],
+        comuna: [null, Validators.required],
+        calle: ['', Validators.required],
+        numero: ['', Validators.required],
+        referencia: ['']
+      })
     });
   }
 
   ngOnInit(): void {
     this.cargarCategorias();
+    this.cargarRegiones();
     this.route.params.subscribe(params => {
       this.idEmprendimiento = +params['id'];
       if (this.idEmprendimiento) {
@@ -78,6 +91,35 @@ export class EditarEmprendimientoComponent implements OnInit {
         console.error('Error al cargar categorías', err);
       }
     });
+  }
+
+  cargarRegiones(): void {
+    this.ubicacionService.regiones().subscribe({
+      next: (regiones) => {
+        this.regiones = regiones;
+      },
+      error: (err) => {
+        console.error('Error al cargar regiones', err);
+      }
+    });
+  }
+
+  onRegionChange(): void {
+    const regionObj = this.formulario.get('ubicacion.region')?.value;
+    if (regionObj && regionObj.id_Region) {
+      this.ubicacionService.comunasPorRegion(regionObj.id_Region).subscribe({
+        next: (comunas) => {
+          this.comunas = comunas;
+          this.formulario.get('ubicacion.comuna')?.setValue(null);
+        },
+        error: (err) => {
+          console.error('Error al cargar comunas', err);
+        }
+      });
+    } else {
+      this.comunas = [];
+      this.formulario.get('ubicacion.comuna')?.setValue(null);
+    }
   }
 
   get contactos(): FormArray {
@@ -203,6 +245,8 @@ export class EditarEmprendimientoComponent implements OnInit {
   cargarEmprendimiento(id: number): void {
     this.emprendimientoFormService.obtenerEmprendimientoPorId(id).subscribe({
       next: (emprendimiento) => {
+        this.idUbicacion = emprendimiento.id_Ubicacion;
+        
         this.formulario.patchValue({
           rut: emprendimiento.rut,
           nombre: emprendimiento.nombre,
@@ -238,6 +282,7 @@ export class EditarEmprendimientoComponent implements OnInit {
         this.cargarContactos();
         this.cargarCategoriasSeleccionadas();
         this.cargarPlataformas();
+        this.cargarUbicacion();
       },
       error: (error) => {
         console.error('Error al cargar el emprendimiento', error);
@@ -245,6 +290,44 @@ export class EditarEmprendimientoComponent implements OnInit {
         this.router.navigate(['/mis-emprendimientos']);
       }
     });
+  }
+
+  cargarUbicacion(): void {
+    if (this.idUbicacion) {
+      this.emprendimientoFormService.obtenerUbicacionPorId(this.idUbicacion).subscribe({
+        next: (ubicacion) => {
+          // Buscar la región correspondiente
+          const regionEncontrada = this.regiones.find((r: any) => r.id_Region === ubicacion.id_Region);
+          
+          if (regionEncontrada) {
+            this.formulario.get('ubicacion.region')?.setValue(regionEncontrada);
+            
+            // Cargar comunas de esa región
+            this.ubicacionService.comunasPorRegion(ubicacion.id_Region).subscribe({
+              next: (comunas) => {
+                this.comunas = comunas;
+                
+                this.formulario.patchValue({
+                  ubicacion: {
+                    region: regionEncontrada,
+                    comuna: ubicacion.comuna,
+                    calle: ubicacion.calle,
+                    numero: ubicacion.numero,
+                    referencia: ubicacion.referencia || ''
+                  }
+                });
+              },
+              error: (err) => {
+                console.error('Error al cargar comunas', err);
+              }
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Error al cargar ubicación', err);
+        }
+      });
+    }
   }
 
   cargarContactos(): void {
@@ -398,10 +481,38 @@ export class EditarEmprendimientoComponent implements OnInit {
 
   onSubmit() {
     if (this.formulario.invalid) {
+      this.formulario.markAllAsTouched();
       alert('Por favor completa todos los campos obligatorios.');
       return;
     }
 
+    // Actualizar ubicación primero
+    const ubicacionData = this.formulario.get('ubicacion')?.value;
+    const regionObj = ubicacionData.region;
+    const comunaObj = this.comunas.find(c => c.nombre === ubicacionData.comuna);
+
+    const ubicacion = {
+      id_Region: Number(regionObj.id_Region),
+      id_Comuna: Number(comunaObj.id_Comuna),
+      calle: ubicacionData.calle,
+      numero: String(ubicacionData.numero),
+      referencia: ubicacionData.referencia || '',
+      vigencia: true
+    };
+
+    this.emprendimientoFormService.actualizarUbicacion(this.idUbicacion, ubicacion).subscribe({
+      next: () => {
+        console.log('Ubicación actualizada');
+        this.actualizarEmprendimiento();
+      },
+      error: (err) => {
+        console.error('Error al actualizar ubicación', err);
+        alert('Ocurrió un error al actualizar la ubicación.');
+      }
+    });
+  }
+
+  private actualizarEmprendimiento(): void {
     const data = this.formulario.value;
     const formData = new FormData();
 
@@ -411,7 +522,8 @@ export class EditarEmprendimientoComponent implements OnInit {
     formData.append('Modalidad', data.modalidad);
     formData.append('Horario_Atencion', data.horario_Atencion);
     formData.append('Vigencia', 'true');
-    formData.append('VideoUrl', data.videoUrl);
+    formData.append('VideoUrl', data.videoUrl || '');
+    formData.append('Id_Ubicacion', this.idUbicacion.toString());
 
     if (this.imagenPrincipalFile) {
       formData.append('Imagen', this.imagenPrincipalFile);

@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { EmprendimientoFormService } from '../../services/emprendimiento-form.service';
+import { UbicacionService } from '../../services/ubicacion.service';
 import { TokenService } from '../../../../core/services/token.service';
 import { PersonaService } from '../../../profile/services/persona.service';
 import { Router } from '@angular/router';
@@ -27,7 +28,10 @@ export class NuevoEmprendimientoComponent implements OnInit {
   idUsuario: number = 0;
   idPersona: number = 0;
   idEmprendimiento: number = 0;
+  idUbicacion: number = 0;
   categorias: any[] = [];
+  regiones: any[] = [];
+  comunas: any[] = [];
   videoEmbedUrl: SafeResourceUrl | null = null;
 
   tiposContacto = ['telefono', 'email'];
@@ -44,6 +48,7 @@ export class NuevoEmprendimientoComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private emprendimientoFormService: EmprendimientoFormService,
+    private ubicacionService: UbicacionService,
     private personaService: PersonaService,
     private tokenService: TokenService,
     private router: Router,
@@ -58,12 +63,20 @@ export class NuevoEmprendimientoComponent implements OnInit {
       categorias: [[], Validators.required],
       videoUrl: [''],
       contactos: this.fb.array([]),
-      plataformas: this.fb.array([])
+      plataformas: this.fb.array([]),
+      ubicacion: this.fb.group({
+        region: [null, Validators.required],
+        comuna: [null, Validators.required],
+        calle: ['', Validators.required],
+        numero: ['', Validators.required],
+        referencia: ['']
+      })
     });
   }
 
   ngOnInit(): void {
     this.cargarCategorias();
+    this.cargarRegiones();
     this.agregarContacto();
     this.agregarPlataforma();
   }
@@ -77,6 +90,35 @@ export class NuevoEmprendimientoComponent implements OnInit {
         console.error('Error al cargar categorías', err);
       }
     });
+  }
+
+  cargarRegiones(): void {
+    this.ubicacionService.regiones().subscribe({
+      next: (regiones) => {
+        this.regiones = regiones;
+      },
+      error: (err) => {
+        console.error('Error al cargar regiones', err);
+      }
+    });
+  }
+
+  onRegionChange(): void {
+    const regionObj = this.formulario.get('ubicacion.region')?.value;
+    if (regionObj && regionObj.id_Region) {
+      this.ubicacionService.comunasPorRegion(regionObj.id_Region).subscribe({
+        next: (comunas) => {
+          this.comunas = comunas;
+          this.formulario.get('ubicacion.comuna')?.setValue(null);
+        },
+        error: (err) => {
+          console.error('Error al cargar comunas', err);
+        }
+      });
+    } else {
+      this.comunas = [];
+      this.formulario.get('ubicacion.comuna')?.setValue(null);
+    }
   }
 
   get contactos(): FormArray {
@@ -236,10 +278,38 @@ export class NuevoEmprendimientoComponent implements OnInit {
 
   onSubmit(): void {
     if (this.formulario.invalid) {
+      this.formulario.markAllAsTouched();
       alert('Por favor completa todos los campos obligatorios.');
       return;
     }
 
+    // Primero crear la ubicación
+    const ubicacionData = this.formulario.get('ubicacion')?.value;
+    const regionObj = ubicacionData.region;
+    const comunaObj = this.comunas.find(c => c.nombre === ubicacionData.comuna);
+
+    const ubicacion = {
+      id_Region: Number(regionObj.id_Region),
+      id_Comuna: Number(comunaObj.id_Comuna),
+      calle: ubicacionData.calle,
+      numero: String(ubicacionData.numero),
+      referencia: ubicacionData.referencia || '',
+      vigencia: true
+    };
+
+    this.emprendimientoFormService.crearUbicacion(ubicacion).subscribe({
+      next: (ubicacionRes) => {
+        this.idUbicacion = ubicacionRes.id_Ubicacion;
+        this.crearEmprendimiento();
+      },
+      error: (err) => {
+        console.error('Error al crear ubicación', err);
+        alert('Ocurrió un error al crear la ubicación.');
+      }
+    });
+  }
+
+  private crearEmprendimiento(): void {
     const formData = new FormData();
     const data = this.formulario.value;
 
@@ -249,7 +319,8 @@ export class NuevoEmprendimientoComponent implements OnInit {
     formData.append('Modalidad', data.modalidad);
     formData.append('Horario_Atencion', data.horario_Atencion);
     formData.append('Vigencia', 'true');
-    formData.append('VideoUrl', data.videoUrl);
+    formData.append('VideoUrl', data.videoUrl || '');
+    formData.append('Id_Ubicacion', this.idUbicacion.toString());
     
     if (this.imagenPrincipalFile) {
       formData.append('Imagen', this.imagenPrincipalFile);
@@ -371,6 +442,7 @@ export class NuevoEmprendimientoComponent implements OnInit {
     this.videoEmbedUrl = null;
     this.contactos.clear();
     this.plataformas.clear();
+    this.comunas = [];
     this.agregarContacto();
     this.agregarPlataforma();
   }

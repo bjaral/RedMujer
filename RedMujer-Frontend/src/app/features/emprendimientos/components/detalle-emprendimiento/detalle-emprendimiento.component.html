@@ -1,46 +1,81 @@
 <div class="contenedor-principal">
     <div class="informacion-principal">
         <h3 class="nombre-emprendimiento">{{ emprendimiento.nombre }}</h3>
-        <p>{{ emprendimiento.descripcion }}</p>
+        <p>{{ emprendimiento.descripcion || 'La emprendedora no ha proporcionado una descripción.' }}</p>
 
         <h4>CATEGORÍA</h4>
-        <p class="categoria">{{ emprendimiento.categoriasTexto }}</p>
+        <p class="categoria">{{ emprendimiento.categoriasTexto || 'La emprendedora no ha proporcionado categorías.' }}</p>
+
+        <h4>MODALIDAD</h4>
+        <p class="categoria">{{ emprendimiento.modalidad || 'La emprendedora no ha proporcionado la modalidad.' }}</p>
+
+        <h4>HORARIO DE ATENCIÓN</h4>
+        <p class="categoria">{{ emprendimiento.horario_Atencion || 'La emprendedora no ha proporcionado horarios de atención.' }}</p>
 
         <h4>PLATAFORMAS</h4>
-        <div class="iconos">
+        <div class="iconos" *ngIf="emprendimiento.plataformas && emprendimiento.plataformas.length > 0">
             <a *ngFor="let plataforma of emprendimiento.plataformas" [href]="plataforma.ruta" target="_blank"
                 rel="noreferrer" class="plataforma-link" [title]="plataforma.descripcion">
                 <mat-icon>{{ plataforma.icon }}</mat-icon>
             </a>
         </div>
+        <p class="categoria" *ngIf="!emprendimiento.plataformas || emprendimiento.plataformas.length === 0">
+            La emprendedora no ha proporcionado plataformas de contacto.
+        </p>
 
         <h4>UBICACIÓN</h4>
-        <a href="https://www.google.com/maps/search/?api=1&query={{emprendimiento.calle}}+{{emprendimiento.numero}},+{{emprendimiento.comuna}},+{{emprendimiento.region}}"
+        <a *ngIf="emprendimiento.calle && emprendimiento.numero && emprendimiento.comuna && emprendimiento.region"
+            href="https://www.google.com/maps/search/?api=1&query={{emprendimiento.calle}}+{{emprendimiento.numero}},+{{emprendimiento.comuna}},+{{emprendimiento.region}}"
             target="_blank" rel="noreferrer">{{emprendimiento.calle}} {{emprendimiento.numero}}
             {{emprendimiento.comuna}} {{emprendimiento.region}}</a>
+        <p class="categoria" *ngIf="!emprendimiento.calle || !emprendimiento.numero || !emprendimiento.comuna || !emprendimiento.region">
+            La emprendedora no ha proporcionado una ubicación física.
+        </p>
     </div>
 
-    <!-- FLASHCARD SOLO IMAGEN PRINCIPAL -->
     <div class="imagen-principal">
         <img [src]="emprendimiento.imagen" alt="" (error)="onImageError($event)" loading="lazy">
     </div>
 </div>
 
-<!-- GALERÍA FUERA DEL FLASHCARD -->
 <div class="contenedor">
     <h2>GALERÍA</h2>
-    <div class="galeria">
-        <img *ngFor="let imagen of imagenesExtras" [src]="imagen" alt="Imagen de {{ emprendimiento.nombre }}"
-            (error)="onImageError($event)" loading="lazy">
+    <div class="galeria" *ngIf="imagenesExtras && imagenesExtras.length > 0">
+        <img *ngFor="let imagen of imagenesExtras; let i = index" 
+             [src]="imagen" 
+             alt="Imagen de {{ emprendimiento.nombre }}"
+             (error)="onImageError($event)" 
+             (click)="abrirModal(imagen, i)"
+             loading="lazy">
+    </div>
+    <div class="mensaje-vacio" *ngIf="!imagenesExtras || imagenesExtras.length === 0">
+        <p>La emprendedora no ha proporcionado imágenes adicionales para la galería.</p>
     </div>
 
     <br>
     <h2>VIDEO</h2>
-    <div class="video-container">
-        <iframe src="https://www.youtube.com/embed/glHfVFk8CwQ?si=aKf4WjRIgXMGG3Rf" title="YouTube video player"
+    <div class="video-container" *ngIf="emprendimiento.videoUrl && emprendimiento.videoUrl !== '' && emprendimiento.videoUrl !== 'null'">
+        <iframe [src]="emprendimiento.videoUrl" title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen>
         </iframe>
     </div>
+    <div class="mensaje-vacio" *ngIf="!emprendimiento.videoUrl || emprendimiento.videoUrl === '' || emprendimiento.videoUrl === 'null'">
+        <p>La emprendedora no ha proporcionado un video promocional.</p>
+    </div>
+</div>
+
+<!-- Modal de galería -->
+<div class="modal-galeria" *ngIf="modalAbierto" (click)="cerrarModal()">
+    <button class="cerrar" (click)="cerrarModal()">
+        <mat-icon>close</mat-icon>
+    </button>
+    <button class="nav-btn anterior" (click)="anterior(); $event.stopPropagation()">
+        <mat-icon>chevron_left</mat-icon>
+    </button>
+    <img [src]="imagenSeleccionada" (click)="$event.stopPropagation()" alt="Imagen ampliada">
+    <button class="nav-btn siguiente" (click)="siguiente(); $event.stopPropagation()">
+        <mat-icon>chevron_right</mat-icon>
+    </button>
 </div>
