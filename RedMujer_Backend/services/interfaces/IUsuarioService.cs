@@ -14,5 +14,6 @@ namespace RedMujer_Backend.services
         Task EliminarAsync(int id);
         Task<Usuario?> AuthenticateAsync(string usuarioNombre, string plainPassword);
         Task<Usuario?> AuthenticateByCorreoAsync(string correo, string plainPassword);
+        Task<bool> CambiarContrasenaAsync(int userId, string contrasenaActual, string contrasenaNueva);
     }
 }

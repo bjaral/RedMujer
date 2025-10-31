@@ -117,5 +117,25 @@ namespace RedMujer_Backend.controllers
                 correo = correo.Trim()
             });
         }
+
+        [HttpPut("{id}/cambiar-contrasena")]
+        public async Task<ActionResult> CambiarContrasena(int id, [FromBody] CambiarContrasenaRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var resultado = await _service.CambiarContrasenaAsync(id, request.ContrasenaActual, request.ContrasenaNueva);
+
+            if (!resultado)
+                return BadRequest(new { mensaje = "La contraseña actual es incorrecta" });
+
+            return Ok(new { mensaje = "Contraseña cambiada exitosamente" });
+        }
+
+        public class CambiarContrasenaRequest
+        {
+            public required string ContrasenaActual { get; set; }
+            public required string ContrasenaNueva { get; set; }
+        }
     }
 }
