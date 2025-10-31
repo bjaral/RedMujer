@@ -71,50 +71,55 @@
     </div>
 
     <div class="carousel-scroll">
-    <ng-container *ngIf="random; else cargando">
-      <ng-container *ngFor="let emp of random; let i = index">
-        <div class="emprendimiento-card" [style.animation-delay]="i * 100 + 'ms'">
-          <div class="card-image">
-            <img [src]="emp.imagen" [alt]="'Imagen de ' + emp.nombre" (error)="onImageError($event)" loading="lazy">
-            <div class="card-overlay">
-              <button mat-fab class="quick-view-btn" color="primary" (click)="verDetalles(emp)">
-                <mat-icon>visibility</mat-icon>
+      <ng-container *ngIf="random; else cargando">
+        <ng-container *ngFor="let emp of random; let i = index">
+          <div class="emprendimiento-card" [style.animation-delay]="i * 100 + 'ms'">
+            <div class="card-image">
+              <img [src]="emp.imagen" [alt]="'Imagen de ' + emp.nombre" (error)="onImageError($event)" loading="lazy">
+              <div class="card-overlay">
+                <button mat-fab class="quick-view-btn" color="primary" (click)="verDetalles(emp)">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="card-content">
+              <h3 class="card-title">{{ emp.nombre }}</h3>
+              <p class="card-description">{{ emp.descripcion }}</p>
+              <div class="card-tags">
+                <ng-container *ngIf="emp.categorias && emp.categorias.length > 0; else sinCategorias">
+                  <span class="tag" *ngFor="let categoria of emp.categorias">{{ categoria.nombre }}</span>
+                </ng-container>
+                <ng-template #sinCategorias>
+                  <span class="tag tag-default">Sin categoría</span>
+                </ng-template>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button mat-button class="learn-more-btn" (click)="verDetalles(emp)">
+                Conocer más
+                <mat-icon>arrow_forward</mat-icon>
               </button>
             </div>
           </div>
-          <div class="card-content">
-            <h3 class="card-title">{{ emp.nombre }}</h3>
-            <p class="card-description">{{ emp.descripcion }}</p>
-            <div class="card-tags">
-              <span class="tag">Emprendimiento</span>
+        </ng-container>
+        <!-- Tarjeta especial de call-to-action -->
+        <div class="cta-card">
+          <div class="cta-content">
+            <div class="cta-icon">
+              <mat-icon>add_circle</mat-icon>
             </div>
-          </div>
-          <div class="card-actions">
-            <button mat-button class="learn-more-btn" (click)="verDetalles(emp)">
-              Conocer más
-              <mat-icon>arrow_forward</mat-icon>
+            <h3 class="cta-title">¡Únete a nuestra red!</h3>
+            <p class="cta-description">Conoce a todas nuestras increíbles emprendedoras y sus historias de éxito</p>
+            <button mat-flat-button class="cta-button-secondary" (click)="toEmprendimientos()">
+              Ver todos los emprendimientos
             </button>
+          </div>
+          <div class="cta-decoration">
+            <div class="decoration-circle"></div>
+            <div class="decoration-dots"></div>
           </div>
         </div>
       </ng-container>
-      <!-- Tarjeta especial de call-to-action -->
-      <div class="cta-card">
-        <div class="cta-content">
-          <div class="cta-icon">
-            <mat-icon>add_circle</mat-icon>
-          </div>
-          <h3 class="cta-title">¡Únete a nuestra red!</h3>
-          <p class="cta-description">Conoce a todas nuestras increíbles emprendedoras y sus historias de éxito</p>
-          <button mat-flat-button class="cta-button-secondary" (click)="toEmprendimientos()">
-            Ver todos los emprendimientos
-          </button>
-        </div>
-        <div class="cta-decoration">
-          <div class="decoration-circle"></div>
-          <div class="decoration-dots"></div>
-        </div>
-      </div>
-    </ng-container>
     </div>
 
     <ng-template #cargando>

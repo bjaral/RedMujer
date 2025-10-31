@@ -6,98 +6,101 @@
     <div class="form-col-left">
       <div class="emprendimiento-section">
         <h3>Emprendimiento</h3>
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>RUT</mat-label>
-          <input matInput formControlName="rut" required (input)="formatRut($event)">
-        </mat-form-field>
+        <div class="emprendimiento-group">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>RUT</mat-label>
+            <input matInput formControlName="rut" required (input)="formatRut($event)">
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Nombre</mat-label>
-          <input matInput formControlName="nombre" required>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" required>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Descripción</mat-label>
-          <textarea matInput formControlName="descripcion"></textarea>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="descripcion"></textarea>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Modalidad</mat-label>
-          <mat-select formControlName="modalidad">
-            <mat-option value="Presencial">Presencial</mat-option>
-            <mat-option value="Online">Online</mat-option>
-            <mat-option value="presencialyonline">Híbrida</mat-option>
-          </mat-select>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Modalidad</mat-label>
+            <mat-select formControlName="modalidad">
+              <mat-option value="Presencial">Presencial</mat-option>
+              <mat-option value="Online">Online</mat-option>
+              <mat-option value="presencialyonline">Híbrida</mat-option>
+            </mat-select>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Horario de Atención</mat-label>
-          <textarea matInput formControlName="horario_Atencion"></textarea>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Horario de Atención</mat-label>
+            <textarea matInput formControlName="horario_Atencion"></textarea>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Categorías</mat-label>
-          <mat-select formControlName="categorias" multiple>
-            <mat-option *ngFor="let categoria of categorias" [value]="categoria.id_Categoria">
-              {{ categoria.nombre }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Categorías</mat-label>
+            <mat-select formControlName="categorias" multiple>
+              <mat-option *ngFor="let categoria of categorias" [value]="categoria.id_Categoria">
+                {{ categoria.nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
       </div>
 
       <!-- SECCIÓN DE UBICACIÓN -->
       <div class="ubicacion-section" formGroupName="ubicacion">
         <h3>Ubicación</h3>
+        <div class="ubicacion-group">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Región</mat-label>
+            <mat-select formControlName="region" (selectionChange)="onRegionChange()">
+              <mat-option *ngFor="let region of regiones" [value]="region">
+                {{ region.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="formulario.get('ubicacion.region')?.hasError('required') && formulario.get('ubicacion.region')?.touched">
+              La región es requerida.
+            </mat-error>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Región</mat-label>
-          <mat-select formControlName="region" (selectionChange)="onRegionChange()">
-            <mat-option *ngFor="let region of regiones" [value]="region">
-              {{ region.nombre }}
-            </mat-option>
-          </mat-select>
-          <mat-error
-            *ngIf="formulario.get('ubicacion.region')?.hasError('required') && formulario.get('ubicacion.region')?.touched">
-            La región es requerida.
-          </mat-error>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Comuna</mat-label>
+            <mat-select formControlName="comuna">
+              <mat-option [value]="null" disabled>Seleccione una región primero</mat-option>
+              <mat-option *ngFor="let comuna of comunas" [value]="comuna.nombre">
+                {{ comuna.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="formulario.get('ubicacion.comuna')?.hasError('required') && formulario.get('ubicacion.comuna')?.touched">
+              La comuna es requerida.
+            </mat-error>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Comuna</mat-label>
-          <mat-select formControlName="comuna">
-            <mat-option [value]="null" disabled>Seleccione una región primero</mat-option>
-            <mat-option *ngFor="let comuna of comunas" [value]="comuna.nombre">
-              {{ comuna.nombre }}
-            </mat-option>
-          </mat-select>
-          <mat-error
-            *ngIf="formulario.get('ubicacion.comuna')?.hasError('required') && formulario.get('ubicacion.comuna')?.touched">
-            La comuna es requerida.
-          </mat-error>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Calle</mat-label>
+            <input matInput formControlName="calle">
+            <mat-error
+              *ngIf="formulario.get('ubicacion.calle')?.hasError('required') && formulario.get('ubicacion.calle')?.touched">
+              La calle es requerida.
+            </mat-error>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Calle</mat-label>
-          <input matInput formControlName="calle">
-          <mat-error
-            *ngIf="formulario.get('ubicacion.calle')?.hasError('required') && formulario.get('ubicacion.calle')?.touched">
-            La calle es requerida.
-          </mat-error>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Número</mat-label>
+            <input matInput formControlName="numero">
+            <mat-error
+              *ngIf="formulario.get('ubicacion.numero')?.hasError('required') && formulario.get('ubicacion.numero')?.touched">
+              El número es requerido.
+            </mat-error>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Número</mat-label>
-          <input matInput formControlName="numero">
-          <mat-error
-            *ngIf="formulario.get('ubicacion.numero')?.hasError('required') && formulario.get('ubicacion.numero')?.touched">
-            El número es requerido.
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Referencia adicional</mat-label>
-          <input matInput formControlName="referencia">
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Referencia adicional</mat-label>
+            <input matInput formControlName="referencia">
+          </mat-form-field>
+        </div>
       </div>
 
       <div class="contactos-section">
@@ -212,18 +215,20 @@
           </div>
         </div>
 
-        <mat-form-field appearance="outline" class="form-field video-field">
-          <mat-label>Video de YouTube (opcional)</mat-label>
-          <input matInput formControlName="videoUrl" (change)="onVideoUrlChange($event)"
-            placeholder="https://youtube.com/watch?v=...">
-          <mat-icon matSuffix>videocam</mat-icon>
-        </mat-form-field>
+        <div class="multimedia-group">
+          <mat-form-field appearance="outline" class="form-field video-field">
+            <mat-label>Video de YouTube (opcional)</mat-label>
+            <input matInput formControlName="videoUrl" (change)="onVideoUrlChange($event)"
+              placeholder="https://youtube.com/watch?v=...">
+            <mat-icon matSuffix>videocam</mat-icon>
+          </mat-form-field>
 
-        <div class="video-preview" *ngIf="videoEmbedUrl">
-          <iframe [src]="videoEmbedUrl" frameborder="0" allowfullscreen></iframe>
-          <button type="button" class="remove-btn" (click)="removeVideo()">
-            <mat-icon>close</mat-icon>
-          </button>
+          <div class="video-preview" *ngIf="videoEmbedUrl">
+            <iframe [src]="videoEmbedUrl" frameborder="0" allowfullscreen></iframe>
+            <button type="button" class="remove-btn" (click)="removeVideo()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
         </div>
       </div>
     </div>
