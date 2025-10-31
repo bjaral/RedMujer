@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -120,6 +120,73 @@ export class EmprendimientoFormService {
 
   actualizarUbicacion(id: number, ubicacion: any): Observable<any> {
     return this.http.put<any>(`${this.api}Ubicaciones/${id}`, ubicacion);
+  }
+
+  crearEmprendimientoUbicacion(empUbicacion: any): Observable<any> {
+    return this.http.post<any>(`${this.api}EmprendimientoUbicacion`, empUbicacion);
+  }
+
+  getUbicacionDeEmprendimiento(idEmprendimiento: number): Observable<any> {
+    return this.http.get<any>(`http://localhost:5145/emprendimientos/${idEmprendimiento}/ubicaciones`).pipe(
+      switchMap((ubicaciones: any[]) => {
+        const ubicacionesVigentes = ubicaciones.filter(ubicacion => ubicacion.vigencia === true);
+
+        if (ubicacionesVigentes.length === 0) {
+          return of({
+            id_Ubicacion: null,  // ← Agregado
+            comuna: 'No especificada',
+            region: 'No especificada',
+            id_Comuna: null,
+            id_Region: null,
+            calle: '',
+            numero: '',
+            referencia: ''
+          });
+        }
+
+        const ubicacion = ubicacionesVigentes[0];
+
+        return forkJoin({
+          comuna: this.getComunaById(ubicacion.id_Comuna),
+          region: this.getRegionById(ubicacion.id_Region)
+        }).pipe(
+          map(({ comuna, region }) => {
+            return {
+              id_Ubicacion: ubicacion.id_Ubicacion,  // ← Agregado
+              comuna: comuna.nombre,
+              region: region.nombre,
+              id_Comuna: ubicacion.id_Comuna,
+              id_Region: ubicacion.id_Region,
+              calle: ubicacion.calle,
+              numero: ubicacion.numero,
+              referencia: ubicacion.referencia
+            };
+          })
+        );
+      }),
+      catchError(error => {
+        console.error(`Error al obtener ubicaciones para emprendimiento ${idEmprendimiento}:`, error);
+
+        return of({
+          id_Ubicacion: null,  // ← Agregado
+          comuna: '',
+          region: '',
+          id_Comuna: null,
+          id_Region: null,
+          calle: '',
+          numero: '',
+          referencia: ''
+        });
+      })
+    );
+  }
+
+  getComunaById(idComuna: number): Observable<any> {
+    return this.http.get<any>(`${this.api}Comunas/${idComuna}`);
+  }
+
+  getRegionById(idRegion: number): Observable<any> {
+    return this.http.get<any>(`${this.api}Regiones/${idRegion}`);
   }
 
 }

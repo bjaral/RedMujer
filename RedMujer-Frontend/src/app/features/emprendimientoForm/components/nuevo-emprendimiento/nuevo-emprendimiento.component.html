@@ -51,7 +51,7 @@
 
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Región</mat-label>
-          <mat-select formControlName="region" (selectionChange)="onRegionChange()" required>
+          <mat-select formControlName="region" (selectionChange)="onRegionChange()">
             <mat-option *ngFor="let region of regiones" [value]="region">
               {{ region.nombre }}
             </mat-option>
@@ -64,7 +64,7 @@
 
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Comuna</mat-label>
-          <mat-select formControlName="comuna" required>
+          <mat-select formControlName="comuna">
             <mat-option [value]="null" disabled>Seleccione una región primero</mat-option>
             <mat-option *ngFor="let comuna of comunas" [value]="comuna.nombre">
               {{ comuna.nombre }}
@@ -78,7 +78,7 @@
 
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Calle</mat-label>
-          <input matInput formControlName="calle" required>
+          <input matInput formControlName="calle">
           <mat-error
             *ngIf="formulario.get('ubicacion.calle')?.hasError('required') && formulario.get('ubicacion.calle')?.touched">
             La calle es requerida.
@@ -87,7 +87,7 @@
 
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Número</mat-label>
-          <input matInput formControlName="numero" required>
+          <input matInput formControlName="numero">
           <mat-error
             *ngIf="formulario.get('ubicacion.numero')?.hasError('required') && formulario.get('ubicacion.numero')?.touched">
             El número es requerido.

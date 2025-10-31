@@ -44,7 +44,7 @@ export class EditarEmprendimientoComponent implements OnInit {
   redesSociales = ['Instagram', 'Facebook', 'LinkedIn', 'Twitter/X', 'TikTok', 'YouTube', 'Pinterest', 'Otra'];
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private emprendimientoFormService: EmprendimientoFormService,
     private ubicacionService: UbicacionService,
     private router: Router,
@@ -56,16 +56,16 @@ export class EditarEmprendimientoComponent implements OnInit {
       nombre: ['', Validators.required],
       descripcion: [''],
       modalidad: ['', Validators.required],
-      horario_Atencion: ['', Validators.required],
+      horario_Atencion: [''],
       categorias: [[], Validators.required],
       videoUrl: [''],
       contactos: this.fb.array([]),
       plataformas: this.fb.array([]),
       ubicacion: this.fb.group({
-        region: [null, Validators.required],
-        comuna: [null, Validators.required],
-        calle: ['', Validators.required],
-        numero: ['', Validators.required],
+        region: [null],
+        comuna: [null],
+        calle: [''],
+        numero: [''],
         referencia: ['']
       })
     });
@@ -203,7 +203,7 @@ export class EditarEmprendimientoComponent implements OnInit {
   onVideoUrlChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     const url = input.value.trim();
-    
+
     if (!url) {
       this.videoEmbedUrl = null;
       return;
@@ -246,7 +246,7 @@ export class EditarEmprendimientoComponent implements OnInit {
     this.emprendimientoFormService.obtenerEmprendimientoPorId(id).subscribe({
       next: (emprendimiento) => {
         this.idUbicacion = emprendimiento.id_Ubicacion;
-        
+
         this.formulario.patchValue({
           rut: emprendimiento.rut,
           nombre: emprendimiento.nombre,
@@ -293,41 +293,48 @@ export class EditarEmprendimientoComponent implements OnInit {
   }
 
   cargarUbicacion(): void {
-    if (this.idUbicacion) {
-      this.emprendimientoFormService.obtenerUbicacionPorId(this.idUbicacion).subscribe({
-        next: (ubicacion) => {
-          // Buscar la región correspondiente
-          const regionEncontrada = this.regiones.find((r: any) => r.id_Region === ubicacion.id_Region);
-          
-          if (regionEncontrada) {
-            this.formulario.get('ubicacion.region')?.setValue(regionEncontrada);
-            
-            // Cargar comunas de esa región
-            this.ubicacionService.comunasPorRegion(ubicacion.id_Region).subscribe({
-              next: (comunas) => {
-                this.comunas = comunas;
-                
-                this.formulario.patchValue({
-                  ubicacion: {
-                    region: regionEncontrada,
-                    comuna: ubicacion.comuna,
-                    calle: ubicacion.calle,
-                    numero: ubicacion.numero,
-                    referencia: ubicacion.referencia || ''
-                  }
-                });
-              },
-              error: (err) => {
-                console.error('Error al cargar comunas', err);
-              }
-            });
-          }
-        },
-        error: (err) => {
-          console.error('Error al cargar ubicación', err);
+    this.emprendimientoFormService.getUbicacionDeEmprendimiento(this.idEmprendimiento).subscribe({
+      next: (ubicacion) => {
+        console.log('Ubicación obtenida:', ubicacion);
+
+        // Guardar el id_Ubicacion
+        if (ubicacion.id_Ubicacion) {
+          this.idUbicacion = ubicacion.id_Ubicacion;
         }
-      });
-    }
+
+        // Buscar la región por nombre
+        const regionEncontrada = this.regiones.find((r: any) => r.nombre === ubicacion.region);
+
+        if (regionEncontrada && ubicacion.id_Region) {
+          // Cargar las comunas de esa región
+          this.ubicacionService.comunasPorRegion(ubicacion.id_Region).subscribe({
+            next: (comunas) => {
+              this.comunas = comunas;
+
+              // Cargar los valores en el formulario
+              this.formulario.patchValue({
+                ubicacion: {
+                  region: regionEncontrada,
+                  comuna: ubicacion.comuna,
+                  calle: ubicacion.calle,
+                  numero: ubicacion.numero,
+                  referencia: ubicacion.referencia || ''
+                }
+              });
+
+              console.log('Valores cargados en formulario ubicación:', this.formulario.get('ubicacion')?.value);
+              console.log('ID Ubicación guardado:', this.idUbicacion);
+            },
+            error: (err) => {
+              console.error('Error al cargar comunas de la región', err);
+            }
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar ubicación', err);
+      }
+    });
   }
 
   cargarContactos(): void {
@@ -542,11 +549,11 @@ export class EditarEmprendimientoComponent implements OnInit {
             }
           });
         }
-        
+
         this.actualizarContactos();
         this.actualizarCategorias();
         this.actualizarPlataformas();
-        
+
         alert('Emprendimiento actualizado exitosamente.');
         this.router.navigate(['/mis-emprendimientos']);
       },
@@ -585,7 +592,7 @@ export class EditarEmprendimientoComponent implements OnInit {
 
   actualizarCategorias(): void {
     const categoriasSeleccionadas = this.formulario.get('categorias')?.value || [];
-    
+
     // Eliminar categorías que ya no están seleccionadas
     this.categoriasOriginales.forEach(idCategoria => {
       if (!categoriasSeleccionadas.includes(idCategoria)) {
@@ -641,5 +648,5 @@ export class EditarEmprendimientoComponent implements OnInit {
   get maximoImagenesExtrasAlcanzado(): boolean {
     return this.imagenesExtras.length >= 5;
   }
-  
+
 }

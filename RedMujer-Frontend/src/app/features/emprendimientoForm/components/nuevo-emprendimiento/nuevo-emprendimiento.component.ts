@@ -9,6 +9,7 @@ import { TokenService } from '../../../../core/services/token.service';
 import { PersonaService } from '../../../profile/services/persona.service';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { forkJoin, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-nuevo-emprendimiento',
@@ -59,16 +60,16 @@ export class NuevoEmprendimientoComponent implements OnInit {
       nombre: ['', Validators.required],
       descripcion: [''],
       modalidad: ['', Validators.required],
-      horario_Atencion: ['', Validators.required],
+      horario_Atencion: [''],
       categorias: [[], Validators.required],
       videoUrl: [''],
       contactos: this.fb.array([]),
       plataformas: this.fb.array([]),
       ubicacion: this.fb.group({
-        region: [null, Validators.required],
-        comuna: [null, Validators.required],
-        calle: ['', Validators.required],
-        numero: ['', Validators.required],
+        region: [null],
+        comuna: [null],
+        calle: [''],
+        numero: [''],
         referencia: ['']
       })
     });
@@ -166,7 +167,7 @@ export class NuevoEmprendimientoComponent implements OnInit {
   onVideoUrlChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     const url = input.value.trim();
-    
+
     if (!url) {
       this.videoEmbedUrl = null;
       return;
@@ -280,6 +281,8 @@ export class NuevoEmprendimientoComponent implements OnInit {
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       alert('Por favor completa todos los campos obligatorios.');
+      console.log('Errores en el formulario:', this.formulario.errors);
+      console.log('Errores en ubicación:', this.formulario.get('ubicacion')?.errors);
       return;
     }
 
@@ -287,6 +290,17 @@ export class NuevoEmprendimientoComponent implements OnInit {
     const ubicacionData = this.formulario.get('ubicacion')?.value;
     const regionObj = ubicacionData.region;
     const comunaObj = this.comunas.find(c => c.nombre === ubicacionData.comuna);
+
+    // Validar que tengamos región y comuna
+    if (!regionObj || !regionObj.id_Region) {
+      alert('Por favor selecciona una región válida.');
+      return;
+    }
+
+    if (!comunaObj || !comunaObj.id_Comuna) {
+      alert('Por favor selecciona una comuna válida.');
+      return;
+    }
 
     const ubicacion = {
       id_Region: Number(regionObj.id_Region),
@@ -297,9 +311,13 @@ export class NuevoEmprendimientoComponent implements OnInit {
       vigencia: true
     };
 
+    console.log('Datos de ubicación a enviar:', ubicacion);
+
     this.emprendimientoFormService.crearUbicacion(ubicacion).subscribe({
       next: (ubicacionRes) => {
-        this.idUbicacion = ubicacionRes.id_Ubicacion;
+        console.log('Ubicación creada:', ubicacionRes);
+        // Cambiar de id_Ubicacion a id
+        this.idUbicacion = ubicacionRes.id || ubicacionRes.id_Ubicacion;
         this.crearEmprendimiento();
       },
       error: (err) => {
@@ -321,7 +339,7 @@ export class NuevoEmprendimientoComponent implements OnInit {
     formData.append('Vigencia', 'true');
     formData.append('VideoUrl', data.videoUrl || '');
     formData.append('Id_Ubicacion', this.idUbicacion.toString());
-    
+
     if (this.imagenPrincipalFile) {
       formData.append('Imagen', this.imagenPrincipalFile);
     }
@@ -336,39 +354,73 @@ export class NuevoEmprendimientoComponent implements OnInit {
 
         this.idEmprendimiento = idEmprendimiento;
 
-        this.idUsuario = this.tokenService.getNameIdentifier() || 0;
-        this.personaService.getIdPersona(this.idUsuario).subscribe({
-          next: (idPersona) => {
-            this.idPersona = idPersona;
-            console.log('ID de la persona:', this.idPersona);
+        // Asociar emprendimiento con ubicación
+        const empUbicacion = {
+          id_Ubicacion: this.idUbicacion,
+          id_Emprendimiento: this.idEmprendimiento
+        };
 
-            this.personaService.postEmprendimientoToPersona(this.idPersona, this.idEmprendimiento).subscribe({
-              next: () => {
-                console.log('Emprendimiento asociado a la persona correctamente.');
-                this.guardarContactos();
-                this.guardarCategorias();
-                this.guardarPlataformas();
+        this.emprendimientoFormService.crearEmprendimientoUbicacion(empUbicacion).subscribe({
+          next: () => {
+            console.log('Emprendimiento asociado a ubicación correctamente.');
+
+            // Continuar con el resto de las operaciones
+            this.idUsuario = this.tokenService.getNameIdentifier() || 0;
+            this.personaService.getIdPersona(this.idUsuario).subscribe({
+              next: (idPersona) => {
+                this.idPersona = idPersona;
+                console.log('ID de la persona:', this.idPersona);
+
+                this.personaService.postEmprendimientoToPersona(this.idPersona, this.idEmprendimiento).subscribe({
+                  next: () => {
+                    console.log('Emprendimiento asociado a la persona correctamente.');
+
+                    // Ejecutar todas las operaciones en paralelo y esperar a que terminen
+                    forkJoin({
+                      contactos: this.guardarContactos(),
+                      categorias: this.guardarCategorias(),
+                      plataformas: this.guardarPlataformas()
+                    }).subscribe({
+                      next: () => {
+                        console.log('Todos los datos guardados correctamente');
+                        alert('Emprendimiento creado exitosamente.');
+                        this.limpiarFormulario();
+                        this.router.navigate(['/mis-emprendimientos']);
+                      },
+                      error: (err) => {
+                        console.error('Error al guardar datos adicionales:', err);
+                        alert('Emprendimiento creado, pero hubo un error al guardar algunos datos adicionales.');
+                        this.router.navigate(['/mis-emprendimientos']);
+                      }
+                    });
+                  },
+                  error: (err) => {
+                    console.error('Error al asociar el emprendimiento a la persona:', err);
+                  }
+                });
               },
               error: (err) => {
-                console.error('Error al asociar el emprendimiento a la persona:', err);
+                console.error('Error al obtener el ID de la persona:', err);
               }
             });
+
+            // Subir multimedia si hay
+            if (this.imagenesExtrasFile.length > 0) {
+              this.emprendimientoFormService.subirMultimedia(idEmprendimiento, this.imagenesExtrasFile).subscribe({
+                next: () => {
+                  console.log('Multimedia subida exitosamente.');
+                },
+                error: (err) => {
+                  console.error('Error al subir multimedia', err);
+                }
+              });
+            }
           },
           error: (err) => {
-            console.error('Error al obtener el ID de la persona:', err);
+            console.error('Error al asociar emprendimiento con ubicación:', err);
+            alert('Ocurrió un error al asociar la ubicación con el emprendimiento.');
           }
         });
-
-        if (this.imagenesExtrasFile.length > 0) {
-          this.emprendimientoFormService.subirMultimedia(idEmprendimiento, this.imagenesExtrasFile).subscribe({
-            next: () => {
-              console.log('Multimedia subida exitosamente.');
-            },
-            error: (err) => {
-              console.error('Error al subir multimedia', err);
-            }
-          });
-        }
       },
       error: (err) => {
         console.error('Error al crear el emprendimiento', err);
@@ -377,42 +429,41 @@ export class NuevoEmprendimientoComponent implements OnInit {
     });
   }
 
-  guardarContactos(): void {
+  guardarContactos(): Observable<any[]> {
     const contactos = this.formulario.get('contactos')?.value;
-    contactos.forEach((contacto: any) => {
-      if (contacto.valor) {
+    const observables = contactos
+      .filter((contacto: any) => contacto.valor)
+      .map((contacto: any) => {
         const contactoData = {
           id_Emprendimiento: this.idEmprendimiento,
           valor: contacto.valor,
           tipo_Contacto: contacto.tipo_Contacto,
           vigencia: true
         };
-        this.emprendimientoFormService.crearContacto(contactoData).subscribe({
-          next: () => console.log('Contacto guardado'),
-          error: (err) => console.error('Error al guardar contacto', err)
-        });
-      }
-    });
+        return this.emprendimientoFormService.crearContacto(contactoData);
+      });
+
+    return observables.length > 0 ? forkJoin<any[]>(observables) : of([]);
   }
 
-  guardarCategorias(): void {
+  guardarCategorias(): Observable<any[]> {
     const categorias = this.formulario.get('categorias')?.value;
-    categorias.forEach((idCategoria: number) => {
+    const observables = categorias.map((idCategoria: number) => {
       const empCat = {
         id_Categoria: idCategoria,
         id_Emprendimiento: this.idEmprendimiento
       };
-      this.emprendimientoFormService.crearEmprendimientoCategoria(empCat).subscribe({
-        next: () => console.log('Categoría asociada'),
-        error: (err) => console.error('Error al asociar categoría', err)
-      });
+      return this.emprendimientoFormService.crearEmprendimientoCategoria(empCat);
     });
+
+    return observables.length > 0 ? forkJoin<any[]>(observables) : of([]);
   }
 
-  guardarPlataformas(): void {
+  guardarPlataformas(): Observable<any[]> {
     const plataformas = this.formulario.get('plataformas')?.value;
-    plataformas.forEach((plataforma: any) => {
-      if (plataforma.ruta) {
+    const observables = plataformas
+      .filter((plataforma: any) => plataforma.ruta)
+      .map((plataforma: any) => {
         const plataformaData = {
           id_Emprendimiento: this.idEmprendimiento,
           ruta: plataforma.ruta,
@@ -420,17 +471,10 @@ export class NuevoEmprendimientoComponent implements OnInit {
           descripcion: plataforma.descripcion || '',
           vigencia: true
         };
-        this.emprendimientoFormService.crearPlataforma(plataformaData).subscribe({
-          next: () => {
-            console.log('Plataforma guardada');
-            alert('Emprendimiento creado exitosamente.');
-            this.limpiarFormulario();
-            this.router.navigate(['/mis-emprendimientos']);
-          },
-          error: (err) => console.error('Error al guardar plataforma', err)
-        });
-      }
-    });
+        return this.emprendimientoFormService.crearPlataforma(plataformaData);
+      });
+
+    return observables.length > 0 ? forkJoin<any[]>(observables) : of([]);
   }
 
   private limpiarFormulario(): void {
@@ -454,5 +498,5 @@ export class NuevoEmprendimientoComponent implements OnInit {
   get imagenPrincipalDeshabilitada(): boolean {
     return this.imagenPrincipalFile !== null;
   }
-  
+
 }
