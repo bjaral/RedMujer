@@ -69,6 +69,7 @@ export class LoginComponent implements AfterViewInit {
   }
 
   toPerfil() {
-    this.router.navigate(['/perfil']);
+    // this.router.navigate(['/perfil']);
+    this.router.navigate(['/mis-emprendimientos'])
   }
 }

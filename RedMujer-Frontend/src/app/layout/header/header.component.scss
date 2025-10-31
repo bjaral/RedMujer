@@ -14,6 +14,7 @@ mat-toolbar {
         max-width: 160px;
         object-fit: contain;
         margin-right: 16px;
+        cursor: pointer;
     }
 
     .menu-icon {
@@ -62,12 +63,83 @@ mat-toolbar {
             background-color: darken($primary-color, 10%);
         }
     }
+
+    // Estilos del perfil de usuario
+    .user-profile {
+    .profile-button {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background-color: rgba($primary-color, 0.05);
+        }
+
+        .profile-icon {
+            font-size: 2rem;
+            width: 2rem;
+            height: 2rem;
+            color: $secondary-color;
+            transition: color 0.3s ease;
+            margin: 0;
+        }
+
+        &:hover .profile-icon {
+            color: $primary-color;
+        }
+
+        // Sobrescribir estilos de Material
+        ::ng-deep .mat-mdc-button-touch-target {
+            width: 48px;
+            height: 48px;
+        }
+    }
+}
 }
 
 .spacer {
     flex: 1 1 auto;
 }
 
+// Estilos del menú desplegable
+::ng-deep .user-menu {
+    margin-top: 0.5rem;
+
+    .mat-mdc-menu-content {
+        padding: 0.5rem 0;
+    }
+
+    button {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+        color: $secondary-color;
+        transition: all 0.2s ease;
+
+        mat-icon {
+            color: $primary-color;
+            font-size: 1.3rem;
+            width: 1.3rem;
+            height: 1.3rem;
+        }
+
+        &:hover {
+            background-color: rgba($primary-color, 0.05);
+        }
+    }
+
+    mat-divider {
+        margin: 0.5rem 0;
+    }
+}
+
+// Menú móvil
 .mobile-menu-dropdown {
     background-color: white;
     width: 100%;
@@ -107,7 +179,6 @@ mat-toolbar {
             &:hover {
                 background-color: #cde5ff;
             }
-
         }
 
         &.mobile-login-btn {
@@ -120,6 +191,70 @@ mat-toolbar {
             }
         }
     }
+
+    // Sección de usuario en móvil
+    .mobile-user-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #e0e0e0;
+        margin-top: 0.5rem;
+
+        .mobile-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #f5f7fa, #e8eef5);
+            border-radius: 0.75rem;
+            color: $secondary-color;
+            font-weight: 600;
+
+            mat-icon {
+                color: $primary-color;
+                font-size: 1.5rem;
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+        }
+
+        .mobile-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+
+            mat-icon {
+                color: $primary-color;
+                font-size: 1.3rem;
+                width: 1.3rem;
+                height: 1.3rem;
+            }
+
+            span {
+                font-size: 0.95rem;
+            }
+
+            &:hover {
+                background-color: rgba($primary-color, 0.05);
+            }
+
+            &.logout-btn {
+                color: #d32f2f;
+
+                mat-icon {
+                    color: #d32f2f;
+                }
+
+                &:hover {
+                    background-color: rgba(211, 47, 47, 0.05);
+                }
+            }
+        }
+    }
 }
 
 @media (max-width: 768px) {
@@ -129,7 +264,8 @@ mat-toolbar {
         }
 
         .desktop-nav,
-        .desktop-buttons {
+        .desktop-buttons,
+        .user-profile {
             display: none;
         }
 

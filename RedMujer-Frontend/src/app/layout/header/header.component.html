@@ -14,17 +14,68 @@
 
   <span class="spacer"></span>
 
-  <div class="desktop-buttons">
+  <!-- Botones para usuarios NO autenticados -->
+  <div class="desktop-buttons" *ngIf="!isLoggedIn">
     <button mat-button class="signin-btn" routerLink="/registro">Únete</button>
     <button mat-flat-button class="login-btn" routerLink="/login">Iniciar sesión</button>
   </div>
+
+  <!-- Perfil de usuario para usuarios autenticados -->
+  <div class="user-profile" *ngIf="isLoggedIn">
+    <button mat-icon-button class="profile-button" [matMenuTriggerFor]="userMenu">
+      <mat-icon class="profile-icon">account_circle</mat-icon>
+    </button>
+
+    <mat-menu #userMenu="matMenu" class="user-menu">
+      <button mat-menu-item routerLink="/mis-emprendimientos">
+        <mat-icon>business_center</mat-icon>
+        <span>Mis emprendimientos</span>
+      </button>
+      <button mat-menu-item routerLink="/perfil">
+        <mat-icon>person</mat-icon>
+        <span>Mi perfil</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Cerrar sesión</span>
+      </button>
+    </mat-menu>
+  </div>
 </mat-toolbar>
 
+<!-- Menú móvil -->
 <div class="mobile-menu-dropdown" *ngIf="isMobileMenuOpen">
   <a mat-button (click)="toggleMobileMenu()" routerLink="/">Inicio</a>
   <a mat-button (click)="toggleMobileMenu()" routerLink="/quienes-somos">Quiénes somos</a>
   <a mat-button (click)="toggleMobileMenu()" routerLink="/que-hacemos">Qué hacemos</a>
   <a mat-button (click)="toggleMobileMenu()" routerLink="/contacto">Contacto</a>
-  <button mat-button class="mobile-signin-btn" routerLink="/registro" (click)="toggleMobileMenu()">Únete</button>
-  <button mat-flat-button class="mobile-login-btn" routerLink="/login" (click)="toggleMobileMenu()">Iniciar sesión</button>
+
+  <!-- Opciones para usuarios no autenticados -->
+  <ng-container *ngIf="!isLoggedIn">
+    <button mat-button class="mobile-signin-btn" routerLink="/registro" (click)="toggleMobileMenu()">Únete</button>
+    <button mat-flat-button class="mobile-login-btn" routerLink="/login" (click)="toggleMobileMenu()">Iniciar sesión</button>
+  </ng-container>
+
+  <!-- Opciones para usuarios autenticados -->
+  <ng-container *ngIf="isLoggedIn">
+    <div class="mobile-user-section">
+      <div class="mobile-user-info">
+        <mat-icon>person</mat-icon>
+        <span>{{ userName }}</span>
+      </div>
+      <button mat-button class="mobile-menu-item" routerLink="/mis-emprendimientos" (click)="toggleMobileMenu()">
+        <mat-icon>business_center</mat-icon>
+        <span>Mis emprendimientos</span>
+      </button>
+      <button mat-button class="mobile-menu-item" routerLink="/perfil" (click)="toggleMobileMenu()">
+        <mat-icon>person</mat-icon>
+        <span>Mi perfil</span>
+      </button>
+      <button mat-button class="mobile-menu-item logout-btn" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Cerrar sesión</span>
+      </button>
+    </div>
+  </ng-container>
 </div>
