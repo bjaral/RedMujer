@@ -35,7 +35,7 @@ export class NuevoEmprendimientoComponent implements OnInit {
   comunas: any[] = [];
   videoEmbedUrl: SafeResourceUrl | null = null;
 
-  tiposContacto = ['telefono', 'email'];
+  tiposContacto = ['telefono', 'correo'];
   tiposPlataforma = [
     { value: 'red_social', label: 'Red Social' },
     { value: 'sitio_web', label: 'Sitio Web' },
@@ -78,8 +78,9 @@ export class NuevoEmprendimientoComponent implements OnInit {
   ngOnInit(): void {
     this.cargarCategorias();
     this.cargarRegiones();
-    this.agregarContacto();
-    this.agregarPlataforma();
+    // Removidas las líneas que agregaban contacto y plataforma por defecto
+    // this.agregarContacto();
+    // this.agregarPlataforma();
   }
 
   cargarCategorias(): void {
@@ -139,9 +140,7 @@ export class NuevoEmprendimientoComponent implements OnInit {
   }
 
   eliminarContacto(index: number): void {
-    if (this.contactos.length > 1) {
-      this.contactos.removeAt(index);
-    }
+    this.contactos.removeAt(index);
   }
 
   agregarPlataforma(): void {
@@ -154,9 +153,7 @@ export class NuevoEmprendimientoComponent implements OnInit {
   }
 
   eliminarPlataforma(index: number): void {
-    if (this.plataformas.length > 1) {
-      this.plataformas.removeAt(index);
-    }
+    this.plataformas.removeAt(index);
   }
 
   esTipoRedSocial(index: number): boolean {
@@ -432,7 +429,7 @@ export class NuevoEmprendimientoComponent implements OnInit {
   guardarContactos(): Observable<any[]> {
     const contactos = this.formulario.get('contactos')?.value;
     const observables = contactos
-      .filter((contacto: any) => contacto.valor)
+      .filter((contacto: any) => contacto.valor && contacto.valor.trim() !== '')
       .map((contacto: any) => {
         const contactoData = {
           id_Emprendimiento: this.idEmprendimiento,
@@ -462,7 +459,7 @@ export class NuevoEmprendimientoComponent implements OnInit {
   guardarPlataformas(): Observable<any[]> {
     const plataformas = this.formulario.get('plataformas')?.value;
     const observables = plataformas
-      .filter((plataforma: any) => plataforma.ruta)
+      .filter((plataforma: any) => plataforma.ruta && plataforma.ruta.trim() !== '')
       .map((plataforma: any) => {
         const plataformaData = {
           id_Emprendimiento: this.idEmprendimiento,
@@ -487,8 +484,6 @@ export class NuevoEmprendimientoComponent implements OnInit {
     this.contactos.clear();
     this.plataformas.clear();
     this.comunas = [];
-    this.agregarContacto();
-    this.agregarPlataforma();
   }
 
   get maximoImagenesExtrasAlcanzado(): boolean {

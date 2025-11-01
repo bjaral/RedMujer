@@ -32,7 +32,7 @@ export class EditarEmprendimientoComponent implements OnInit {
   categoriasOriginales: number[] = [];
   videoEmbedUrl: SafeResourceUrl | null = null;
 
-  tiposContacto = ['telefono', 'email'];
+  tiposContacto = ['telefono', 'correo'];
   tiposPlataforma = [
     { value: 'red_social', label: 'Red Social' },
     { value: 'sitio_web', label: 'Sitio Web' },
@@ -156,9 +156,7 @@ export class EditarEmprendimientoComponent implements OnInit {
         }
       });
     } else {
-      if (this.contactos.length > 1) {
-        this.contactos.removeAt(index);
-      }
+      this.contactos.removeAt(index);
     }
   }
 
@@ -189,9 +187,7 @@ export class EditarEmprendimientoComponent implements OnInit {
         }
       });
     } else {
-      if (this.plataformas.length > 1) {
-        this.plataformas.removeAt(index);
-      }
+      this.plataformas.removeAt(index);
     }
   }
 
@@ -266,7 +262,7 @@ export class EditarEmprendimientoComponent implements OnInit {
         }
 
         if (emprendimiento.imagen) {
-          this.imagenSeleccionada = `http://localhost:5145/media/${emprendimiento.imagen}`;
+          this.imagenSeleccionada = `${this.emprendimientoFormService['apiUrl'].replace('/api', '')}/media/${emprendimiento.imagen}`;
         }
 
         this.emprendimientoFormService.obtenerMultimediaPorId(id).subscribe({
@@ -351,13 +347,11 @@ export class EditarEmprendimientoComponent implements OnInit {
             });
             this.contactos.push(contactoGroup);
           });
-        } else {
-          this.agregarContacto();
         }
+        // Ya no agregamos contacto por defecto si no hay ninguno
       },
       error: (err) => {
         console.error('Error al cargar contactos', err);
-        this.agregarContacto();
       }
     });
   }
@@ -390,13 +384,11 @@ export class EditarEmprendimientoComponent implements OnInit {
             });
             this.plataformas.push(plataformaGroup);
           });
-        } else {
-          this.agregarPlataforma();
         }
+        // Ya no agregamos plataforma por defecto si no hay ninguna
       },
       error: (err) => {
         console.error('Error al cargar plataformas', err);
-        this.agregarPlataforma();
       }
     });
   }
@@ -567,7 +559,7 @@ export class EditarEmprendimientoComponent implements OnInit {
   actualizarContactos(): void {
     const contactos = this.formulario.get('contactos')?.value;
     contactos.forEach((contacto: any) => {
-      if (contacto.valor) {
+      if (contacto.valor && contacto.valor.trim() !== '') {
         const contactoData = {
           id_Emprendimiento: this.idEmprendimiento,
           valor: contacto.valor,
@@ -621,7 +613,7 @@ export class EditarEmprendimientoComponent implements OnInit {
   actualizarPlataformas(): void {
     const plataformas = this.formulario.get('plataformas')?.value;
     plataformas.forEach((plataforma: any) => {
-      if (plataforma.ruta) {
+      if (plataforma.ruta && plataforma.ruta.trim() !== '') {
         const plataformaData = {
           id_Emprendimiento: this.idEmprendimiento,
           ruta: plataforma.ruta,

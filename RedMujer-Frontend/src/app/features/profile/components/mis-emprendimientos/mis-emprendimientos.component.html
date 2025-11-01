@@ -5,7 +5,7 @@
     <div class="card-image">
       <img [src]="e.imagen" [alt]="'Imagen de ' + e.nombre" (error)="onImageError($event)" loading="lazy">
       <div class="card-overlay">
-        <button class="quick-view-btn" color="primary" aria-label="Ver rápido">
+        <button class="quick-view-btn" color="primary" aria-label="Ver rápido" (click)="toEmprendimiento(e.id_Emprendimiento)">
           <mat-icon>visibility</mat-icon>
         </button>
       </div>

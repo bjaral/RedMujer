@@ -92,6 +92,44 @@
       }
     }
 
+    .contactos {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 0.7rem;
+
+      .contacto-item {
+        background: #f8f9fa;
+        padding: 0.8rem 1rem;
+        border-radius: 0.6rem;
+
+        .contacto-info {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          mat-icon {
+            font-size: 1.2rem;
+            width: 1.2rem;
+            height: 1.2rem;
+            color: $primary-color;
+          }
+
+          a {
+            font-size: 1rem;
+            color: $secondary-color;
+            text-decoration: none;
+            transition: color 0.3s;
+
+            &:hover {
+              color: $primary-color;
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+    }
+
     h2 {
       font-size: 1.35rem;
       color: $secondary-color;
@@ -204,6 +242,19 @@
     iframe {
       height: 455px;
       width: 700px;
+    }
+  }
+
+  .mensaje-vacio {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.8rem;
+    text-align: center;
+
+    p {
+      margin: 0;
+      color: #5a6c7d;
+      font-size: 1rem;
     }
   }
 }

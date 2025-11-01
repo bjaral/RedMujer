@@ -23,6 +23,7 @@ export interface Emprendimiento {
   numero?: string;
   calle?: string;
   plataformas?: Plataforma[];
+  contactos?: Contacto[];
   videoUrl?: SafeResourceUrl;
 }
 
@@ -31,6 +32,13 @@ export interface Plataforma {
   descripcion: string;
   tipo_plataforma: string;
   icon?: string;
+}
+
+export interface Contacto {
+  id_Contacto: number;
+  valor: string;
+  tipo_Contacto: 'telefono' | 'correo';
+  vigencia: boolean;
 }
 
 @Component({
@@ -57,6 +65,7 @@ export class DetalleEmprendimientoComponent implements OnInit {
     numero: '',
     calle: '',
     plataformas: [],
+    contactos: [],
     videoUrl: ''
   };
 
@@ -139,12 +148,20 @@ export class DetalleEmprendimientoComponent implements OnInit {
         console.error(`Error al obtener plataformas del emprendimiento con id ${this.idEmprendimiento}:`, err);
         return of([]);
       })
-    )
+    );
+
+    const contactos$ = this.emprendimientoService.getContactosByEmprendimiento(this.idEmprendimiento).pipe(
+      catchError(err => {
+        console.error(`Error al obtener contactos del emprendimiento con id ${this.idEmprendimiento}:`, err);
+        return of([]);
+      })
+    );
 
     forkJoin({
       ubicacion: ubicacion$,
       categorias: categorias$,
-      plataformas: plataformas$
+      plataformas: plataformas$,
+      contactos: contactos$
     }).subscribe({
       next: (result) => {
         this.emprendimiento.region = result.ubicacion.region;
@@ -162,8 +179,10 @@ export class DetalleEmprendimientoComponent implements OnInit {
           icon: this.getIconForPlataforma(plataforma)
         }));
 
+        this.emprendimiento.contactos = result.contactos;
+
         if (this.emprendimiento.imagen) {
-          this.emprendimiento.imagen = `http://localhost:5145/media/${this.emprendimiento.imagen}`;
+          this.emprendimiento.imagen = `${this.emprendimientoService['apiUrl'].replace('/api', '')}/media/${this.emprendimiento.imagen}`;
         }
 
         if (this.emprendimiento.videoUrl) {
@@ -181,7 +200,7 @@ export class DetalleEmprendimientoComponent implements OnInit {
         console.error('Error al cargar datos adicionales del emprendimiento:', err);
 
         if (this.emprendimiento.imagen) {
-          this.emprendimiento.imagen = `http://localhost:5145/media/${this.emprendimiento.imagen}`;
+          this.emprendimiento.imagen = `${this.emprendimientoService['apiUrl'].replace('/api', '')}/media/${this.emprendimiento.imagen}`;
         }
 
         this.loading = false;
@@ -235,7 +254,7 @@ export class DetalleEmprendimientoComponent implements OnInit {
           if (imagen.startsWith('http://') || imagen.startsWith('https://')) {
             return imagen;
           }
-          return `http://localhost:5145/media/${imagen}`;
+          return `${this.emprendimientoService['apiUrl'].replace('/api', '')}/media/${imagen}`;
         });
       },
       error: (err) => {

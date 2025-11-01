@@ -3,16 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { TokenService } from './token.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private apiUrl = 'http://localhost:5145/api/Auth';
-  private usuarioUrl = 'http://localhost:5145/api/Usuarios';
-  private personaUrl = 'http://localhost:5145/api/Personas';
-  private ubicacionUrl = 'http://localhost:5145/api/Ubicaciones';
+  private apiUrl = `${environment.apiUrl}/Auth`;
+  private usuarioUrl = `${environment.apiUrl}/Usuarios`;
+  private personaUrl = `${environment.apiUrl}/Personas`;
+  private ubicacionUrl = `${environment.apiUrl}/Ubicaciones`;
 
   constructor(private http: HttpClient, private tokenService: TokenService) { }
 

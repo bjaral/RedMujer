@@ -105,6 +105,9 @@
       <div class="contactos-section">
         <h3>Contactos</h3>
         <div formArrayName="contactos">
+          <p class="info-text" *ngIf="contactos.length === 0">
+            No hay contactos agregados. Haz clic en "Agregar Contacto" para añadir información de contacto.
+          </p>
           <div *ngFor="let contacto of contactos.controls; let i = index" [formGroupName]="i" class="contacto-group">
             <mat-form-field appearance="outline" class="form-field">
               <mat-label>Tipo de Contacto</mat-label>
@@ -120,8 +123,7 @@
               <input matInput formControlName="valor" placeholder="Ej: +56912345678">
             </mat-form-field>
 
-            <button type="button" mat-icon-button color="warn" (click)="eliminarContacto(i)"
-              *ngIf="contactos.length > 1">
+            <button type="button" mat-icon-button color="warn" (click)="eliminarContacto(i)">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -134,6 +136,9 @@
       <div class="plataformas-section">
         <h3>Plataformas</h3>
         <div formArrayName="plataformas">
+          <p class="info-text" *ngIf="plataformas.length === 0">
+            No hay plataformas agregadas. Haz clic en "Agregar Plataforma" para añadir redes sociales o sitios web.
+          </p>
           <div *ngFor="let plataforma of plataformas.controls; let i = index" [formGroupName]="i"
             class="plataforma-group">
             <mat-form-field appearance="outline" class="form-field">
@@ -148,7 +153,7 @@
             <mat-form-field appearance="outline" class="form-field" *ngIf="esTipoRedSocial(i)">
               <mat-label>Red Social</mat-label>
               <mat-select formControlName="descripcion">
-                <mat-option *ngFor="let red of redesSociales" [value]="red">
+                <mat-option *ngFor="let red de redesSociales" [value]="red">
                   {{ red }}
                 </mat-option>
               </mat-select>
@@ -164,8 +169,7 @@
               <input matInput formControlName="ruta" placeholder="https://...">
             </mat-form-field>
 
-            <button type="button" mat-icon-button color="warn" (click)="eliminarPlataforma(i)"
-              *ngIf="plataformas.length > 1">
+            <button type="button" mat-icon-button color="warn" (click)="eliminarPlataforma(i)">
               <mat-icon>delete</mat-icon>
             </button>
           </div>

@@ -23,6 +23,23 @@
             La emprendedora no ha proporcionado plataformas de contacto.
         </p>
 
+        <h4>CONTACTO</h4>
+        <div class="contactos" *ngIf="emprendimiento.contactos && emprendimiento.contactos.length > 0">
+            <div *ngFor="let contacto of emprendimiento.contactos" class="contacto-item">
+                <div class="contacto-info" *ngIf="contacto.tipo_Contacto === 'telefono'">
+                    <mat-icon>phone</mat-icon>
+                    <a [href]="'tel:' + contacto.valor">{{ contacto.valor }}</a>
+                </div>
+                <div class="contacto-info" *ngIf="contacto.tipo_Contacto === 'correo'">
+                    <mat-icon>email</mat-icon>
+                    <a [href]="'mailto:' + contacto.valor">{{ contacto.valor }}</a>
+                </div>
+            </div>
+        </div>
+        <p class="categoria" *ngIf="!emprendimiento.contactos || emprendimiento.contactos.length === 0">
+            La emprendedora no ha proporcionado información de contacto.
+        </p>
+
         <h4>UBICACIÓN</h4>
         <a *ngIf="emprendimiento.calle && emprendimiento.numero && emprendimiento.comuna && emprendimiento.region"
             href="https://www.google.com/maps/search/?api=1&query={{emprendimiento.calle}}+{{emprendimiento.numero}},+{{emprendimiento.comuna}},+{{emprendimiento.region}}"

@@ -1,42 +1,39 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, map, switchMap, of, catchError } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmprendimientoService {
 
+  private apiUrl = environment.apiUrl;
+
   constructor(private http: HttpClient) { }
 
-  private url = 'http://localhost:5145/api'
-
-  getByIdRedes(id: number): Observable<any> {
-    return this.http.get<any>(`${this.url}/Contactos/emprendimiento/${id}/`);
-  }
-
-  getContactoById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.url}/Emprendimientos/${id}/contactos`);
+  getContactosByEmprendimiento(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/Contactos/emprendimiento/${id}`);
   }
 
   getByIdImg(id: number): Observable<any> {
-    return this.http.get<any>(`${this.url}/Emprendimientos/${id}/imagenes-emprendimiento`);
+    return this.http.get<any>(`${this.apiUrl}/Emprendimientos/${id}/imagenes-emprendimiento`);
   }
 
   getAll(): Observable<any> {
-    return this.http.get<any>(`${this.url}/Emprendimientos`);
+    return this.http.get<any>(`${this.apiUrl}/Emprendimientos`);
   }
 
   getById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.url}/Emprendimientos/${id}`);
+    return this.http.get<any>(`${this.apiUrl}/Emprendimientos/${id}`);
   }
 
   getByCategory(category: string): Observable<any> {
-    return this.http.get<any>(`${this.url}/Emprendimientos/categoria/${category}`);
+    return this.http.get<any>(`${this.apiUrl}/Emprendimientos/categoria/${category}`);
   }
 
   getCategories(id: number): Observable<any> {
-    return this.http.get<any>(`${this.url}/emprendimientos/${id}/categorias`);
+    return this.http.get<any>(`${this.apiUrl}/emprendimientos/${id}/categorias`);
   }
 
   getAllWithCategories(): Observable<any[]> {
@@ -58,7 +55,7 @@ export class EmprendimientoService {
   }
 
   getUbicacionDeEmprendimiento(idEmprendimiento: number): Observable<any> {
-    return this.http.get<any>(`http://localhost:5145/emprendimientos/${idEmprendimiento}/ubicaciones`).pipe(
+    return this.http.get<any>(`${this.apiUrl}/emprendimientos/${idEmprendimiento}/ubicaciones`).pipe(
       switchMap((ubicaciones: any[]) => {
         const ubicacionesVigentes = ubicaciones.filter(ubicacion => ubicacion.vigencia === true);
 
@@ -103,19 +100,19 @@ export class EmprendimientoService {
   }
 
   getComunaById(idComuna: number): Observable<any> {
-    return this.http.get<any>(`${this.url}/Comunas/${idComuna}`);
+    return this.http.get<any>(`${this.apiUrl}/Comunas/${idComuna}`);
   }
 
   getRegionById(idRegion: number): Observable<any> {
-    return this.http.get<any>(`${this.url}/Regiones/${idRegion}`);
+    return this.http.get<any>(`${this.apiUrl}/Regiones/${idRegion}`);
   }
 
   getCategoriasByEmprendimiento(idEmprendimiento: number): Observable<any> {
-    return this.http.get<any>(`http://localhost:5145/emprendimientos/${idEmprendimiento}/categorias`);
+    return this.http.get<any>(`${this.apiUrl}/emprendimientos/${idEmprendimiento}/categorias`);
   }
 
   getPlataformasByEmprendimiento(idEmprendimiento: number): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:5145/emprendimientos/${idEmprendimiento}/plataformas`).pipe(
+    return this.http.get<any[]>(`${this.apiUrl}/emprendimientos/${idEmprendimiento}/plataformas`).pipe(
       switchMap((plataformas: any[]) => {
         const plataformasVigentes = plataformas.filter(plataforma => plataforma.vigencia === true);
 
@@ -148,7 +145,7 @@ export class EmprendimientoService {
   }
 
   obtenerMultimediaPorId(id: number): Observable<string[]> {
-    return this.http.get<{ imagenes: string[] }>(`${this.url}/Emprendimientos/${id}/imagenes-emprendimiento`)
+    return this.http.get<{ imagenes: string[] }>(`${this.apiUrl}/Emprendimientos/${id}/imagenes-emprendimiento`)
       .pipe(map(response => response.imagenes));
   }
 

@@ -76,7 +76,6 @@ namespace RedMujer_Backend.controllers
             return Ok(modalidades);
         }
 
-
         // =========== CREAR ===========
         [HttpPost]
         [Consumes("multipart/form-data")]
@@ -108,9 +107,8 @@ namespace RedMujer_Backend.controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Actualizar(int id, [FromForm] EmprendimientoCreateDto dto)
         {
-            // Verifica si no se recibió ni imagen ni campos actualizables
             if (dto.Imagen == null && dto.EsVacio())
-                return NoContent(); // No hacer nada si no hay datos
+                return NoContent();
 
             string? rutaImagen = null;
             if (dto.Imagen != null)
@@ -148,7 +146,7 @@ namespace RedMujer_Backend.controllers
         {
             var imagen = dto.Imagen;
             if (imagen == null || imagen.Length == 0)
-                return NoContent(); // No elimina ni modifica nada si no recibe archivo
+                return NoContent();
 
             var existe = await _service.ExisteAsync(id);
             if (!existe)
@@ -184,7 +182,6 @@ namespace RedMujer_Backend.controllers
         }
 
         // =========== IMÁGENES ADICIONALES ===========
-
         [HttpGet("{id}/imagenes-emprendimiento")]
         public IActionResult GetImagenesEmprendimiento(int id)
         {
@@ -212,7 +209,6 @@ namespace RedMujer_Backend.controllers
             if (string.IsNullOrWhiteSpace(nombreArchivo))
                 return BadRequest("Nombre de archivo inválido.");
 
-            // Seguridad básica: evita path traversal
             nombreArchivo = Path.GetFileName(nombreArchivo);
 
             var carpeta = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", id.ToString(), "imagenes_emprendimiento");
@@ -225,7 +221,6 @@ namespace RedMujer_Backend.controllers
             return NoContent();
         }
 
-        // POST para agregar imágenes de emprendimiento (adicionales)
         [HttpPost("{id}/imagenes-emprendimiento")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> SubirImagenesEmprendimiento(int id, [FromForm] ImagenesUploadDto dto)
@@ -265,7 +260,7 @@ namespace RedMujer_Backend.controllers
         {
             var imagenes = dto.Imagenes;
             if (imagenes == null || imagenes.Count == 0)
-                return NoContent(); // No elimina ni modifica nada si no recibe archivos
+                return NoContent();
 
             var existe = await _service.ExisteAsync(id);
             if (!existe)
@@ -306,36 +301,42 @@ namespace RedMujer_Backend.controllers
             return NoContent();
         }
 
-        // =========== ENDPOINT DE CATEGORIAS DE EMPRENDIMIENTO ===========
-        [HttpGet("/emprendimientos/{idEmprendimiento}/categorias")]
-        public async Task<ActionResult<IEnumerable<CategoriaDto>>> GetCategoriasPorEmprendimiento(int idEmprendimiento)
+        // =========== CATEGORÍAS DE EMPRENDIMIENTO ===========
+        // GET: /api/emprendimientos/{id}/categorias
+        [HttpGet("{id}/categorias")]
+        public async Task<ActionResult<IEnumerable<CategoriaDto>>> GetCategoriasPorEmprendimiento(int id)
         {
-            var categorias = await _categoriaService.ObtenerCategoriasPorEmprendimientoAsync(idEmprendimiento);
+            var categorias = await _categoriaService.ObtenerCategoriasPorEmprendimientoAsync(id);
             if (categorias == null || !categorias.Any())
                 return NotFound("No se encontraron categorías para el emprendimiento.");
             return Ok(categorias);
         }
 
-        // =========== ENDPOINT DE UBICACIONES DE EMPRENDIMIENTO ===========
-        [HttpGet("/emprendimientos/{idEmprendimiento}/ubicaciones")]
-        public async Task<ActionResult<IEnumerable<UbicacionDto>>> GetUbicacionesPorEmprendimiento(int idEmprendimiento)
+        // =========== UBICACIONES DE EMPRENDIMIENTO ===========
+        // GET: /api/emprendimientos/{id}/ubicaciones
+        [HttpGet("{id}/ubicaciones")]
+        public async Task<ActionResult<IEnumerable<UbicacionDto>>> GetUbicacionesPorEmprendimiento(int id)
         {
-            var ubicaciones = await _ubicacionService.ObtenerUbicacionesPorEmprendimientoAsync (idEmprendimiento);
+            var ubicaciones = await _ubicacionService.ObtenerUbicacionesPorEmprendimientoAsync(id);
             if (ubicaciones == null || !ubicaciones.Any())
                 return NotFound("No se encontraron ubicaciones para el emprendimiento.");
             return Ok(ubicaciones);
         }
 
-        // =========== ENDPOINT DE PERSONAS DE EMPRENDIMIENTO ===========
+        // =========== PLATAFORMAS DE EMPRENDIMIENTO ===========
+        // GET: /api/emprendimientos/{id}/plataformas
+        [HttpGet("{id}/plataformas")]
+        public async Task<IActionResult> GetPlataformasPorEmprendimiento(int id)
+        {
+            var plataformas = await _plataformaService.GetByEmprendimientoIdAsync(id);
 
+            if (plataformas == null || !plataformas.Any())
+                return NotFound("No se encontraron plataformas para el emprendimiento.");
 
+            return Ok(plataformas);
+        }
 
-
-
-
-        
-
-        // =========== MÉTODOS DE GUARDADO DE IMÁGENES ===========
+        // =========== MÉTODOS PRIVADOS ===========
         private async Task<string?> GuardarImagenPrincipal(int idEmprendimiento, IFormFile? imagen)
         {
             if (imagen == null || imagen.Length == 0)
@@ -360,42 +361,5 @@ namespace RedMujer_Backend.controllers
 
             return Path.Combine("emprendimientos", idEmprendimiento.ToString(), "imagen_principal", nombreArchivo).Replace("\\", "/");
         }
-        [HttpGet("/emprendimientos/{idEmprendimiento}/plataformas")]
-        public async Task<IActionResult> GetPlataformasPorEmprendimiento(int idEmprendimiento)
-        {
-            var plataformas = await _plataformaService.GetByEmprendimientoIdAsync(idEmprendimiento);
-
-            if (plataformas == null || !plataformas.Any())
-                return NotFound("No se encontraron plataformas para el emprendimiento.");
-
-            return Ok(plataformas);
-        }   
-        // // =========== ENDPOINT DE VIDEOS DE EMPRENDIMIENTO ===========
-        // [HttpGet("/emprendimientos/{idEmprendimiento}/video")]
-        // public async Task<ActionResult<string>> GetVideoPrincipal(int idEmprendimiento)
-        // {
-        //     var videoUrl = await _service.ObtenerVideoPrincipalAsync(idEmprendimiento);
-        //     if (string.IsNullOrEmpty(videoUrl))
-        //         return NotFound("No se encontró un video principal para este emprendimiento.");
-        //     return Ok(videoUrl);
-        // }
-        // [HttpPost("/emprendimientos/{idEmprendimiento}/video")]
-        // public async Task<ActionResult> PostVideoPrincipal(int idEmprendimiento, [FromForm] string? videoUrl)
-        // {
-        //     await _service.ActualizarVideoPrincipalAsync(idEmprendimiento, videoUrl);
-        //     return Ok();
-        // }
-
-        // [HttpPut("/emprendimientos/{idEmprendimiento}/video")]
-        // public async Task<ActionResult> PutVideoPrincipal(int idEmprendimiento, [FromForm] string? videoUrl)
-        // {
-        //     var existe = await _service.ExisteAsync(idEmprendimiento);
-        //     if (!existe)
-        //         return NotFound($"No se encontró el emprendimiento con ID {idEmprendimiento}");
-                
-        //     await _service.ActualizarVideoPrincipalAsync(idEmprendimiento, videoUrl);
-        //     return Ok(new { mensaje = "Video actualizado correctamente" });
-        // }
-        
     }
 }
