@@ -31,7 +31,6 @@ namespace RedMujer_Backend.services
             return await _repo.GetByCorreoAsync(correo.Trim());
         }
 
-        // MEJORA: Siempre quita espacios antes de buscar por correo
         public async Task<Usuario?> AuthenticateByCorreoAsync(string correo, string plainPassword)
         {
             var user = await _repo.GetByCorreoAsync(correo.Trim());
@@ -59,12 +58,29 @@ namespace RedMujer_Backend.services
         public async Task EliminarAsync(int id) =>
             await _repo.EliminarAsync(id);
 
-        // MEJORA: Siempre quita espacios antes de buscar por nombre de usuario
         public async Task<Usuario?> AuthenticateAsync(string usuarioNombre, string plainPassword)
         {
             var user = await _repo.GetByUsuarioNombreAsync(usuarioNombre.Trim());
             if (user == null) return null;
             return BCrypt.Net.BCrypt.Verify(plainPassword, user.Contrasenna) ? user : null;
+        }
+
+        public async Task<bool> CambiarContrasenaAsync(int userId, string contrasenaActual, string contrasenaNueva)
+        {
+            var usuario = await _repo.GetByIdAsync(userId);
+            if (usuario == null) return false;
+
+            // Verificar que la contraseña actual sea correcta
+            if (!BCrypt.Net.BCrypt.Verify(contrasenaActual, usuario.Contrasenna))
+                return false;
+
+            // Hashear la nueva contraseña
+            var nuevaContrasenaHash = BCrypt.Net.BCrypt.HashPassword(contrasenaNueva);
+
+            // Actualizar la contraseña en la base de datos
+            await _repo.CambiarContrasenaAsync(userId, nuevaContrasenaHash);
+
+            return true;
         }
     }
 }

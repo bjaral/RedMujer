@@ -102,5 +102,40 @@ namespace RedMujer_Backend.controllers
             await _service.EliminarAsync(id);
             return Ok(new { mensaje = "Usuario eliminado correctamente" });
         }
+
+        [HttpGet("verificar-correo")]
+        public async Task<ActionResult> VerificarCorreo([FromQuery] string correo)
+        {
+            if (string.IsNullOrWhiteSpace(correo))
+                return BadRequest(new { mensaje = "El correo es requerido" });
+
+            var usuario = await _service.GetByCorreoAsync(correo);
+
+            return Ok(new
+            {
+                existe = usuario != null,
+                correo = correo.Trim()
+            });
+        }
+
+        [HttpPut("{id}/cambiar-contrasena")]
+        public async Task<ActionResult> CambiarContrasena(int id, [FromBody] CambiarContrasenaRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var resultado = await _service.CambiarContrasenaAsync(id, request.ContrasenaActual, request.ContrasenaNueva);
+
+            if (!resultado)
+                return BadRequest(new { mensaje = "La contraseña actual es incorrecta" });
+
+            return Ok(new { mensaje = "Contraseña cambiada exitosamente" });
+        }
+
+        public class CambiarContrasenaRequest
+        {
+            public required string ContrasenaActual { get; set; }
+            public required string ContrasenaNueva { get; set; }
+        }
     }
 }

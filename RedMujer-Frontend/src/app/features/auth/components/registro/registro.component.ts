@@ -54,7 +54,7 @@ export class RegistroComponent implements OnInit, AfterViewInit {
 
     this.usuarioForm = this.fb.group({
       username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email], [this.emailExistsValidator()]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
     }, { validators: this.passwordMatchValidator });
@@ -169,6 +169,46 @@ export class RegistroComponent implements OnInit, AfterViewInit {
       }
 
       return null;
+    };
+  }
+
+  emailExistsValidator(): any {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value) {
+        return new Observable(observer => {
+          observer.next(null);
+          observer.complete();
+        });
+      }
+
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailPattern.test(control.value)) {
+        return new Observable(observer => {
+          observer.next(null);
+          observer.complete();
+        });
+      }
+
+      return new Observable(observer => {
+        const timeoutId = setTimeout(() => {
+          this.authService.verificarCorreo(control.value).subscribe({
+            next: (response) => {
+              if (response.existe) {
+                observer.next({ emailExists: true });
+              } else {
+                observer.next(null);
+              }
+              observer.complete();
+            },
+            error: () => {
+              observer.next(null);
+              observer.complete();
+            }
+          });
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+      });
     };
   }
 

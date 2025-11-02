@@ -4,7 +4,8 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { EmprendimientoService } from '../../services/emprendimiento.service';
 import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 export interface Emprendimiento {
   id_Emprendimiento: number;
@@ -16,18 +17,28 @@ export interface Emprendimiento {
   region?: string;
   comuna?: string;
   modalidad?: string;
+  horario_Atencion?: string;
   id_Comuna?: number;
   id_Region?: number;
   numero?: string;
   calle?: string;
-  plataformas?: Plataforma[],
+  plataformas?: Plataforma[];
+  contactos?: Contacto[];
+  videoUrl?: SafeResourceUrl;
 }
 
 export interface Plataforma {
   ruta: string;
   descripcion: string;
   tipo_plataforma: string;
-  icon?: string; // Nuevo atributo para el icono
+  icon?: string;
+}
+
+export interface Contacto {
+  id_Contacto: number;
+  valor: string;
+  tipo_Contacto: 'telefono' | 'correo';
+  vigencia: boolean;
 }
 
 @Component({
@@ -48,20 +59,27 @@ export class DetalleEmprendimientoComponent implements OnInit {
     region: '',
     comuna: '',
     modalidad: '',
+    horario_Atencion: '',
     id_Comuna: 0,
     id_Region: 0,
     numero: '',
     calle: '',
     plataformas: [],
+    contactos: [],
+    videoUrl: ''
   };
 
   imagenesExtras: string[] = [];
   loading: boolean = true;
+  modalAbierto: boolean = false;
+  imagenSeleccionada: string = '';
+  indiceImagenActual: number = 0;
 
   constructor(
     private emprendimientoService: EmprendimientoService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
@@ -70,6 +88,22 @@ export class DetalleEmprendimientoComponent implements OnInit {
       this.getEmprendimiento();
       this.cargarMultimedias();
     });
+  }
+
+  extractYoutubeVideoId(url: string): string | null {
+    const patterns = [
+      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/,
+      /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^?]+)/,
+      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^?]+)/
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    return null;
   }
 
   getEmprendimiento(): void {
@@ -114,15 +148,22 @@ export class DetalleEmprendimientoComponent implements OnInit {
         console.error(`Error al obtener plataformas del emprendimiento con id ${this.idEmprendimiento}:`, err);
         return of([]);
       })
-    )
+    );
+
+    const contactos$ = this.emprendimientoService.getContactosByEmprendimiento(this.idEmprendimiento).pipe(
+      catchError(err => {
+        console.error(`Error al obtener contactos del emprendimiento con id ${this.idEmprendimiento}:`, err);
+        return of([]);
+      })
+    );
 
     forkJoin({
       ubicacion: ubicacion$,
       categorias: categorias$,
-      plataformas: plataformas$
+      plataformas: plataformas$,
+      contactos: contactos$
     }).subscribe({
       next: (result) => {
-        // Asignar ubicación
         this.emprendimiento.region = result.ubicacion.region;
         this.emprendimiento.comuna = result.ubicacion.comuna;
         this.emprendimiento.id_Comuna = result.ubicacion.id_Comuna;
@@ -130,19 +171,27 @@ export class DetalleEmprendimientoComponent implements OnInit {
         this.emprendimiento.calle = result.ubicacion.calle;
         this.emprendimiento.numero = result.ubicacion.numero;
 
-        // Asignar categorías
         this.emprendimiento.categorias = result.categorias;
         this.emprendimiento.categoriasTexto = result.categorias.map((cat: any) => cat.nombre).join(', ');
 
-        // Asignar plataformas con iconos
         this.emprendimiento.plataformas = result.plataformas.map(plataforma => ({
           ...plataforma,
           icon: this.getIconForPlataforma(plataforma)
         }));
 
-        // Procesar imagen
+        this.emprendimiento.contactos = result.contactos;
+
         if (this.emprendimiento.imagen) {
-          this.emprendimiento.imagen = `http://localhost:5145/media/${this.emprendimiento.imagen}`;
+          this.emprendimiento.imagen = `${this.emprendimientoService['apiUrl'].replace('/api', '')}/media/${this.emprendimiento.imagen}`;
+        }
+
+        if (this.emprendimiento.videoUrl) {
+          const videoUrlString = this.emprendimiento.videoUrl as string;
+          const videoId = this.extractYoutubeVideoId(videoUrlString);
+          if (videoId) {
+            const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+            this.emprendimiento.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+          }
         }
 
         this.loading = false;
@@ -151,7 +200,7 @@ export class DetalleEmprendimientoComponent implements OnInit {
         console.error('Error al cargar datos adicionales del emprendimiento:', err);
 
         if (this.emprendimiento.imagen) {
-          this.emprendimiento.imagen = `http://localhost:5145/media/${this.emprendimiento.imagen}`;
+          this.emprendimiento.imagen = `${this.emprendimientoService['apiUrl'].replace('/api', '')}/media/${this.emprendimiento.imagen}`;
         }
 
         this.loading = false;
@@ -184,42 +233,29 @@ export class DetalleEmprendimientoComponent implements OnInit {
         }
 
       case 'sitio_web':
-        return 'language'; // Icono de mundo/web
+        return 'language';
 
       case 'mercado_online':
-        return 'shopping_cart'; // Icono de carrito de compras
+        return 'shopping_cart';
 
       case 'aplicacion_movil':
-        return 'smartphone'; // Icono de móvil
+        return 'smartphone';
 
       case 'otro':
       default:
-        return 'link'; // Icono genérico de enlace
+        return 'link';
     }
   }
 
   private cargarMultimedias(): void {
     this.emprendimientoService.obtenerMultimediaPorId(this.idEmprendimiento).subscribe({
       next: (imagenes) => {
-        console.log('Imágenes recibidas del servicio:', imagenes);
-
-        // Verificar si las imágenes ya tienen la URL completa
         this.imagenesExtras = imagenes.map(imagen => {
-          console.log('Imagen original:', imagen);
-
-          // Si la imagen ya tiene http:// o https://, no agregar el prefijo
           if (imagen.startsWith('http://') || imagen.startsWith('https://')) {
-            console.log('URL completa:', imagen);
             return imagen;
           }
-
-          // Si no, construir la URL completa
-          const urlCompleta = `http://localhost:5145/media/${imagen}`;
-          console.log('URL construida:', urlCompleta);
-          return urlCompleta;
+          return `${this.emprendimientoService['apiUrl'].replace('/api', '')}/media/${imagen}`;
         });
-
-        console.log('URLs finales:', this.imagenesExtras);
       },
       error: (err) => {
         console.error('Error al cargar las imágenes secundarias', err);
@@ -229,5 +265,27 @@ export class DetalleEmprendimientoComponent implements OnInit {
 
   onImageError(event: any): void {
     event.target.src = 'assets/images/emprendimiento-placeholder.png';
+  }
+
+  abrirModal(imagen: string, indice: number): void {
+    this.imagenSeleccionada = imagen;
+    this.indiceImagenActual = indice;
+    this.modalAbierto = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  cerrarModal(): void {
+    this.modalAbierto = false;
+    document.body.style.overflow = 'auto';
+  }
+
+  siguiente(): void {
+    this.indiceImagenActual = (this.indiceImagenActual + 1) % this.imagenesExtras.length;
+    this.imagenSeleccionada = this.imagenesExtras[this.indiceImagenActual];
+  }
+
+  anterior(): void {
+    this.indiceImagenActual = (this.indiceImagenActual - 1 + this.imagenesExtras.length) % this.imagenesExtras.length;
+    this.imagenSeleccionada = this.imagenesExtras[this.indiceImagenActual];
   }
 }

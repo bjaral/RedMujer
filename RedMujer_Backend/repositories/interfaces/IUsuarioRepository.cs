@@ -14,5 +14,6 @@ namespace RedMujer_Backend.repositories
 
         Task<Usuario?> GetByCorreoAsync(string correo);
         Task<Usuario?> GetByUsuarioNombreAsync(string usuarioNombre);
+        Task CambiarContrasenaAsync(int userId, string nuevaContrasenaHash);
     }
 }

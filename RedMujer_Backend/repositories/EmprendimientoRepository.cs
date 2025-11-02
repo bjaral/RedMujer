@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace RedMujer_Backend.repositories
 {
@@ -65,7 +66,7 @@ namespace RedMujer_Backend.repositories
         public async Task<Emprendimiento?> GetByIdAsync(int id)
         {
             const string query = @"
-                SELECT id_emprendimiento, ""RUT"", nombre, descripcion, horario_atencion, vigencia, imagen, modalidad
+                SELECT id_emprendimiento, ""RUT"", nombre, descripcion, horario_atencion, vigencia, imagen, modalidad, video_url
                 FROM public.""Emprendimientos""
                 WHERE id_emprendimiento = @Id
 		AND vigencia = true
@@ -86,13 +87,14 @@ namespace RedMujer_Backend.repositories
                 Horario_Atencion = result.horario_atencion,
                 Vigencia = result.vigencia,
                 Imagen = result.imagen,
-                Modalidad = StringToModalidad(result.modalidad)
+                Modalidad = StringToModalidad(result.modalidad),
+                VideoUrl = result.video_url
             };
         }
 
         public async Task<IEnumerable<Emprendimiento>> GetAllAsync()
         {
-            const string query = @"SELECT id_emprendimiento, ""RUT"", nombre, descripcion, horario_atencion, vigencia, imagen, modalidad
+            const string query = @"SELECT id_emprendimiento, ""RUT"", nombre, descripcion, horario_atencion, vigencia, imagen, modalidad, video_url
                                    FROM public.""Emprendimientos"" WHERE vigencia = true;";
 
             using var connection = CreateConnection();
@@ -107,7 +109,8 @@ namespace RedMujer_Backend.repositories
                 Horario_Atencion = e.horario_atencion,
                 Vigencia = e.vigencia,
                 Imagen = e.imagen,
-                Modalidad = StringToModalidad(e.modalidad)
+                Modalidad = StringToModalidad(e.modalidad),
+                VideoUrl = e.video_url
             });
         }
 
@@ -115,8 +118,8 @@ namespace RedMujer_Backend.repositories
         {
             const string query = @"
                 INSERT INTO public.""Emprendimientos""(
-                    ""RUT"", nombre, descripcion, horario_atencion, vigencia, modalidad, imagen)
-                VALUES (@RUT, @Nombre, @Descripcion, @Horario_Atencion, @Vigencia, @Modalidad::tipo_modalidad, @Imagen)
+                    ""RUT"", nombre, descripcion, horario_atencion, vigencia, modalidad, imagen, video_url)
+                VALUES (@RUT, @Nombre, @Descripcion, @Horario_Atencion, @Vigencia, @Modalidad::tipo_modalidad, @Imagen, @VideoUrl)
                 RETURNING id_emprendimiento;";
 
             using var connection = CreateConnection();
@@ -128,7 +131,8 @@ namespace RedMujer_Backend.repositories
                 e.Horario_Atencion,
                 e.Vigencia,
                 Modalidad = e.Modalidad == null ? null : EnumToString(e.Modalidad.Value),
-                e.Imagen
+                e.Imagen,
+                e.VideoUrl
             });
 
             e.Id_Emprendimiento = id;
@@ -146,7 +150,8 @@ namespace RedMujer_Backend.repositories
                     horario_atencion = @Horario_Atencion,
                     vigencia = @Vigencia,
                     modalidad = @Modalidad::tipo_modalidad,
-                    imagen = @Imagen
+                    imagen = @Imagen,
+                    video_url = @VideoUrl
                 WHERE id_emprendimiento = @Id_Emprendimiento;";
 
             using var connection = CreateConnection();
@@ -159,13 +164,14 @@ namespace RedMujer_Backend.repositories
                 e.Vigencia,
                 Modalidad = e.Modalidad == null ? null : EnumToString(e.Modalidad.Value),
                 e.Imagen,
+                e.VideoUrl,
                 e.Id_Emprendimiento
             });
         }
 
         public async Task EliminarEmprendimientoAsync(int id)
         {
-            const string query = @"DELETE FROM public.""Emprendimientos"" WHERE id_emprendimiento = @Id;";
+            const string query = @"UPDATE public.""Emprendimientos"" SET vigencia = false WHERE id_emprendimiento = @Id;";
 
             using var connection = CreateConnection();
             await connection.ExecuteAsync(query, new { Id = id });
@@ -174,7 +180,7 @@ namespace RedMujer_Backend.repositories
         public async Task<IEnumerable<Emprendimiento>> GetRandomAsync(int cantidad)
         {
             const string query = @"
-                SELECT id_emprendimiento, ""RUT"", nombre, descripcion, horario_atencion, vigencia, imagen, modalidad
+                SELECT id_emprendimiento, ""RUT"", nombre, descripcion, horario_atencion, vigencia, imagen, modalidad, video_url
                 FROM public.""Emprendimientos""
                 WHERE vigencia = true
                 ORDER BY RANDOM()
@@ -192,7 +198,8 @@ namespace RedMujer_Backend.repositories
                 Horario_Atencion = e.horario_atencion,
                 Vigencia = e.vigencia,
                 Imagen = e.imagen,
-                Modalidad = StringToModalidad(e.modalidad)
+                Modalidad = StringToModalidad(e.modalidad),
+                VideoUrl = e.video_url
             });
         }
         public async Task<string?> GetImagenPrincipalAsync(int id)
@@ -220,10 +227,27 @@ namespace RedMujer_Backend.repositories
                 SELECT e.*
                 FROM ""Emprendimientos"" e
                 INNER JOIN ""Persona_emprendimiento"" pe ON e.""id_emprendimiento"" = pe.""id_emprendimiento""
-                WHERE pe.""id_persona"" = @Id_Persona
+                WHERE pe.""id_persona"" = @Id_Persona AND vigencia = true
             ";
 
             return await connection.QueryAsync<Emprendimiento>(query, new { Id_Persona = id_Persona });
         }
+        // public async Task<string?> GetVideoPrincipalAsync(int id)
+        // {
+        //     const string sql = @"SELECT video_url FROM public.""Emprendimientos"" WHERE id_emprendimiento = @Id";
+        //     using (var connection = CreateConnection())
+        //     {
+        //         return await connection.QueryFirstOrDefaultAsync<string>(sql, new { Id = id });
+        //     }
+        // }
+
+        // public async Task UpdateVideoPrincipalAsync(int id, string? videoUrl)
+        // {
+        //     const string sql = @"UPDATE public.""Emprendimientos"" SET video_url = @VideoUrl WHERE id_emprendimiento = @Id";
+        //     using (var connection = CreateConnection())
+        //     {
+        //         await connection.ExecuteAsync(sql, new { VideoUrl = videoUrl, Id = id });
+        //     }
+        // }
     }
 }

@@ -64,4 +64,14 @@ export class TokenService {
   clearToken(): void {
     localStorage.removeItem(this.tokenKey);
   }
+
+  isLoggedIn(): boolean {
+    return !!this.getToken() && !this.isTokenExpired();
+  }
+
+  getUserName(): string | null {
+    const decoded = this.decodeToken();
+    if (!decoded) return null;
+    return decoded[this.claimTypes.name] || decoded.usuarioNombre || null;
+  }
 }

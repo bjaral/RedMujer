@@ -85,7 +85,8 @@ namespace RedMujer_Backend.repositories
                 @"INSERT INTO ""Usuarios"" 
                     (""usuario"", ""contrasenna"", ""vigencia"", ""tipo_usuario"", ""correo"") 
                   VALUES (@UsuarioNombre, @Contrasenna, @Vigencia, @TipoUsuarioStr::tipo_usuario, @Correo) RETURNING id_usuario",
-                new {
+                new
+                {
                     usuario.UsuarioNombre,
                     usuario.Contrasenna,
                     usuario.Vigencia,
@@ -105,7 +106,8 @@ namespace RedMujer_Backend.repositories
                         ""tipo_usuario"" = @TipoUsuarioStr::tipo_usuario,
                         ""correo"" = @Correo
                     WHERE ""id_usuario"" = @Id_Usuario",
-                new {
+                new
+                {
                     usuario.UsuarioNombre,
                     usuario.Contrasenna,
                     usuario.Vigencia,
@@ -115,8 +117,18 @@ namespace RedMujer_Backend.repositories
                 });
         }
 
+        public async Task CambiarContrasenaAsync(int userId, string nuevaContrasenaHash)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            await connection.ExecuteAsync(
+                @"UPDATE ""Usuarios"" SET ""contrasenna"" = @NuevaContrasena 
+          WHERE ""id_usuario"" = @UserId",
+                new { UserId = userId, NuevaContrasena = nuevaContrasenaHash });
+        }
+
         public async Task EliminarAsync(int id) =>
             await new NpgsqlConnection(_connectionString)
                 .ExecuteAsync(@"DELETE FROM ""Usuarios"" WHERE ""id_usuario"" = @Id", new { Id = id });
+
     }
 }

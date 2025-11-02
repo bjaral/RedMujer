@@ -4,13 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using RedMujer_Backend.DTOs;
 using RedMujer_Backend.services;
-
 using RedMujer_Backend.models;
 
 namespace RedMujer_Backend.controllers
 {
     [ApiController]
-    [Route("categorias")]
+    [Route("api/[controller]")]
     public class CategoriasController : ControllerBase
     {
         private readonly ICategoriaService _categoriaService;
@@ -20,7 +19,7 @@ namespace RedMujer_Backend.controllers
             _categoriaService = categoriaService;
         }
 
-        // GET: /categorias
+        // GET: /api/categorias
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoriaDto>>> GetAll()
         {
@@ -28,8 +27,7 @@ namespace RedMujer_Backend.controllers
             return Ok(categorias);
         }
 
-
-        // endpoint para los enums de grupo_categoria
+        // GET: /api/categorias/grupos
         [HttpGet("grupos")]
         public ActionResult<IEnumerable<string>> GetGruposCategoria()
         {
@@ -37,8 +35,7 @@ namespace RedMujer_Backend.controllers
             return Ok(grupos);
         }
 
-
-        // GET: /categorias/{id}
+        // GET: /api/categorias/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoriaDto>> GetById(int id)
         {
@@ -48,7 +45,7 @@ namespace RedMujer_Backend.controllers
             return Ok(categoria);
         }
 
-        // POST: /categorias
+        // POST: /api/categorias
         [HttpPost]
         public async Task<IActionResult> Crear(CategoriaCreateDto dto)
         {
@@ -56,7 +53,7 @@ namespace RedMujer_Backend.controllers
             return Ok();
         }
 
-        // PUT: /categorias/{id}
+        // PUT: /api/categorias/{id}
         [HttpPut("{id}")]
         public async Task<ActionResult> Actualizar(int id, [FromBody] CategoriaCreateDto dto)
         {
@@ -64,7 +61,7 @@ namespace RedMujer_Backend.controllers
             return NoContent();
         }
 
-        // DELETE: /categorias/{id}
+        // DELETE: /api/categorias/{id}
         [HttpDelete("{id}")]
         public async Task<ActionResult> Eliminar(int id)
         {
