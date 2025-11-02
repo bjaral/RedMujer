@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { EmprendimientoFormService } from '../../services/emprendimiento-form.service';
+import { UbicacionService } from '../../services/ubicacion.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-editar-emprendimiento',
@@ -21,12 +23,16 @@ export class EditarEmprendimientoComponent implements OnInit {
   imagenesExtrasData: { preview: string; file: File }[] = [];
   imagenPrincipalFile: File | null = null;
   idEmprendimiento!: number;
+  idUbicacion: number = 0;
   categorias: any[] = [];
+  regiones: any[] = [];
+  comunas: any[] = [];
   contactosOriginales: any[] = [];
   plataformasOriginales: any[] = [];
   categoriasOriginales: number[] = [];
+  videoEmbedUrl: SafeResourceUrl | null = null;
 
-  tiposContacto = ['telefono', 'email'];
+  tiposContacto = ['telefono', 'correo'];
   tiposPlataforma = [
     { value: 'red_social', label: 'Red Social' },
     { value: 'sitio_web', label: 'Sitio Web' },
@@ -38,25 +44,36 @@ export class EditarEmprendimientoComponent implements OnInit {
   redesSociales = ['Instagram', 'Facebook', 'LinkedIn', 'Twitter/X', 'TikTok', 'YouTube', 'Pinterest', 'Otra'];
 
   constructor(
-    private fb: FormBuilder, 
-    private emprendimientoFormService: EmprendimientoFormService, 
+    private fb: FormBuilder,
+    private emprendimientoFormService: EmprendimientoFormService,
+    private ubicacionService: UbicacionService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private sanitizer: DomSanitizer
   ) {
     this.formulario = this.fb.group({
       rut: ['', Validators.required],
       nombre: ['', Validators.required],
       descripcion: [''],
       modalidad: ['', Validators.required],
-      horario_Atencion: ['', Validators.required],
+      horario_Atencion: [''],
       categorias: [[], Validators.required],
+      videoUrl: [''],
       contactos: this.fb.array([]),
-      plataformas: this.fb.array([])
+      plataformas: this.fb.array([]),
+      ubicacion: this.fb.group({
+        region: [null],
+        comuna: [null],
+        calle: [''],
+        numero: [''],
+        referencia: ['']
+      })
     });
   }
 
   ngOnInit(): void {
     this.cargarCategorias();
+    this.cargarRegiones();
     this.route.params.subscribe(params => {
       this.idEmprendimiento = +params['id'];
       if (this.idEmprendimiento) {
@@ -74,6 +91,35 @@ export class EditarEmprendimientoComponent implements OnInit {
         console.error('Error al cargar categorías', err);
       }
     });
+  }
+
+  cargarRegiones(): void {
+    this.ubicacionService.regiones().subscribe({
+      next: (regiones) => {
+        this.regiones = regiones;
+      },
+      error: (err) => {
+        console.error('Error al cargar regiones', err);
+      }
+    });
+  }
+
+  onRegionChange(): void {
+    const regionObj = this.formulario.get('ubicacion.region')?.value;
+    if (regionObj && regionObj.id_Region) {
+      this.ubicacionService.comunasPorRegion(regionObj.id_Region).subscribe({
+        next: (comunas) => {
+          this.comunas = comunas;
+          this.formulario.get('ubicacion.comuna')?.setValue(null);
+        },
+        error: (err) => {
+          console.error('Error al cargar comunas', err);
+        }
+      });
+    } else {
+      this.comunas = [];
+      this.formulario.get('ubicacion.comuna')?.setValue(null);
+    }
   }
 
   get contactos(): FormArray {
@@ -110,9 +156,7 @@ export class EditarEmprendimientoComponent implements OnInit {
         }
       });
     } else {
-      if (this.contactos.length > 1) {
-        this.contactos.removeAt(index);
-      }
+      this.contactos.removeAt(index);
     }
   }
 
@@ -143,9 +187,7 @@ export class EditarEmprendimientoComponent implements OnInit {
         }
       });
     } else {
-      if (this.plataformas.length > 1) {
-        this.plataformas.removeAt(index);
-      }
+      this.plataformas.removeAt(index);
     }
   }
 
@@ -154,19 +196,73 @@ export class EditarEmprendimientoComponent implements OnInit {
     return tipo === 'red_social';
   }
 
+  onVideoUrlChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const url = input.value.trim();
+
+    if (!url) {
+      this.videoEmbedUrl = null;
+      return;
+    }
+
+    const videoId = this.extractYoutubeVideoId(url);
+    if (videoId) {
+      const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+      this.videoEmbedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+    } else {
+      this.videoEmbedUrl = null;
+      alert('Por favor ingresa una URL válida de YouTube.');
+    }
+  }
+
+  extractYoutubeVideoId(url: string): string | null {
+    const patterns = [
+      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/,
+      /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^?]+)/,
+      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^?]+)/
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    return null;
+  }
+
+  removeVideo(): void {
+    const confirmar = confirm('¿Estás segura de querer eliminar el video?');
+    if (!confirmar) return;
+    this.formulario.get('videoUrl')?.setValue('');
+    this.videoEmbedUrl = null;
+  }
+
   cargarEmprendimiento(id: number): void {
     this.emprendimientoFormService.obtenerEmprendimientoPorId(id).subscribe({
       next: (emprendimiento) => {
+        this.idUbicacion = emprendimiento.id_Ubicacion;
+
         this.formulario.patchValue({
           rut: emprendimiento.rut,
           nombre: emprendimiento.nombre,
           descripcion: (emprendimiento.descripcion && emprendimiento.descripcion !== 'null') ? emprendimiento.descripcion : '',
           modalidad: emprendimiento.modalidad,
           horario_Atencion: emprendimiento.horario_Atencion,
+          videoUrl: emprendimiento.videoUrl || ''
         });
 
+        // Cargar video si existe
+        if (emprendimiento.videoUrl) {
+          const videoId = this.extractYoutubeVideoId(emprendimiento.videoUrl);
+          if (videoId) {
+            const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+            this.videoEmbedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+          }
+        }
+
         if (emprendimiento.imagen) {
-          this.imagenSeleccionada = `http://localhost:5145/media/${emprendimiento.imagen}`;
+          this.imagenSeleccionada = `${this.emprendimientoFormService['apiUrl'].replace('/api', '')}/media/${emprendimiento.imagen}`;
         }
 
         this.emprendimientoFormService.obtenerMultimediaPorId(id).subscribe({
@@ -182,11 +278,57 @@ export class EditarEmprendimientoComponent implements OnInit {
         this.cargarContactos();
         this.cargarCategoriasSeleccionadas();
         this.cargarPlataformas();
+        this.cargarUbicacion();
       },
       error: (error) => {
         console.error('Error al cargar el emprendimiento', error);
         alert('Ocurrió un error al cargar el emprendimiento. Por favor, inténtelo de nuevo');
         this.router.navigate(['/mis-emprendimientos']);
+      }
+    });
+  }
+
+  cargarUbicacion(): void {
+    this.emprendimientoFormService.getUbicacionDeEmprendimiento(this.idEmprendimiento).subscribe({
+      next: (ubicacion) => {
+        console.log('Ubicación obtenida:', ubicacion);
+
+        // Guardar el id_Ubicacion
+        if (ubicacion.id_Ubicacion) {
+          this.idUbicacion = ubicacion.id_Ubicacion;
+        }
+
+        // Buscar la región por nombre
+        const regionEncontrada = this.regiones.find((r: any) => r.nombre === ubicacion.region);
+
+        if (regionEncontrada && ubicacion.id_Region) {
+          // Cargar las comunas de esa región
+          this.ubicacionService.comunasPorRegion(ubicacion.id_Region).subscribe({
+            next: (comunas) => {
+              this.comunas = comunas;
+
+              // Cargar los valores en el formulario
+              this.formulario.patchValue({
+                ubicacion: {
+                  region: regionEncontrada,
+                  comuna: ubicacion.comuna,
+                  calle: ubicacion.calle,
+                  numero: ubicacion.numero,
+                  referencia: ubicacion.referencia || ''
+                }
+              });
+
+              console.log('Valores cargados en formulario ubicación:', this.formulario.get('ubicacion')?.value);
+              console.log('ID Ubicación guardado:', this.idUbicacion);
+            },
+            error: (err) => {
+              console.error('Error al cargar comunas de la región', err);
+            }
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar ubicación', err);
       }
     });
   }
@@ -205,13 +347,11 @@ export class EditarEmprendimientoComponent implements OnInit {
             });
             this.contactos.push(contactoGroup);
           });
-        } else {
-          this.agregarContacto();
         }
+        // Ya no agregamos contacto por defecto si no hay ninguno
       },
       error: (err) => {
         console.error('Error al cargar contactos', err);
-        this.agregarContacto();
       }
     });
   }
@@ -244,13 +384,11 @@ export class EditarEmprendimientoComponent implements OnInit {
             });
             this.plataformas.push(plataformaGroup);
           });
-        } else {
-          this.agregarPlataforma();
         }
+        // Ya no agregamos plataforma por defecto si no hay ninguna
       },
       error: (err) => {
         console.error('Error al cargar plataformas', err);
-        this.agregarPlataforma();
       }
     });
   }
@@ -342,10 +480,38 @@ export class EditarEmprendimientoComponent implements OnInit {
 
   onSubmit() {
     if (this.formulario.invalid) {
+      this.formulario.markAllAsTouched();
       alert('Por favor completa todos los campos obligatorios.');
       return;
     }
 
+    // Actualizar ubicación primero
+    const ubicacionData = this.formulario.get('ubicacion')?.value;
+    const regionObj = ubicacionData.region;
+    const comunaObj = this.comunas.find(c => c.nombre === ubicacionData.comuna);
+
+    const ubicacion = {
+      id_Region: Number(regionObj.id_Region),
+      id_Comuna: Number(comunaObj.id_Comuna),
+      calle: ubicacionData.calle,
+      numero: String(ubicacionData.numero),
+      referencia: ubicacionData.referencia || '',
+      vigencia: true
+    };
+
+    this.emprendimientoFormService.actualizarUbicacion(this.idUbicacion, ubicacion).subscribe({
+      next: () => {
+        console.log('Ubicación actualizada');
+        this.actualizarEmprendimiento();
+      },
+      error: (err) => {
+        console.error('Error al actualizar ubicación', err);
+        alert('Ocurrió un error al actualizar la ubicación.');
+      }
+    });
+  }
+
+  private actualizarEmprendimiento(): void {
     const data = this.formulario.value;
     const formData = new FormData();
 
@@ -355,6 +521,8 @@ export class EditarEmprendimientoComponent implements OnInit {
     formData.append('Modalidad', data.modalidad);
     formData.append('Horario_Atencion', data.horario_Atencion);
     formData.append('Vigencia', 'true');
+    formData.append('VideoUrl', data.videoUrl || '');
+    formData.append('Id_Ubicacion', this.idUbicacion.toString());
 
     if (this.imagenPrincipalFile) {
       formData.append('Imagen', this.imagenPrincipalFile);
@@ -373,11 +541,11 @@ export class EditarEmprendimientoComponent implements OnInit {
             }
           });
         }
-        
+
         this.actualizarContactos();
         this.actualizarCategorias();
         this.actualizarPlataformas();
-        
+
         alert('Emprendimiento actualizado exitosamente.');
         this.router.navigate(['/mis-emprendimientos']);
       },
@@ -391,7 +559,7 @@ export class EditarEmprendimientoComponent implements OnInit {
   actualizarContactos(): void {
     const contactos = this.formulario.get('contactos')?.value;
     contactos.forEach((contacto: any) => {
-      if (contacto.valor) {
+      if (contacto.valor && contacto.valor.trim() !== '') {
         const contactoData = {
           id_Emprendimiento: this.idEmprendimiento,
           valor: contacto.valor,
@@ -416,7 +584,7 @@ export class EditarEmprendimientoComponent implements OnInit {
 
   actualizarCategorias(): void {
     const categoriasSeleccionadas = this.formulario.get('categorias')?.value || [];
-    
+
     // Eliminar categorías que ya no están seleccionadas
     this.categoriasOriginales.forEach(idCategoria => {
       if (!categoriasSeleccionadas.includes(idCategoria)) {
@@ -445,7 +613,7 @@ export class EditarEmprendimientoComponent implements OnInit {
   actualizarPlataformas(): void {
     const plataformas = this.formulario.get('plataformas')?.value;
     plataformas.forEach((plataforma: any) => {
-      if (plataforma.ruta) {
+      if (plataforma.ruta && plataforma.ruta.trim() !== '') {
         const plataformaData = {
           id_Emprendimiento: this.idEmprendimiento,
           ruta: plataforma.ruta,
@@ -472,5 +640,5 @@ export class EditarEmprendimientoComponent implements OnInit {
   get maximoImagenesExtrasAlcanzado(): boolean {
     return this.imagenesExtras.length >= 5;
   }
-  
+
 }

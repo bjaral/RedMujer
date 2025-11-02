@@ -57,6 +57,10 @@ export class MisEmprendimientosComponent implements OnInit {
     this.router.navigate(['/editar-emprendimiento/', idEmprendimiento]);
   }
 
+  toEmprendimiento(idEmprendimiento: number): void {
+    this.router.navigate(['/emprendimientos/', idEmprendimiento]);
+  }
+
   eliminarEmprendimiento(idEmprendimiento: number): void {
     const confirmar = confirm('¿Estás segura de que deseas eliminar este emprendimiento? Esta acción no se puede deshacer.');
     if (!confirmar) return;

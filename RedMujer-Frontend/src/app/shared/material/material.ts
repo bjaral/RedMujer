@@ -12,6 +12,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatMenuModule } from '@angular/material/menu';
 
 export const MATERIAL_IMPORTS = [
   MatButtonModule,
@@ -27,5 +28,6 @@ export const MATERIAL_IMPORTS = [
   MatProgressSpinner,
   MatOptionModule,
   MatSelect,
-  MatPaginatorModule
+  MatPaginatorModule,
+  MatMenuModule
 ]

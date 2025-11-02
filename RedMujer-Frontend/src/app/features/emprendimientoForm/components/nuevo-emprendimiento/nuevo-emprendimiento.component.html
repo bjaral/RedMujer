@@ -4,47 +4,111 @@
   <form class="formulario" [formGroup]="formulario" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
 
     <div class="form-col-left">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>RUT</mat-label>
-        <input matInput formControlName="rut" required (input)="formatRut($event)">
-      </mat-form-field>
+      <div class="emprendimiento-section">
+        <h3>Emprendimiento</h3>
+        <div class="emprendimiento-group">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>RUT</mat-label>
+            <input matInput formControlName="rut" required (input)="formatRut($event)">
+          </mat-form-field>
 
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Nombre</mat-label>
-        <input matInput formControlName="nombre" required>
-      </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" required>
+          </mat-form-field>
 
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Descripción</mat-label>
-        <textarea matInput formControlName="descripcion"></textarea>
-      </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="descripcion"></textarea>
+          </mat-form-field>
 
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Modalidad</mat-label>
-        <mat-select formControlName="modalidad">
-          <mat-option value="Presencial">Presencial</mat-option>
-          <mat-option value="Online">Online</mat-option>
-          <mat-option value="presencialyonline">Híbrida</mat-option>
-        </mat-select>
-      </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Modalidad</mat-label>
+            <mat-select formControlName="modalidad">
+              <mat-option value="Presencial">Presencial</mat-option>
+              <mat-option value="Online">Online</mat-option>
+              <mat-option value="presencialyonline">Híbrida</mat-option>
+            </mat-select>
+          </mat-form-field>
 
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Horario de Atención</mat-label>
-        <textarea matInput formControlName="horario_Atencion"></textarea>
-      </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Horario de Atención</mat-label>
+            <textarea matInput formControlName="horario_Atencion"></textarea>
+          </mat-form-field>
 
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Categorías</mat-label>
-        <mat-select formControlName="categorias" multiple>
-          <mat-option *ngFor="let categoria of categorias" [value]="categoria.id_Categoria">
-            {{ categoria.nombre }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Categorías</mat-label>
+            <mat-select formControlName="categorias" multiple>
+              <mat-option *ngFor="let categoria of categorias" [value]="categoria.id_Categoria">
+                {{ categoria.nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- SECCIÓN DE UBICACIÓN -->
+      <div class="ubicacion-section" formGroupName="ubicacion">
+        <h3>Ubicación</h3>
+        <div class="ubicacion-group">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Región</mat-label>
+            <mat-select formControlName="region" (selectionChange)="onRegionChange()">
+              <mat-option *ngFor="let region of regiones" [value]="region">
+                {{ region.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="formulario.get('ubicacion.region')?.hasError('required') && formulario.get('ubicacion.region')?.touched">
+              La región es requerida.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Comuna</mat-label>
+            <mat-select formControlName="comuna">
+              <mat-option [value]="null" disabled>Seleccione una región primero</mat-option>
+              <mat-option *ngFor="let comuna of comunas" [value]="comuna.nombre">
+                {{ comuna.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="formulario.get('ubicacion.comuna')?.hasError('required') && formulario.get('ubicacion.comuna')?.touched">
+              La comuna es requerida.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Calle</mat-label>
+            <input matInput formControlName="calle">
+            <mat-error
+              *ngIf="formulario.get('ubicacion.calle')?.hasError('required') && formulario.get('ubicacion.calle')?.touched">
+              La calle es requerida.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Número</mat-label>
+            <input matInput formControlName="numero">
+            <mat-error
+              *ngIf="formulario.get('ubicacion.numero')?.hasError('required') && formulario.get('ubicacion.numero')?.touched">
+              El número es requerido.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Referencia adicional</mat-label>
+            <input matInput formControlName="referencia">
+          </mat-form-field>
+        </div>
+      </div>
 
       <div class="contactos-section">
         <h3>Contactos</h3>
         <div formArrayName="contactos">
+          <p class="info-text" *ngIf="contactos.length === 0">
+            No hay contactos agregados. Haz clic en "Agregar Contacto" para añadir información de contacto.
+          </p>
           <div *ngFor="let contacto of contactos.controls; let i = index" [formGroupName]="i" class="contacto-group">
             <mat-form-field appearance="outline" class="form-field">
               <mat-label>Tipo de Contacto</mat-label>
@@ -60,7 +124,7 @@
               <input matInput formControlName="valor" placeholder="Ej: +56912345678">
             </mat-form-field>
 
-            <button type="button" mat-icon-button color="warn" (click)="eliminarContacto(i)" *ngIf="contactos.length > 1">
+            <button type="button" mat-icon-button color="warn" (click)="eliminarContacto(i)">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -73,7 +137,11 @@
       <div class="plataformas-section">
         <h3>Plataformas</h3>
         <div formArrayName="plataformas">
-          <div *ngFor="let plataforma of plataformas.controls; let i = index" [formGroupName]="i" class="plataforma-group">
+          <p class="info-text" *ngIf="plataformas.length === 0">
+            No hay plataformas agregadas. Haz clic en "Agregar Plataforma" para añadir redes sociales o sitios web.
+          </p>
+          <div *ngFor="let plataforma of plataformas.controls; let i = index" [formGroupName]="i"
+            class="plataforma-group">
             <mat-form-field appearance="outline" class="form-field">
               <mat-label>Tipo de Plataforma</mat-label>
               <mat-select formControlName="tipo_Plataforma">
@@ -102,7 +170,7 @@
               <input matInput formControlName="ruta" placeholder="https://...">
             </mat-form-field>
 
-            <button type="button" mat-icon-button color="warn" (click)="eliminarPlataforma(i)" *ngIf="plataformas.length > 1">
+            <button type="button" mat-icon-button color="warn" (click)="eliminarPlataforma(i)">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -111,37 +179,60 @@
           <mat-icon>add</mat-icon> Agregar Plataforma
         </button>
       </div>
-      
+
     </div>
 
     <div class="form-col-right">
-      <div class="image-upload" [class.disabled]="imagenPrincipalDeshabilitada" (click)="!imagenPrincipalDeshabilitada && uploadInput.click()" >
-        <mat-icon>upload</mat-icon>
-        <span class="image-text">Subir imagen principal</span>
-        <small *ngIf="imagenPrincipalDeshabilitada">Ya se ha seleccionado una imagen</small>
-        <input #uploadInput type="file" (change)="onFileSelected($event)" accept="image/*" hidden aria-label="Subir imagen principal"/>
-      </div>
-      <div class="preview-container" *ngIf="imagenSeleccionada">
-        <img [src]="imagenSeleccionada" alt="Vista previa" class="preview" />
-        <button type="button" class="remove-btn" (click)="removeImagenPrincipal()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-
-      <div class="extra-images-upload" [class.disabled]="maximoImagenesExtrasAlcanzado" (click)="!maximoImagenesExtrasAlcanzado && extraUploadInput.click()">
-        <mat-icon>collections</mat-icon>
-        <span class="image-text">Agregar hasta 5 imágenes adicionales</span>
-        <small *ngIf="imagenesExtras.length > 0">{{ imagenesExtras.length }}/5 imágenes subidas</small>
-        <input #extraUploadInput type="file" (change)="onExtraImagesSelected($event)" multiple accept="image/*" hidden aria-label="Agregar hasta 5 imágenes adicionales"/>
-      </div>
-      <div class="extra-preview" *ngIf="imagenesExtras.length > 0">
-        <div class="mini-preview" *ngFor="let img of imagenesExtras; let i = index">
-          <img [src]="img" alt="Imagen adicional {{ i + 1 }}" />
-          <button type="button" class="remove-btn" (click)="removeExtraImage(i)">
-            <div class="icon-container">
-              <mat-icon>close</mat-icon>
-            </div>
+      <div class="multimedia-section">
+        <h3>Multimedia</h3>
+        <div class="image-upload" [class.disabled]="imagenPrincipalDeshabilitada"
+          (click)="!imagenPrincipalDeshabilitada && uploadInput.click()">
+          <mat-icon>upload</mat-icon>
+          <span class="image-text">Subir imagen principal</span>
+          <small *ngIf="imagenPrincipalDeshabilitada">Ya se ha seleccionado una imagen</small>
+          <input #uploadInput type="file" (change)="onFileSelected($event)" accept="image/*" hidden
+            aria-label="Subir imagen principal" />
+        </div>
+        <div class="preview-container" *ngIf="imagenSeleccionada">
+          <img [src]="imagenSeleccionada" alt="Vista previa" class="preview" />
+          <button type="button" class="remove-btn" (click)="removeImagenPrincipal()">
+            <mat-icon>close</mat-icon>
           </button>
+        </div>
+
+        <div class="extra-images-upload" [class.disabled]="maximoImagenesExtrasAlcanzado"
+          (click)="!maximoImagenesExtrasAlcanzado && extraUploadInput.click()">
+          <mat-icon>collections</mat-icon>
+          <span class="image-text">Agregar hasta 5 imágenes adicionales</span>
+          <small *ngIf="imagenesExtras.length > 0">{{ imagenesExtras.length }}/5 imágenes subidas</small>
+          <input #extraUploadInput type="file" (change)="onExtraImagesSelected($event)" multiple accept="image/*" hidden
+            aria-label="Agregar hasta 5 imágenes adicionales" />
+        </div>
+        <div class="extra-preview" *ngIf="imagenesExtras.length > 0">
+          <div class="mini-preview" *ngFor="let img of imagenesExtras; let i = index">
+            <img [src]="img" alt="Imagen adicional {{ i + 1 }}" />
+            <button type="button" class="remove-btn" (click)="removeExtraImage(i)">
+              <div class="icon-container">
+                <mat-icon>close</mat-icon>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div class="multimedia-group">
+          <mat-form-field appearance="outline" class="form-field video-field">
+            <mat-label>Video de YouTube (opcional)</mat-label>
+            <input matInput formControlName="videoUrl" (change)="onVideoUrlChange($event)"
+              placeholder="https://youtube.com/watch?v=...">
+            <mat-icon matSuffix>videocam</mat-icon>
+          </mat-form-field>
+
+          <div class="video-preview" *ngIf="videoEmbedUrl">
+            <iframe [src]="videoEmbedUrl" frameborder="0" allowfullscreen></iframe>
+            <button type="button" class="remove-btn" (click)="removeVideo()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
         </div>
       </div>
     </div>
