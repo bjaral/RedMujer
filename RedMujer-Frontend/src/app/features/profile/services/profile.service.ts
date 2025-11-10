@@ -40,7 +40,7 @@ export class ProfileService {
   obtenerPerfilCompleto(userId: number): Observable<any> {
     return this.obtenerUsuario(userId).pipe(
       switchMap(usuario => {
-        console.log('Usuario obtenido:', usuario);
+        // console.log('Usuario obtenido:', usuario);
         
         return this.http.get<any[]>(`${this.apiUrl}/Personas`).pipe(
           map(personas => {
@@ -52,11 +52,11 @@ export class ProfileService {
             return { usuario, persona };
           }),
           switchMap(({ usuario, persona }) => {
-            console.log('Persona obtenida:', persona);
+            // console.log('Persona obtenida:', persona);
             // Con la persona obtenemos la ubicación
             return this.obtenerUbicacion(persona.id_Ubicacion).pipe(
               map(ubicacion => {
-                console.log('Ubicación obtenida:', ubicacion);
+                // console.log('Ubicación obtenida:', ubicacion);
                 return {
                   usuario,
                   persona,

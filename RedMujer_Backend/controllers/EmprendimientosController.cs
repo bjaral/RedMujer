@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using RedMujer_Backend.DTOs;
 using RedMujer_Backend.models;
 using RedMujer_Backend.services;
+using System.Security.Claims;
+using RedMujer_Backend.Utils;
 using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -78,6 +82,7 @@ namespace RedMujer_Backend.controllers
 
         // =========== CREAR ===========
         [HttpPost]
+        [Authorize]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Crear([FromForm] EmprendimientoCreateDto dto)
         {
@@ -104,9 +109,13 @@ namespace RedMujer_Backend.controllers
 
         // =========== ACTUALIZAR ===========
         [HttpPut("{id}")]
+        [Authorize]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Actualizar(int id, [FromForm] EmprendimientoCreateDto dto)
         {
+            var uid = AuthHelpers.GetUserId(User);
+            if (uid == null) return Unauthorized();
+            if (!await AuthHelpers.IsOwnerAsync(_service, User, id)) return Forbid();
             if (dto.Imagen == null && dto.EsVacio())
                 return NoContent();
 
@@ -120,8 +129,12 @@ namespace RedMujer_Backend.controllers
 
         // =========== ELIMINAR ===========
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> Eliminar(int id)
         {
+            var uid = AuthHelpers.GetUserId(User);
+            if (uid == null) return Unauthorized();
+            if (!await AuthHelpers.IsOwnerAsync(_service, User, id)) return Forbid();
             await _service.EliminarAsync(id);
             return NoContent();
         }
@@ -141,9 +154,13 @@ namespace RedMujer_Backend.controllers
         }
 
         [HttpPut("{id}/imagen-principal")]
+        [Authorize]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> ActualizarImagenPrincipal(int id, [FromForm] ImagenUploadDto dto)
         {
+            var uid = AuthHelpers.GetUserId(User);
+            if (uid == null) return Unauthorized();
+            if (!await AuthHelpers.IsOwnerAsync(_service, User, id)) return Forbid();
             var imagen = dto.Imagen;
             if (imagen == null || imagen.Length == 0)
                 return NoContent();
@@ -167,8 +184,12 @@ namespace RedMujer_Backend.controllers
         }
 
         [HttpDelete("{id}/imagen-principal")]
+        [Authorize]
         public async Task<IActionResult> EliminarImagenPrincipal(int id)
         {
+            var uid = AuthHelpers.GetUserId(User);
+            if (uid == null) return Unauthorized();
+            if (!await AuthHelpers.IsOwnerAsync(_service, User, id)) return Forbid();
             var ruta = await _service.ObtenerRutaImagenPrincipalAsync(id);
             if (string.IsNullOrEmpty(ruta))
                 return NotFound("No hay imagen principal para este emprendimiento.");
@@ -204,10 +225,15 @@ namespace RedMujer_Backend.controllers
         }
 
         [HttpDelete("{id}/imagenes-emprendimiento/{nombreArchivo}")]
-        public IActionResult EliminarImagenEspecifica(int id, string nombreArchivo)
+        [Authorize]
+        public async Task<IActionResult> EliminarImagenEspecifica(int id, string nombreArchivo)
         {
             if (string.IsNullOrWhiteSpace(nombreArchivo))
                 return BadRequest("Nombre de archivo inválido.");
+
+            var uid = AuthHelpers.GetUserId(User);
+            if (uid == null) return Unauthorized();
+            if (!await AuthHelpers.IsOwnerAsync(_service, User, id)) return Forbid();
 
             nombreArchivo = Path.GetFileName(nombreArchivo);
 
@@ -222,9 +248,13 @@ namespace RedMujer_Backend.controllers
         }
 
         [HttpPost("{id}/imagenes-emprendimiento")]
+        [Authorize]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> SubirImagenesEmprendimiento(int id, [FromForm] ImagenesUploadDto dto)
         {
+            var uid = AuthHelpers.GetUserId(User);
+            if (uid == null) return Unauthorized();
+            if (!await AuthHelpers.IsOwnerAsync(_service, User, id)) return Forbid();
             var imagenes = dto.Imagenes;
             if (imagenes == null || imagenes.Count == 0)
                 return BadRequest("No se recibieron archivos.");
@@ -255,9 +285,13 @@ namespace RedMujer_Backend.controllers
         }
 
         [HttpPut("{id}/imagenes-emprendimiento")]
+        [Authorize]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> ActualizarImagenesEmprendimiento(int id, [FromForm] ImagenesUploadDto dto)
         {
+            var uid = AuthHelpers.GetUserId(User);
+            if (uid == null) return Unauthorized();
+            if (!await AuthHelpers.IsOwnerAsync(_service, User, id)) return Forbid();
             var imagenes = dto.Imagenes;
             if (imagenes == null || imagenes.Count == 0)
                 return NoContent();
@@ -288,8 +322,12 @@ namespace RedMujer_Backend.controllers
         }
 
         [HttpDelete("{id}/imagenes-emprendimiento")]
-        public IActionResult EliminarImagenesEmprendimiento(int id)
+        [Authorize]
+        public async Task<IActionResult> EliminarImagenesEmprendimiento(int id)
         {
+            var uid = AuthHelpers.GetUserId(User);
+            if (uid == null) return Unauthorized();
+            if (!await AuthHelpers.IsOwnerAsync(_service, User, id)) return Forbid();
             var carpeta = Path.Combine(_env.ContentRootPath, "media", "emprendimientos", id.ToString(), "imagenes_emprendimiento");
             if (!Directory.Exists(carpeta))
                 return NotFound("No hay imágenes para este emprendimiento.");

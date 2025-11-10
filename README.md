@@ -1,12 +1,8 @@
 ﻿# RedMujer
-**Equipo:**  
-Los de Cartón  
 
-**Miembros:**
+**Equipo:**
 * Tomás Castillo Ávila
-* Sebastián Contreras Sandoval
 * Benjamín Jara López
-* Agustín Podlech Riquelme
 * Gudmar Saldaña Quillas
 * Paula Santana Venegas
 

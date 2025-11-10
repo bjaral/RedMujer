@@ -154,5 +154,10 @@ namespace RedMujer_Backend.services
         // {
         //     await _repo.UpdateVideoPrincipalAsync(id, videoUrl);
         // }
+
+        public async Task<bool> EsPropietariaAsync(int idEmprendimiento, int idUsuario)
+        {
+            return await _repo.EsPropietariaAsync(idEmprendimiento, idUsuario);
+        }
     }
 }
