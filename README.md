@@ -1,8 +1,6 @@
 ﻿# RedMujer
-**Equipo:**  
-Los de Cartón  
 
-**Miembros:**
+**Equipo:**
 * Tomás Castillo Ávila
 * Benjamín Jara López
 * Gudmar Saldaña Quillas

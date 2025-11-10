@@ -14,6 +14,7 @@ import { MisEmprendimientosComponent } from './features/profile/components/mis-e
 import { DetalleEmprendimientoComponent } from './features/emprendimientos/components/detalle-emprendimiento/detalle-emprendimiento.component';
 import { CreditosComponent } from './features/creditos/creditos.component';
 import { NotFoundComponent } from './features/not-found/not-found.component';
+import { QuienesSomosComponent } from './features/quienes-somos/quienes-somos.component';
 
 export const routes: Routes = [
 
@@ -21,9 +22,10 @@ export const routes: Routes = [
     { 'path': '', 'component': LayoutComponent, 'children': [
         { 'path': '', 'component': HomeComponent },
         { 'path': 'emprendimientos', 'component': EmprendimientosComponent },
-        { 'path': 'emprendimientos/:id', 'component': DetalleEmprendimientoComponent},
+        { 'path': 'emprendimientos/:slug', 'component': DetalleEmprendimientoComponent},
         { 'path': '404', 'component': NotFoundComponent },
         { 'path': 'creditos', 'component': CreditosComponent },
+        { 'path': 'quienes-somos', 'component': QuienesSomosComponent }
     ]},
 
     // Vistas sólo con header

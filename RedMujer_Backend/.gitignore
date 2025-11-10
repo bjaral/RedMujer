@@ -74,3 +74,5 @@ Thumbs.db
 # Optional: if using SonarQube or code analysis tools
 .sonar/
 *.sonarqube
+
+appsettings.Production.json
