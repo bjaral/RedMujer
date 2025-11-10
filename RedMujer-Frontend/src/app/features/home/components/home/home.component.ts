@@ -6,6 +6,7 @@ import { MATERIAL_IMPORTS } from '../../../../shared/material/material';
 import { Router } from '@angular/router';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { slugify } from '../../../../core/utils/slugify';
 
 export interface Emprendimiento {
   id_Emprendimiento: number;
@@ -38,7 +39,7 @@ export class HomeComponent implements OnInit {
         const emprendimientosConDatos$ = data.map((emp: Emprendimiento) => {
           // Obtener categorías del emprendimiento
           const categorias$ = this.homeService.getCategoriasByEmprendimiento?.(Number(emp.id_Emprendimiento)) || of([]);
-          
+
           return categorias$.pipe(
             catchError(err => {
               console.error(`Error al cargar categorías para emprendimiento ${emp.id_Emprendimiento}:`, err);
@@ -49,16 +50,16 @@ export class HomeComponent implements OnInit {
               if (emp.imagen) {
                 emp.imagen = encodeURI(`http://localhost:5145/media/${emp.imagen}`);
               }
-              
+
               // Asignar categorías
               emp.categorias = categorias;
               emp.categoriasTexto = categorias.map((cat: any) => cat.nombre).join(', ');
-              
+
               return emp;
             })
           );
         });
-        
+
         return forkJoin(emprendimientosConDatos$);
       })
     ).subscribe({
@@ -92,7 +93,10 @@ export class HomeComponent implements OnInit {
   }
 
   verDetalles(emp: Emprendimiento): void {
-    this.router.navigate(['/emprendimientos', emp.id_Emprendimiento]);
+    this.router.navigate([
+      '/emprendimientos',
+      `${slugify(emp.nombre)}-${emp.id_Emprendimiento}`
+    ]);
   }
 
   onImageError(event: any): void {

@@ -8,6 +8,7 @@ import { UbicacionService } from '../../services/ubicacion.service';
 import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { slugify } from '../../../../core/utils/slugify';
 
 export interface Emprendimiento {
   id_Emprendimiento: number;
@@ -303,8 +304,11 @@ export class EmprendimientosComponent implements OnInit {
   }
 
   verDetalles(emp: Emprendimiento): void {
-    this.router.navigate(['/emprendimientos', emp.id_Emprendimiento]);
-  }
+      this.router.navigate([
+        '/emprendimientos',
+        `${slugify(emp.nombre)}-${emp.id_Emprendimiento}`
+      ]);
+    }
 
   get contadorTexto(): string {
     if (this.emprendimientosFiltrados.length === 0) {

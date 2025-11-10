@@ -84,7 +84,9 @@ export class DetalleEmprendimientoComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.idEmprendimiento = +params['id'];
+      const fullParam = this.route.snapshot.paramMap.get('slug')!;
+      const id = fullParam.split('-').pop();
+      this.idEmprendimiento = Number(id);
       this.getEmprendimiento();
       this.cargarMultimedias();
     });

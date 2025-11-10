@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://redmujer.com/api'
+  apiUrl: 'http://www.redmujeruss.cl/api/api'
 };
