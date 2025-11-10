@@ -21,5 +21,6 @@ namespace RedMujer_Backend.services
         Task<IEnumerable<Emprendimiento>> ObtenerPorPersonaAsync(int idPersona);
         // Task<string?> ObtenerVideoPrincipalAsync(int id);
         // Task ActualizarVideoPrincipalAsync(int id, string? videoUrl);
+        Task<bool> EsPropietariaAsync(int idEmprendimiento, int idUsuario);
     }
 }

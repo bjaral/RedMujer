@@ -232,22 +232,48 @@ namespace RedMujer_Backend.repositories
 
             return await connection.QueryAsync<Emprendimiento>(query, new { Id_Persona = id_Persona });
         }
-        // public async Task<string?> GetVideoPrincipalAsync(int id)
-        // {
-        //     const string sql = @"SELECT video_url FROM public.""Emprendimientos"" WHERE id_emprendimiento = @Id";
-        //     using (var connection = CreateConnection())
-        //     {
-        //         return await connection.QueryFirstOrDefaultAsync<string>(sql, new { Id = id });
-        //     }
-        // }
 
-        // public async Task UpdateVideoPrincipalAsync(int id, string? videoUrl)
-        // {
-        //     const string sql = @"UPDATE public.""Emprendimientos"" SET video_url = @VideoUrl WHERE id_emprendimiento = @Id";
-        //     using (var connection = CreateConnection())
-        //     {
-        //         await connection.ExecuteAsync(sql, new { VideoUrl = videoUrl, Id = id });
-        //     }
-        // }
+        public async Task<bool> EsPropietariaAsync(int idEmprendimiento, int idUsuario)
+        {
+            using var connection = CreateConnection();
+
+            // Verificar si existe una persona activa asociada a ese usuario
+            // Y que esa persona esté vinculada al emprendimiento
+            var query = @"
+                SELECT COUNT(*)
+                FROM ""Persona_emprendimiento"" pe
+                INNER JOIN ""Personas"" p ON pe.""id_persona"" = p.""id_persona""
+                WHERE pe.""id_emprendimiento"" = @IdEmprendimiento 
+                AND p.""id_usuario"" = @IdUsuario
+                AND p.""vigencia"" = true;";
+
+            var count = await connection.ExecuteScalarAsync<int>(query, new
+            {
+                IdEmprendimiento = idEmprendimiento,
+                IdUsuario = idUsuario
+            });
+
+            return count > 0;
+        }
+
+        public async Task<IEnumerable<Persona>> GetPersonasByEmprendimientoIdAsync(int idEmprendimiento)
+        {
+            const string query = @"
+                SELECT 
+                    p.""id_persona"" as Id_Persona,
+                    p.""id_ubicacion"" as Id_Ubicacion,
+                    p.""id_usuario"" as Id_Usuario,
+                    p.""RUN"",
+                    p.""nombre"" as Nombre,
+                    p.""primer_apellido"" as PrimerApellido,
+                    p.""segundo_apellido"" as SegundoApellido,
+                    p.""vigencia"" as Vigencia
+                FROM public.""Personas"" p
+                INNER JOIN public.""Persona_emprendimiento"" pe ON p.""id_persona"" = pe.""id_persona""
+                WHERE pe.""id_emprendimiento"" = @IdEmprendimiento AND p.vigencia = true;";
+
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<Persona>(query, new { IdEmprendimiento = idEmprendimiento });
+        }
     }
 }

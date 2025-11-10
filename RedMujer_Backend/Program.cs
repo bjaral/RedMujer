@@ -13,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // === AUTENTICACIÓN JWT ===
 var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtAudience = builder.Configuration["Jwt:Audience"];
 if (string.IsNullOrEmpty(jwtKey))
 {
     throw new InvalidOperationException("Jwt:Key no está configurado en la configuración.");
@@ -23,10 +25,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false,
-            ValidateAudience = false,
+            ValidateIssuer = true,
+            ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwtKey))
         };
@@ -45,8 +49,9 @@ builder.Services.AddSwaggerGen(c =>
                         Ejemplo: 'Bearer eyJhbGciOi...'",
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
@@ -58,8 +63,6 @@ builder.Services.AddSwaggerGen(c =>
                     Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
                 },
-                Scheme = "oauth2",
-                Name = "Bearer",
                 In = ParameterLocation.Header,
             },
             new List<string>()
@@ -70,7 +73,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:4200")
+        policy => policy.WithOrigins("http://localhost:4200", "https://redmujeruss.cl", "http://redmujeruss.cl", "https://www.redmujeruss.cl", "http://www.redmujeruss.cl", "http://api.redmujeruss.cl")
                         .AllowAnyHeader()
                         .AllowAnyMethod());
 });
@@ -125,7 +128,6 @@ builder.Services.AddScoped<IPersonaEmprendimientoService, PersonaEmprendimientoS
 
 builder.Services.AddScoped<IPlataformaRepository, PlataformaRepository>();
 builder.Services.AddScoped<IPlataformaService, PlataformaService>();
-
 
 var app = builder.Build();
 
